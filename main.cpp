@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     vec3d max = node->bbox.max;
     vec3d avg = node->bbox.center();
 
+    //maybe vec3d avg1 = (max - min)/3
+    // and vec3d avg2 = avg1*2
 
     node->children[0] = new OctreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
     node->children[1] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
@@ -108,10 +110,7 @@ int main(int argc, char *argv[])
     node->item_indices.clear();
     node->is_inner = true;
 
-
-
     octree.updateGL();
-
 
     GLcanvas canvas;
     canvas.push_obj(&octree); //OCTREE
