@@ -15,11 +15,12 @@ int main(int argc, char *argv[])
 
     /*
      * insert mesh into octree
-     *
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/airplane1_input_tri.obj";
-    DrawableTrimesh<> mesh(s.c_str());
+     */
+    /*
+    std::string ss = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.obj";
+    DrawableTrimesh<> mesh(ss.c_str());
 
-    DrawableOctree octree(7, 100);
+    DrawableTwseventree octree(7, 100);
     octree.build_from_mesh_polys(mesh);
     octree.updateGL();
 
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     gui.push_obj(&octree);
     gui.show();
     */
+
 
     vec3d v1(1., 1., 1.);
     vec3d v2(1., 4., 1.);
@@ -59,6 +61,8 @@ int main(int argc, char *argv[])
     canvas.push_obj(&twseventree); //OCTREE
 
     canvas.show();
+
+
     // CMD+1 to show mesh controls.
     //SurfaceMeshControlPanel<DrawableTrimesh<>> panel(&mesh, &gui);
     //QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});

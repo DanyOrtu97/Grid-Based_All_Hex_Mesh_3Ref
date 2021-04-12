@@ -122,7 +122,7 @@ void Twseventree::build()
             // merged after convergence.
 
             uint octant_depth[27] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-            std::vector<const TwseventreeNode*> octant_leaves[8];
+            std::vector<const TwseventreeNode*> octant_leaves[27];
 
             std::queue<std::pair<TwseventreeNode*,uint>> splitlist[27]; // (node, depth)
             for(int i=0; i<27; ++i)

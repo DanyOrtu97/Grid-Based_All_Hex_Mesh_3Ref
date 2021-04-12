@@ -26,13 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    twseventree.cpp \
-    drawable_twseventree.cpp
+        twseventree.cpp \
+        drawable_twseventree.cpp
 
 HEADERS += \
         mainwindow.h \
-    twseventree.h \
-    drawable_twseventree.h
+        twseventree.h \
+        drawable_twseventree.h
 
 FORMS += \
         mainwindow.ui
@@ -43,7 +43,7 @@ DEFINES += CINOLIB_USES_QT
 QT += core opengl
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/include
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/eigen
-DATA_PATH       = \\\"$$PWD/../Geometries/2019/input/smooth/\\\"
+DATA_PATH       = \\\"$$PWD/../cinolib/examples/data/\\\"
 DEFINES        += DATA_PATH=$$DATA_PATH
 
 # just for Linux
