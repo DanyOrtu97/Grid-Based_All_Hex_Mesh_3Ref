@@ -25,10 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    twseventree.cpp \
+    drawable_twseventree.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    twseventree.h \
+    drawable_twseventree.h
 
 FORMS += \
         mainwindow.ui
