@@ -156,7 +156,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
     }
     else {
         std::vector<std::vector<uint>> v2f_number(8);
-        uint start = mesh.num_verts();
+
         std::vector<uint> vertsId = mesh.poly_verts_id(pid);
 
         int id_angle = 0;
@@ -170,8 +170,12 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
             }
         }
 
+        mesh.poly_remove(pid);
+        uint start = mesh.num_verts();
+
         if (angle){
             std::vector<vec3d> newverts(57); // 57 SOLO SE SIAMO IN UN ANGOLO
+
             //z = min
             newverts[0] = vec3d(avg1[0], min[1], min[2]);
             newverts[1] = vec3d(avg2[0], min[1], min[2]);
@@ -249,6 +253,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
             newverts[55] = vec3d(avg2[0], max[1], max[2]);
 
             newverts[56] = vec3d(verts[id_angle].x(), verts[id_angle].y(), verts[id_angle].z());
+
             for(auto v : newverts) mesh.vert_add(v);
         }
         else{
@@ -330,9 +335,6 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
             newverts[55] = vec3d(avg2[0], max[1], max[2]);
             for(auto v : newverts) mesh.vert_add(v);
         }
-
-
-
         if(angle) {
             switch (id_angle){
                 case 0:
@@ -361,7 +363,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[6] = {start+6,start+7,start+21,start+20,start+56,start+10,start+25,start+24};
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
-                    polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
+                    polys[20] = {start+30,start+31,start+56,start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
                     polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
                     break;
@@ -370,7 +372,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
                     polys[6] = {start+6,start+7,start+21,start+20,vertsId[4],start+10,start+25,start+24};
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,start+56,start+27,start+26};
-                    polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
+                    polys[18] = {start+28,start+29,start+44,start+56,start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
                     polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
@@ -378,7 +380,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                 case 4:
                     polys[0] = {vertsId[0],start+0,start+13,start+12,start+2,start+3,start+17,start+16};
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
-                    polys[6] = {start+6,start+7,start+21,start+20,vertsId[4],start+10,start+25,start+24};
+                    polys[6] = {start+6,start+7,start+21,start+20,start+56,start+10,start+25,start+24};
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,start+56,start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
@@ -389,9 +391,9 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[0] = {vertsId[0],start+0,start+13,start+12,start+2,start+3,start+17,start+16};
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
                     polys[6] = {start+6,start+7,start+21,start+20,vertsId[4],start+10,start+25,start+24};
-                    polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
+                    polys[8] = {start+8,start+9,start+23,start+22,start+11,start+56,start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
-                    polys[20] = {start+30,start+31,start+56,start+45,start+34,start+35,start+49,start+48};
+                    polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
                     polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
                     break;
@@ -402,8 +404,8 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
-                    polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,start+56};
-                    polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
+                    polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
+                    polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,start+56,start+55};
                     break;
                 case 7:
                     polys[0] = {vertsId[0],start+0,start+13,start+12,start+2,start+3,start+17,start+16};
@@ -412,7 +414,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
-                    polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
+                    polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,start+56};
                     polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,start+56,start+55};
                     break;
                 default:
@@ -469,12 +471,6 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
 
         polys[25] = {start+37,start+38,start+52,start+51,start+41,start+42,start+55,start+54};
 
-
-
-
-
-        mesh.poly_remove(pid);
-
         for(auto p : polys) mesh.poly_add(p);
 
     }
@@ -493,7 +489,9 @@ int main(int argc, char *argv[])
 
     split27(0, mesh);
 
-    split27(8, mesh);
+    split27(2, mesh);
+
+    //split27(30, mesh);
 
 
     GLcanvas gui;
