@@ -6,7 +6,7 @@
 #include <cinolib/color.h>
 #include <cinolib/drawable_octree.h>
 #include <cinolib/meshes/hexmesh.h>
-
+#include <cinolib/profiler.h>
 
 namespace cinolib
 {
@@ -489,18 +489,36 @@ int main(int argc, char *argv[])
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube.mesh";
     DrawableHexmesh<> mesh(s.c_str());
 
-    split27(0, mesh);
-
-    for (int i=0; i<27;i++) split27(i, mesh);
-
-
-
-
 
     GLcanvas gui;
     gui.push_obj(&mesh);
     gui.show();
 
+    gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
+
+    Profiler profiler;
+
+    gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
+    {
+        if (e->modifiers() == Qt::ControlModifier)
+        {
+            vec3d p;
+            vec2i click(e->x(), e->y());
+
+            if (c->unproject(click, p)) // transform click in a 3d point
+            {
+                profiler.push("Pick Polys");
+
+                uint pid = mesh.pick_poly(p);
+                profiler.pop();
+
+                split27(pid, mesh);
+
+                mesh.updateGL();
+                c->updateGL();
+            }
+        }
+    };
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
