@@ -7,6 +7,8 @@
 #include <cinolib/drawable_octree.h>
 #include <cinolib/meshes/hexmesh.h>
 #include <cinolib/profiler.h>
+#include <map>
+#include <algorithm>
 
 namespace cinolib
 {
@@ -14,10 +16,12 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
 void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
-    std::vector<vec3d> verts = mesh.poly_verts(pid);
+
+    //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
 
     //points for subdivision
+    std::vector<vec3d> verts = mesh.poly_verts(pid);
     vec3d min = *std::min_element(verts.begin(), verts.end());
     vec3d max = *std::max_element(verts.begin(), verts.end());
     vec3d avg1 = min + ((max-min)/3);
@@ -255,7 +259,9 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
 
             newverts[56] = vec3d(verts[id_angle].x(), verts[id_angle].y(), verts[id_angle].z());
 
-            for(auto v : newverts) mesh.vert_add(v);
+            for(auto v : newverts){
+                mesh.vert_add(v);
+            }
         }
         else{
             std::vector<vec3d> newverts(56);
