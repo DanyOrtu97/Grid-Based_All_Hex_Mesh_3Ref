@@ -12,6 +12,7 @@ namespace cinolib
 {
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
+// split the polygon of id "pid" of the input mesh into 27 cubes
 void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
     std::vector<vec3d> verts = mesh.poly_verts(pid);
     std::vector<std::vector<uint>> polys(27);
@@ -360,7 +361,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                 case 2:
                     polys[0] = {vertsId[0],start+0,start+13,start+12,start+2,start+3,start+17,start+16};
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
-                    polys[6] = {start+6,start+7,start+21,start+20,start+56,start+10,start+25,start+24};
+                    polys[6] = {start+6,start+7,start+21,start+20,vertsId[4],start+10,start+25,start+24};
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,start+56,start+45,start+34,start+35,start+49,start+48};
@@ -371,7 +372,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[0] = {vertsId[0],start+0,start+13,start+12,start+2,start+3,start+17,start+16};
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
                     polys[6] = {start+6,start+7,start+21,start+20,vertsId[4],start+10,start+25,start+24};
-                    polys[8] = {start+8,start+9,start+23,start+22,start+11,start+56,start+27,start+26};
+                    polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
                     polys[18] = {start+28,start+29,start+44,start+56,start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
@@ -382,7 +383,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[2] = {start+1,vertsId[1],start+15,start+14,start+4,start+5,start+19,start+18};
                     polys[6] = {start+6,start+7,start+21,start+20,start+56,start+10,start+25,start+24};
                     polys[8] = {start+8,start+9,start+23,start+22,start+11,vertsId[5],start+27,start+26};
-                    polys[18] = {start+28,start+29,start+44,start+56,start+32,start+33,start+47,start+46};
+                    polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,vertsId[7]};
                     polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
@@ -415,7 +416,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
                     polys[18] = {start+28,start+29,start+44,vertsId[3],start+32,start+33,start+47,start+46};
                     polys[20] = {start+30,start+31,vertsId[2],start+45,start+34,start+35,start+49,start+48};
                     polys[24] = {start+36,start+37,start+51,start+50,start+40,start+41,start+54,start+56};
-                    polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,start+56,start+55};
+                    polys[26] = {start+38,start+39,start+53,start+52,start+42,start+43,vertsId[6],start+55};
                     break;
                 default:
                     printf("%s  ", "Error in the vertex-angle selection!!");
@@ -479,6 +480,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh){
 }
 }
 
+
 int main(int argc, char *argv[])
 {
     using namespace cinolib;
@@ -489,9 +491,10 @@ int main(int argc, char *argv[])
 
     split27(0, mesh);
 
-    split27(2, mesh);
+    for (int i=0; i<27;i++) split27(i, mesh);
 
-    //split27(30, mesh);
+
+
 
 
     GLcanvas gui;
