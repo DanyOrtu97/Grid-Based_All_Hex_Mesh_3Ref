@@ -156,11 +156,15 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
         mesh.poly_remove(pid);
 
-        for(auto v : vertices) mesh.vert_add(v.first);
+        //useful to avoid different order of the vertices in the mesh
+        std::map<uint, vec3d> ordered_vertices;
+        for(auto v: vertices) ordered_vertices.insert(std::pair<uint, vec3d>(v.second, v.first));
+
+        for(auto v : ordered_vertices) mesh.vert_add(v.second);
         for(auto p : polys) mesh.poly_add(p);
     }
     else {
-        std::vector<std::vector<uint>> polys(1);
+        std::vector<std::vector<uint>> polys(6);
 
         //insert polys
         polys[0] = {vertices.find(vec3d(min[0], min[1], min[2]))->second,
@@ -171,7 +175,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
                     vertices.find(vec3d(avg1[0], avg1[1], min[2]))->second,
                     vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
                     vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second};
-/*
+
         polys[1] = {vertices.find(vec3d(avg1[0], min[1], min[2]))->second,
                     vertices.find(vec3d(avg2[0], min[1], min[2]))->second,
                     vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
@@ -217,6 +221,7 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
                     vertices.find(vec3d(max[0], avg2[1], avg1[2]))->second,
                     vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second};
 
+        /*
         polys[0] = {0,1,17,16,4,5,21,20};
         polys[1] = {1,2,18,17,5,6,22,21};
         polys[2] = {2,3,19,18,6,7,23,22};
@@ -258,16 +263,16 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
         mesh.poly_remove(pid);
 
-        //avoid duplicate vertices in the mesh
-        int start = mesh.num_verts();
-        int conta = 0;
-        std::map<vec3d, uint>::iterator it;
-        for(it=vertices.begin(); it!=vertices.end(); ++it){
-            if(conta >= start) mesh.vert_add(it->first);
-            conta++;
+        uint start = uint(mesh.num_verts());
+
+        //useful to avoid different order of the vertices in the mesh
+        std::map<uint, vec3d> ordered_vertices;
+        for(auto v: vertices) ordered_vertices.insert(std::pair<uint, vec3d>(v.second, v.first));
+
+        std::map<uint, vec3d>::iterator it;
+        for(it=ordered_vertices.begin(); it!=ordered_vertices.end(); ++it){
+            if(it->first >= start) mesh.vert_add(it->second);
         }
-
-
         for(auto p : polys) mesh.poly_add(p);
     }
 
