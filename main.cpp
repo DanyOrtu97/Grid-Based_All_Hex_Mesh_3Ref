@@ -27,29 +27,33 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
     vec3d avg1 = min + ((max-min)/3);
     vec3d avg2 = avg1 + ((max-min)/3);
 
+    //useful to avoid different order of the vertices in the mesh
+    std::map<uint, vec3d> ordered_vertices;
 
     //angle vertices
     std::vector<std::vector<uint>> v2f_number(8);
     std::vector<uint> vertsId = mesh.poly_verts_id(pid);
-    int id_angle = 0;
+
     bool angle = false;
+
     for (int c=0; c<8; c++) {
         v2f_number[c] = mesh.adj_v2p(vertsId[c]);
         if (v2f_number[c].size() < 2){
-            id_angle = c;
             angle = true;
         }
     }
 
+    mesh.poly_remove(pid);
 
     if (angle){
-
-        vertices.erase(verts[id_angle]);
-
-        //RIPORTARE INDIETRO I VALORI ****CASINO
+        vertices.clear();
+        ordered_vertices.clear();
+        uint pos=0;
+        for(auto v: mesh.vector_verts()){
+            vertices.insert(std::pair<vec3d, uint>(v, pos));
+            pos++;
+        }
     }
-
-    mesh.poly_remove(pid);
 
     //z = min
     vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], min[1], min[2]), uint(vertices.size()))); //0
@@ -175,9 +179,6 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
         polys[25] = {41,42,58,57,45,46,62,61};
         polys[26] = {42,43,59,58,46,47,63,62};
 
-
-        //useful to avoid different order of the vertices in the mesh
-        std::map<uint, vec3d> ordered_vertices;
         for(auto v: vertices) ordered_vertices.insert(std::pair<uint, vec3d>(v.second, v.first));
 
         for(auto v : ordered_vertices) mesh.vert_add(v.second);
@@ -430,14 +431,14 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
         uint start = uint(mesh.num_verts());
 
-        //useful to avoid different order of the vertices in the mesh
-        std::map<uint, vec3d> ordered_vertices;
         for(auto v: vertices) ordered_vertices.insert(std::pair<uint, vec3d>(v.second, v.first));
 
         std::map<uint, vec3d>::iterator it;
-        for(it=ordered_vertices.begin(); it!=ordered_vertices.end(); ++it){
+        for(it=ordered_vertices.begin(); it!=ordered_vertices.end(); ++it){        
             if(it->first >= start) mesh.vert_add(it->second);
         }
+
+
         for(auto p : polys) mesh.poly_add(p);
     }
 
@@ -489,10 +490,6 @@ int main(int argc, char *argv[])
             }
         }
     };
-
-
-
-
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);

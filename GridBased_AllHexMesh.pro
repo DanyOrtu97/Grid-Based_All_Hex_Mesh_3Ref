@@ -32,7 +32,8 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
         twseventree.h \
-        drawable_twseventree.h
+        drawable_twseventree.h \
+    hex_transition_schemes_3ref.h
 
 FORMS += \
         mainwindow.ui
