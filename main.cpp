@@ -43,7 +43,10 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
 
     if (angle){
+
         vertices.erase(verts[id_angle]);
+
+        //RIPORTARE INDIETRO I VALORI ****CASINO
     }
 
     mesh.poly_remove(pid);
@@ -458,9 +461,12 @@ int main(int argc, char *argv[])
     gui.push_obj(&mesh);
     gui.show();
 
-    gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements and ctrl + Double click to delete a poly", Color::BLACK(), 12, 0);
+
 
     Profiler profiler;
+
+
+    gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
 
     gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
     {
@@ -484,27 +490,8 @@ int main(int argc, char *argv[])
         }
     };
 
-    gui.callback_mouse_double_click = [&](GLcanvas *c, QMouseEvent *e)
-    {
-        if (e->modifiers() == Qt::ControlModifier)
-        {
-            vec3d p;
-            vec2i click(e->x(), e->y());
 
-            if (c->unproject(click, p))
-            {
-                profiler.push("Delete Polys");
 
-                uint pid = mesh.pick_poly(p);
-                profiler.pop();
-
-                mesh.poly_remove(pid);
-
-                mesh.updateGL();
-                c->updateGL();
-            }
-        }
-    };
 
 
 
