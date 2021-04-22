@@ -46,7 +46,7 @@ namespace // anonymous
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
-                                 const std::vcetor<bool>            & transition_verts,
+                                 const std::vector<bool>            & transition_verts,
                                        Polyhedralmesh<M,V,E,F,P>    & m_out){
     //do stuff
 }
