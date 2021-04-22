@@ -27,57 +27,29 @@
 *     Daniele Ortu                                                              *
 *********************************************************************************/
 
-#ifndef HEX_TRANSITION_SCHEMES_3REF_H
-#define HEX_TRANSITION_SCHEMES_3REF_H
+#include "hex_transition_install_3ref.h"
+#include "hex_transition_orient_3ref.h"
 
-#include <vector>
-#include <sys/types.h>
-
-/*
- *  Spiegazione di cosa è e come si usa
- *
- *
- *
- */
 
 namespace cinolib{
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Full{
 
-    static const std::vector<double> verts={ };
+namespace // anonymous
+{
 
-    static const std::vector<std::vector<uint>> faces={ };
 
-    static const std::vector<std::vector<uint>> polys={ };
 
-    static const std::vector<std::vector<bool>> winding={ };
-}
+} // end anonymous namespace
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Face{
 
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
+                                 const std::vcetor<bool>            & transition_verts,
+                                       Polyhedralmesh<M,V,E,F,P>    & m_out){
+    //do stuff
 }
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Two_Adj_Faces{
-
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
-}
 
 }
-
-#endif // HEX_TRANSITION_SCHEMES_3REF_H

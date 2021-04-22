@@ -27,57 +27,58 @@
 *     Daniele Ortu                                                              *
 *********************************************************************************/
 
-#ifndef HEX_TRANSITION_SCHEMES_3REF_H
-#define HEX_TRANSITION_SCHEMES_3REF_H
+#ifndef HEX_TRANSITION_ORIENT_3REF_H
+#define HEX_TRANSITION_ORIENT_3REF_H
 
-#include <vector>
-#include <sys/types.h>
-
-/*
- *  Spiegazione di cosa è e come si usa
- *
- *
- *
- */
+#include <cinolib/geometry/vec3.h>
+#include <map>
 
 namespace cinolib{
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Full{
+/*
+ * Cosa è
+ *
+ */
+enum class HexTransition{
+    FULL,
+    FACE,
+    TWO_ADJ_FACES,
+    /*
+     * Ne mancano, saranno da aggiungere via via che si trovano
+     */
+};
 
-    static const std::vector<double> verts={ };
+/*
+ * Cosa è
+ *
+ */
+struct SchemeInfo{
+    HexTransition           type;
+    double                  scale;
+    std::vector<vec3d>      t_verts;
+    std::map<uint, bool>    cuts;
+    std::vector<int>        orientation;
+};
 
-    static const std::vector<std::vector<uint>> faces={ };
 
-    static const std::vector<std::vector<uint>> polys={ };
 
-    static const std::vector<std::vector<bool>> winding={ };
+/*
+ * Cosa fa la funzione
+ *
+ */
+CINO_INLINE
+void hex_transition_orient_3ref(std::vector<vec3d>              & verts,
+                                std::vector<std::vector<uint>>  & faces,
+                                std::vector<std::vector<uint>>  & polys,
+                                std::vector<std::vector<bool>>  & winding,
+                                const SchemeInfo                & info,
+                                const vec3d                       poly_centroid);
+
+
 }
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Face{
+#ifndef CINO_STATIC_LIB
+#include "hex_transition_orient_3ref.cpp"
+#endif
 
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Two_Adj_Faces{
-
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
-}
-
-}
-
-#endif // HEX_TRANSITION_SCHEMES_3REF_H
+#endif // HEX_TRANSITION_ORIENT_3REF_H

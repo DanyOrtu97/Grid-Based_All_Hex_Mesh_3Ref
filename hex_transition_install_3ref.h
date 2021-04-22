@@ -27,57 +27,27 @@
 *     Daniele Ortu                                                              *
 *********************************************************************************/
 
-#ifndef HEX_TRANSITION_SCHEMES_3REF_H
-#define HEX_TRANSITION_SCHEMES_3REF_H
+#ifndef HEX_TRANSITION_INSTALL_3REF_H
+#define HEX_TRANSITION_INSTALL_3REF_H
 
-#include <vector>
-#include <sys/types.h>
-
-/*
- *  Spiegazione di cosa è e come si usa
- *
- *
- *
- */
+#include <cinolib/meshes/meshes.h>
 
 namespace cinolib{
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Full{
-
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
+/*
+ * Cosa fa la funzione
+ *
+ */
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
+void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
+                                 const std::vcetor<bool>            & transition_verts,
+                                       Polyhedralmesh<M,V,E,F,P>    & m_out);
 }
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Face{
 
-    static const std::vector<double> verts={ };
+#ifndef CINO_STATIC_LIB
+#include "hex_transition_install_3ref.cpp"
+#endif
 
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-namespace Two_Adj_Faces{
-
-    static const std::vector<double> verts={ };
-
-    static const std::vector<std::vector<uint>> faces={ };
-
-    static const std::vector<std::vector<uint>> polys={ };
-
-    static const std::vector<std::vector<bool>> winding={ };
-}
-
-}
-
-#endif // HEX_TRANSITION_SCHEMES_3REF_H
+#endif // HEX_TRANSITION_INSTALL_3REF_H

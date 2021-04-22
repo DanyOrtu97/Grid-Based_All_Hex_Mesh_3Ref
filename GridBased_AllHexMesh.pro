@@ -27,13 +27,17 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         twseventree.cpp \
-        drawable_twseventree.cpp
+        drawable_twseventree.cpp \
+        hex_transition_orient_3ref.cpp \
+        hex_transition_install_3ref.cpp
 
 HEADERS += \
         mainwindow.h \
         twseventree.h \
         drawable_twseventree.h \
-    hex_transition_schemes_3ref.h
+        hex_transition_schemes_3ref.h \
+        hex_transition_orient_3ref.h \
+        hex_transition_install_3ref.h
 
 FORMS += \
         mainwindow.ui
