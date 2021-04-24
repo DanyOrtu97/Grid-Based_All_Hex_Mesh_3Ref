@@ -44,22 +44,27 @@ namespace // anonymous
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void hex_transition_orient_3ref(std::vector<vec3d> &verts,
-                                std::vector<std::vector<uint>> &faces,
-                                std::vector<std::vector<uint>> &polys,
-                                std::vector<std::vector<bool>> &winding,
-                                const SchemeInfo &info,
-                                const vec3d poly_centroid){
+void hex_transition_orient_3ref(      std::vector<vec3d>              &verts,
+                                      std::vector<std::vector<uint>>  &faces,
+                                      std::vector<std::vector<uint>>  &polys,
+                                      std::vector<std::vector<bool>>  &winding,
+                                const SchemeInfo                      &info,
+                                const vec3d                            poly_centroid){
 
 
     switch(info.type){
-        case FULL: break;
-        case FACE: break;
-        case TWO_ADJ_FACES: break;
-        /*
-         * ne mancano anche qua ...
-         */
+        case HexTransition::FULL:
+            break;
+        case HexTransition::TRANSITION:
+            break;
+        case HexTransition::FACE:
+            break;
+        case HexTransition::TWO_ADJ_FACES:
+            break;
+        //case ***** ne mancano
+
     }
+
 }
 }
 

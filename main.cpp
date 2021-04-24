@@ -49,7 +49,7 @@ struct vert_compare
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint, vert_compare> & vertices){
+void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -592,16 +592,13 @@ int main(int argc, char *argv[])
     DrawableHexmesh<> mesh(s.c_str());
 
     //vertices
-    std::map<vec3d, uint, vert_compare> vertices;
+    std::map<vec3d, uint> vertices;
 
     GLcanvas gui;
     gui.push_obj(&mesh);
     gui.show();
 
-    int contaRef = 0;
-
     Profiler profiler;
-
 
     gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
 
@@ -626,7 +623,6 @@ int main(int argc, char *argv[])
                 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
-                contaRef ++;
 
                 mesh.updateGL();
                 c->updateGL();
@@ -634,17 +630,19 @@ int main(int argc, char *argv[])
         }
     };
 
+    /*
+    std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
+    for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
 
-    DrawableHexmesh<> outputMesh();
+    Polyhedralmesh<> inputMesh(mesh.vector_verts(), mesh.vector_faces(), mesh.vector_polys(), polys_face_winding);
+    Polyhedralmesh<> outputMesh;
 
-    if (contaRef == 2) {
-        std::vector<bool> transition_verts;
-        for (int i=0; i<mesh.num_vertices(); i++){
+    std::vector<bool> transition_verts;
+    for (int i=0; i<mesh.num_verts(); i++){
 
-        }
-
-        hex_transition_install_3ref(mesh, , outputMesh);
     }
+    hex_transition_install_3ref(inputMesh, transition_verts, outputMesh);
+    */
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
