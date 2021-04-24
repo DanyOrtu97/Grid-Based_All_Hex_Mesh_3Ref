@@ -10,13 +10,46 @@
 #include <map>
 #include <algorithm>
 #include <cinolib/how_many_seconds.h>
+#include <hex_transition_install_3ref.h>
 
 namespace cinolib
 {
+
+//Custom comparator operator for maps of vec3d
+struct vert_compare
+{
+    bool operator()(const vec3d & a,
+                    const vec3d & b) const
+    {
+       double eps = 1e-6;
+       if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
+       {
+           return true;
+       }
+       else if(abs(a.x()-b.x()) < eps)
+       {
+           if(a.y()-b.y() < 0.0 && abs(a.y()-b.y()) > eps)
+           {
+               return true;
+           }
+           else if(abs(a.y()-b.y()) < eps)
+           {
+               if(a.z()-b.z() < 0.0 && abs(a.z()-b.z()) > eps)
+               {
+                   return true;
+               }
+           }
+       }
+       return false;
+    }
+};
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices){
+void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint, vert_compare> & vertices){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -559,13 +592,13 @@ int main(int argc, char *argv[])
     DrawableHexmesh<> mesh(s.c_str());
 
     //vertices
-    std::map<vec3d, uint> vertices;
+    std::map<vec3d, uint, vert_compare> vertices;
 
     GLcanvas gui;
     gui.push_obj(&mesh);
     gui.show();
 
-
+    int contaRef = 0;
 
     Profiler profiler;
 
@@ -593,6 +626,7 @@ int main(int argc, char *argv[])
                 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
+                contaRef ++;
 
                 mesh.updateGL();
                 c->updateGL();
@@ -600,6 +634,17 @@ int main(int argc, char *argv[])
         }
     };
 
+
+    DrawableHexmesh<> outputMesh();
+
+    if (contaRef == 2) {
+        std::vector<bool> transition_verts;
+        for (int i=0; i<mesh.num_vertices(); i++){
+
+        }
+
+        hex_transition_install_3ref(mesh, , outputMesh);
+    }
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});

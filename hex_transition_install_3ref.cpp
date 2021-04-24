@@ -37,6 +37,36 @@ namespace cinolib{
 namespace // anonymous
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//Custom comparator operator for maps of vec3d
+struct vert_compare
+{
+    bool operator()(const vec3d & a,
+                    const vec3d & b) const
+    {
+       double eps = 1e-6;
+       if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
+       {
+           return true;
+       }
+       else if(abs(a.x()-b.x()) < eps)
+       {
+           if(a.y()-b.y() < 0.0 && abs(a.y()-b.y()) > eps)
+           {
+               return true;
+           }
+           else if(abs(a.y()-b.y()) < eps)
+           {
+               if(a.z()-b.z() < 0.0 && abs(a.z()-b.z()) > eps)
+               {
+                   return true;
+               }
+           }
+       }
+       return false;
+    }
+};
 
 
 } // end anonymous namespace
