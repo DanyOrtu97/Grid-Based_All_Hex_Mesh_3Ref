@@ -61,7 +61,7 @@ void orient_fake(std::vector<vec3d>              & verts,
 
     verts.reserve(Face::verts.size()/3);
 
-    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid], Full::verts[vid+1], Face::verts[vid+2]));
+    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid], Face::verts[vid+1], Face::verts[vid+2]));
 
     polys = Face::polys;
 
