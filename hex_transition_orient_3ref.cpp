@@ -53,6 +53,23 @@ void orient_full(std::vector<vec3d>              & verts,
     winding = Full::winding;
 }
 
+CINO_INLINE
+void orient_fake(std::vector<vec3d>              & verts,
+                 std::vector<std::vector<uint>>  & faces,
+                 std::vector<std::vector<uint>>  & polys,
+                 std::vector<std::vector<bool>>  & winding){
+
+    verts.reserve(Face::verts.size()/3);
+
+    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid], Full::verts[vid+1], Face::verts[vid+2]));
+
+    polys = Face::polys;
+
+    faces = Face::faces;
+
+    winding = Face::winding;
+}
+
 
 } // end anonymous namespace
 
@@ -71,15 +88,15 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
     switch(info.type){
         case HexTransition::FULL:
             orient_full(verts, faces, polys, winding);
-            break;
+            break;           
         case HexTransition::TRANSITION:
-            orient_full(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding);
             break;
         case HexTransition::FACE:
-            orient_full(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding);
             break;
         case HexTransition::TWO_ADJ_FACES:
-            orient_full(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding);
             break;
         //case ***** ne mancano
 

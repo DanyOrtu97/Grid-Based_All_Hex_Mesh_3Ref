@@ -137,10 +137,10 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
 
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
-    SchemeInfo info;
-    info.type = HexTransition::FACE;
+    SchemeInfo info2;
+    info2.type = HexTransition::FACE;
 
-    poly2scheme.insert(std::pair<uint, SchemeInfo>(0, info));
+    poly2scheme.insert(std::pair<uint, SchemeInfo>(0, info2));
 
     merge_schemes_into_mesh(m_out, poly2scheme);
 
