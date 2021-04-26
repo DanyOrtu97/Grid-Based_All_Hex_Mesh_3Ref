@@ -136,11 +136,14 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
     m_out = m_in;
 
 
+    //a seconda di dove sono i vertici a true bisogna capire quali template vanno usati e quale pid è coinvolto
+
     std::unordered_map<uint, SchemeInfo> poly2scheme;
     SchemeInfo info2;
     info2.type = HexTransition::FACE;
 
     poly2scheme.insert(std::pair<uint, SchemeInfo>(0, info2));
+
 
     merge_schemes_into_mesh(m_out, poly2scheme);
 

@@ -632,24 +632,36 @@ int main(int argc, char *argv[])
     };
     */
 
+    split27(0, mesh, vertices);
+
+    split27(4, mesh, vertices);
+
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
     for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
 
     Polyhedralmesh<> inputMesh(mesh.vector_verts(), mesh.vector_faces(), mesh.vector_polys(), polys_face_winding);
     Polyhedralmesh<> outputMesh;
 
+    //find all vertices that needs the schemes
+    std::vector<bool> transition_verts(mesh.num_verts());
 
-    std::vector<bool> transition_verts(8);
+    for (uint fid = 0; fid<mesh.num_faces(); fid++){
+        if(mesh.face_verts_id[fid].size() > 4){ //capire quando ci sono hanging nodes (non funziona così)
+
+        }
+    }
+
+
     for (uint i=0; i<mesh.num_verts(); i++){
         if(i<8){
             transition_verts[i]=true;
         }
     }
+
+
     hex_transition_install_3ref(inputMesh, transition_verts, outputMesh);
 
 
-
-    //tentativi per vedere che gli schemi siano giusti
     std::vector<std::vector<bool>> polys_face_winding2(outputMesh.num_polys());
     for (uint pid=0; pid<outputMesh.num_polys(); pid++) polys_face_winding2[pid] = outputMesh.poly_faces_winding(pid);
     DrawablePolyhedralmesh<> mesh2(outputMesh.vector_verts(), outputMesh.vector_faces(), outputMesh.vector_polys(), polys_face_winding2);
