@@ -36,6 +36,22 @@ namespace cinolib{
 namespace // anonymous
 {
 
+CINO_INLINE
+void orient_full(std::vector<vec3d>              & verts,
+                 std::vector<std::vector<uint>>  & faces,
+                 std::vector<std::vector<uint>>  & polys,
+                 std::vector<std::vector<bool>>  & winding){
+
+    verts.reserve(Full::verts.size()/3);
+
+    for (uint vid=0; vid<Full::verts.size(); vid+=3) verts.push_back(vec3d(Full::verts[vid], Full::verts[vid+1], Full::verts[vid+2]));
+
+    polys = Full::polys;
+
+    faces = Full::faces;
+
+    winding = Full::winding;
+}
 
 
 } // end anonymous namespace
@@ -44,22 +60,26 @@ namespace // anonymous
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void hex_transition_orient_3ref(      std::vector<vec3d>              &verts,
-                                      std::vector<std::vector<uint>>  &faces,
-                                      std::vector<std::vector<uint>>  &polys,
-                                      std::vector<std::vector<bool>>  &winding,
-                                const SchemeInfo                      &info,
-                                const vec3d                            poly_centroid){
+void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
+                                      std::vector<std::vector<uint>>  & faces,
+                                      std::vector<std::vector<uint>>  & polys,
+                                      std::vector<std::vector<bool>>  & winding,
+                                const SchemeInfo                      & info,
+                                const vec3d                             poly_centroid){
 
 
     switch(info.type){
         case HexTransition::FULL:
+            orient_full(verts, faces, polys, winding);
             break;
         case HexTransition::TRANSITION:
+            orient_full(verts, faces, polys, winding);
             break;
         case HexTransition::FACE:
+            orient_full(verts, faces, polys, winding);
             break;
         case HexTransition::TWO_ADJ_FACES:
+            orient_full(verts, faces, polys, winding);
             break;
         //case ***** ne mancano
 

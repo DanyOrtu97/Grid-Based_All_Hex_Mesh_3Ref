@@ -595,6 +595,7 @@ int main(int argc, char *argv[])
     std::map<vec3d, uint> vertices;
 
     GLcanvas gui;
+    /*
     gui.push_obj(&mesh);
     gui.show();
 
@@ -629,22 +630,35 @@ int main(int argc, char *argv[])
             }
         }
     };
+    */
 
-    /*
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
     for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
 
     Polyhedralmesh<> inputMesh(mesh.vector_verts(), mesh.vector_faces(), mesh.vector_polys(), polys_face_winding);
     Polyhedralmesh<> outputMesh;
 
-    std::vector<bool> transition_verts;
-    for (int i=0; i<mesh.num_verts(); i++){
 
+    std::vector<bool> transition_verts(8);
+    for (uint i=0; i<mesh.num_verts(); i++){
+        if(i<8){
+            transition_verts[i]=true;
+        }
     }
     hex_transition_install_3ref(inputMesh, transition_verts, outputMesh);
-    */
 
-    VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
+
+
+    //tentativi per vedere che gli schemi siano giusti
+    std::vector<std::vector<bool>> polys_face_winding2(outputMesh.num_polys());
+    for (uint pid=0; pid<outputMesh.num_polys(); pid++) polys_face_winding2[pid] = outputMesh.poly_faces_winding(pid);
+    DrawablePolyhedralmesh<> mesh2(outputMesh.vector_verts(), outputMesh.vector_faces(), outputMesh.vector_polys(), polys_face_winding2);
+
+
+    gui.push_obj(&mesh2);
+    gui.show();
+
+    VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh2, &gui);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
