@@ -49,7 +49,7 @@ struct vert_compare
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices){
+void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices, std::vector<bool> & transition_verts){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -61,270 +61,99 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
     vec3d avg1 = min + ((max-min)/3);
     vec3d avg2 = avg1 + ((max-min)/3);
 
+    std::vector<vec3d> newverts(64);
+
     if(mesh.num_polys() <= 1) for(auto v: verts) vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
 
     //z = min
-    if (vertices.find(vec3d(min[0], min[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], min[1], min[2]), uint(vertices.size()))); //0
-        mesh.vert_add(vec3d(min[0], min[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], min[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], min[1], min[2]), uint(vertices.size()))); //1
-        mesh.vert_add(vec3d(avg1[0], min[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], min[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], min[1], min[2]), uint(vertices.size()))); //2
-        mesh.vert_add(vec3d(avg2[0], min[1], min[2]));
-    }
-    if (vertices.find(vec3d(max[0], min[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], min[1], min[2]), uint(vertices.size()))); //3
-        mesh.vert_add(vec3d(max[0], min[1], min[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg1[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg1[1], min[2]), uint(vertices.size()))); //4
-        mesh.vert_add(vec3d(min[0], avg1[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg1[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg1[1], min[2]), uint(vertices.size()))); //5
-        mesh.vert_add(vec3d(avg1[0], avg1[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg1[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg1[1], min[2]), uint(vertices.size()))); //6
-        mesh.vert_add(vec3d(avg2[0], avg1[1], min[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg1[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg1[1], min[2]), uint(vertices.size()))); //7
-        mesh.vert_add(vec3d(max[0], avg1[1], min[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg2[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg2[1], min[2]), uint(vertices.size()))); //8
-        mesh.vert_add(vec3d(min[0], avg2[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg2[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg2[1], min[2]), uint(vertices.size()))); //9
-        mesh.vert_add(vec3d(avg1[0], avg2[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg2[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg2[1], min[2]), uint(vertices.size()))); //10
-        mesh.vert_add(vec3d(avg2[0], avg2[1], min[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg2[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg2[1], min[2]), uint(vertices.size()))); //11
-        mesh.vert_add(vec3d(max[0], avg2[1], min[2]));
-    }
-    if (vertices.find(vec3d(min[0], max[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], max[1], min[2]), uint(vertices.size()))); //12
-        mesh.vert_add(vec3d(min[0], max[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], max[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], max[1], min[2]), uint(vertices.size()))); //13
-        mesh.vert_add(vec3d(avg1[0], max[1], min[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], max[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], max[1], min[2]), uint(vertices.size()))); //14
-        mesh.vert_add(vec3d(avg2[0], max[1], min[2]));
-    }
-    if (vertices.find(vec3d(max[0], max[1], min[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], max[1], min[2]), uint(vertices.size()))); //15
-        mesh.vert_add(vec3d(max[0], max[1], min[2]));
-    }
+    newverts[0] = vec3d(min[0], min[1], min[2]); //
+    newverts[1] = vec3d(avg1[0], min[1], min[2]);
+    newverts[2] = vec3d(avg2[0], min[1], min[2]);
+    newverts[3] = vec3d(max[0], min[1], min[2]); //
+
+    newverts[4] = vec3d(min[0], avg1[1], min[2]);
+    newverts[5] = vec3d(avg1[0], avg1[1], min[2]);
+    newverts[6] = vec3d(avg2[0], avg1[1], min[2]);
+    newverts[7] = vec3d(max[0], avg1[1], min[2]);
+
+    newverts[8] = vec3d(min[0], avg2[1], min[2]);
+    newverts[9] = vec3d(avg1[0], avg2[1], min[2]);
+    newverts[10] = vec3d(avg2[0], avg2[1], min[2]);
+    newverts[11] = vec3d(max[0], avg2[1], min[2]);
+
+    newverts[12] = vec3d(min[0], max[1], min[2]); //
+    newverts[13] = vec3d(avg1[0], max[1], min[2]);
+    newverts[14] = vec3d(avg2[0], max[1], min[2]);
+    newverts[15] = vec3d(max[0], max[1], min[2]); //
 
     //z = avg1
-    if (vertices.find(vec3d(min[0], min[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], min[1], avg1[2]), uint(vertices.size()))); //16
-        mesh.vert_add(vec3d(min[0], min[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], min[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], min[1], avg1[2]), uint(vertices.size()))); //17
-        mesh.vert_add(vec3d(avg1[0], min[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], min[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], min[1], avg1[2]), uint(vertices.size()))); //18
-        mesh.vert_add(vec3d(avg2[0], min[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(max[0], min[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], min[1], avg1[2]), uint(vertices.size()))); //19
-        mesh.vert_add(vec3d(max[0], min[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg1[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg1[1], avg1[2]), uint(vertices.size()))); //20
-        mesh.vert_add(vec3d(min[0], avg1[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg1[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg1[1], avg1[2]), uint(vertices.size()))); //21
-        mesh.vert_add(vec3d(avg1[0], avg1[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg1[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg1[1], avg1[2]), uint(vertices.size()))); //22
-        mesh.vert_add(vec3d(avg2[0], avg1[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg1[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg1[1], avg1[2]), uint(vertices.size()))); //23
-        mesh.vert_add(vec3d(max[0], avg1[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg2[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg2[1], avg1[2]), uint(vertices.size()))); //24
-        mesh.vert_add(vec3d(min[0], avg2[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg2[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg2[1], avg1[2]), uint(vertices.size()))); //25
-        mesh.vert_add(vec3d(avg1[0], avg2[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg2[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg2[1], avg1[2]), uint(vertices.size()))); //26
-        mesh.vert_add(vec3d(avg2[0], avg2[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg2[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg2[1], avg1[2]), uint(vertices.size()))); //27
-        mesh.vert_add(vec3d(max[0], avg2[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(min[0], max[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], max[1], avg1[2]), uint(vertices.size()))); //28
-        mesh.vert_add(vec3d(min[0], max[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], max[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], max[1], avg1[2]), uint(vertices.size()))); //29
-        mesh.vert_add(vec3d(avg1[0], max[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], max[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], max[1], avg1[2]), uint(vertices.size()))); //30
-        mesh.vert_add(vec3d(avg2[0], max[1], avg1[2]));
-    }
-    if (vertices.find(vec3d(max[0], max[1], avg1[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], max[1], avg1[2]), uint(vertices.size()))); //31
-        mesh.vert_add(vec3d(max[0], max[1], avg1[2]));
-    }
+    newverts[16] = vec3d(min[0], min[1], avg1[2]);
+    newverts[17] = vec3d(avg1[0], min[1], avg1[2]);
+    newverts[18] = vec3d(avg2[0], min[1], avg1[2]);
+    newverts[19] = vec3d(max[0], min[1], avg1[2]);
+
+    newverts[20] = vec3d(min[0], avg1[1], avg1[2]);
+    newverts[21] = vec3d(avg1[0], avg1[1], avg1[2]);
+    newverts[22] = vec3d(avg2[0], avg1[1], avg1[2]);
+    newverts[23] = vec3d(max[0], avg1[1], avg1[2]);
+
+    newverts[24] = vec3d(min[0], avg2[1], avg1[2]);
+    newverts[25] = vec3d(avg1[0], avg2[1], avg1[2]);
+    newverts[26] = vec3d(avg2[0], avg2[1], avg1[2]);
+    newverts[27] = vec3d(max[0], avg2[1], avg1[2]);
+
+    newverts[28] = vec3d(min[0], max[1], avg1[2]);
+    newverts[29] = vec3d(avg1[0], max[1], avg1[2]);
+    newverts[30] = vec3d(avg2[0], max[1], avg1[2]);
+    newverts[31] = vec3d(max[0], max[1], avg1[2]);
 
     //z = avg2
-    if (vertices.find(vec3d(min[0], min[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], min[1], avg2[2]), uint(vertices.size()))); //32
-        mesh.vert_add(vec3d(min[0], min[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], min[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], min[1], avg2[2]), uint(vertices.size()))); //33
-        mesh.vert_add(vec3d(avg1[0], min[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], min[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], min[1], avg2[2]), uint(vertices.size()))); //34
-        mesh.vert_add(vec3d(avg2[0], min[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(max[0], min[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], min[1], avg2[2]), uint(vertices.size()))); //35
-        mesh.vert_add(vec3d(max[0], min[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg1[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg1[1], avg2[2]), uint(vertices.size()))); //36
-        mesh.vert_add(vec3d(min[0], avg1[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg1[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg1[1], avg2[2]), uint(vertices.size()))); //37
-        mesh.vert_add(vec3d(avg1[0], avg1[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg1[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg1[1], avg2[2]), uint(vertices.size()))); //38
-        mesh.vert_add(vec3d(avg2[0], avg1[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg1[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg1[1], avg2[2]), uint(vertices.size()))); //39
-        mesh.vert_add(vec3d(max[0], avg1[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg2[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg2[1], avg2[2]), uint(vertices.size()))); //40
-        mesh.vert_add(vec3d(min[0], avg2[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg2[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg2[1], avg2[2]), uint(vertices.size()))); //41
-        mesh.vert_add(vec3d(avg1[0], avg2[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg2[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg2[1], avg2[2]), uint(vertices.size()))); //42
-        mesh.vert_add(vec3d(avg2[0], avg2[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg2[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg2[1], avg2[2]), uint(vertices.size()))); //43
-        mesh.vert_add(vec3d(max[0], avg2[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(min[0], max[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], max[1], avg2[2]), uint(vertices.size()))); //44
-        mesh.vert_add(vec3d(min[0], max[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], max[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], max[1], avg2[2]), uint(vertices.size()))); //45
-        mesh.vert_add(vec3d(avg1[0], max[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], max[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], max[1], avg2[2]), uint(vertices.size()))); //46
-        mesh.vert_add(vec3d(avg2[0], max[1], avg2[2]));
-    }
-    if (vertices.find(vec3d(max[0], max[1], avg2[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], max[1], avg2[2]), uint(vertices.size()))); //47
-        mesh.vert_add(vec3d(max[0], max[1], avg2[2]));
-    }
+    newverts[32] = vec3d(min[0], min[1], avg2[2]);
+    newverts[33] = vec3d(avg1[0], min[1], avg2[2]);
+    newverts[34] = vec3d(avg2[0], min[1], avg2[2]);
+    newverts[35] = vec3d(max[0], min[1], avg2[2]);
+
+    newverts[36] = vec3d(min[0], avg1[1], avg2[2]);
+    newverts[37] = vec3d(avg1[0], avg1[1], avg2[2]);
+    newverts[38] = vec3d(avg2[0], avg1[1], avg2[2]);
+    newverts[39] = vec3d(max[0], avg1[1], avg2[2]);
+
+    newverts[40] = vec3d(min[0], avg2[1], avg2[2]);
+    newverts[41] = vec3d(avg1[0], avg2[1], avg2[2]);
+    newverts[42] = vec3d(avg2[0], avg2[1], avg2[2]);
+    newverts[43] = vec3d(max[0], avg2[1], avg2[2]);
+
+    newverts[44] = vec3d(min[0], max[1], avg2[2]);
+    newverts[45] = vec3d(avg1[0], max[1], avg2[2]);
+    newverts[46] = vec3d(avg2[0], max[1], avg2[2]);
+    newverts[47] = vec3d(max[0], max[1], avg2[2]);
 
     //z = max
-    if (vertices.find(vec3d(min[0], min[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], min[1], max[2]), uint(vertices.size()))); //48
-        mesh.vert_add(vec3d(min[0], min[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], min[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], min[1], max[2]), uint(vertices.size()))); //49
-        mesh.vert_add(vec3d(avg1[0], min[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], min[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], min[1], max[2]), uint(vertices.size()))); //50
-        mesh.vert_add(vec3d(avg2[0], min[1], max[2]));
-    }
-    if (vertices.find(vec3d(max[0], min[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], min[1], max[2]), uint(vertices.size()))); //51
-        mesh.vert_add(vec3d(max[0], min[1], max[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg1[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg1[1], max[2]), uint(vertices.size()))); //52
-        mesh.vert_add(vec3d(min[0], avg1[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg1[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg1[1], max[2]), uint(vertices.size()))); //53
-        mesh.vert_add(vec3d(avg1[0], avg1[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg1[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg1[1], max[2]), uint(vertices.size()))); //54
-        mesh.vert_add(vec3d(avg2[0], avg1[1], max[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg1[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg1[1], max[2]), uint(vertices.size()))); //55
-        mesh.vert_add(vec3d(max[0], avg1[1], max[2]));
-    }
-    if (vertices.find(vec3d(min[0], avg2[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], avg2[1], max[2]), uint(vertices.size()))); //56
-        mesh.vert_add(vec3d(min[0], avg2[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], avg2[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], avg2[1], max[2]), uint(vertices.size()))); //57
-        mesh.vert_add(vec3d(avg1[0], avg2[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], avg2[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], avg2[1], max[2]), uint(vertices.size()))); //58
-        mesh.vert_add(vec3d(avg2[0], avg2[1], max[2]));
-    }
-    if (vertices.find(vec3d(max[0], avg2[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], avg2[1], max[2]), uint(vertices.size()))); //59
-        mesh.vert_add(vec3d(max[0], avg2[1], max[2]));
-    }
-    if (vertices.find(vec3d(min[0], max[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(min[0], max[1], max[2]), uint(vertices.size()))); //60
-        mesh.vert_add(vec3d(min[0], max[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg1[0], max[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg1[0], max[1], max[2]), uint(vertices.size()))); //61
-        mesh.vert_add(vec3d(avg1[0], max[1], max[2]));
-    }
-    if (vertices.find(vec3d(avg2[0], max[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(avg2[0], max[1], max[2]), uint(vertices.size()))); //62
-        mesh.vert_add(vec3d(avg2[0], max[1], max[2]));
-    }
-    if (vertices.find(vec3d(max[0], max[1], max[2])) == vertices.end()){
-        vertices.insert(std::pair<vec3d, uint>(vec3d(max[0], max[1], max[2]), uint(vertices.size()))); //63
-        mesh.vert_add(vec3d(max[0], max[1], max[2]));
+    newverts[48] = vec3d(min[0], min[1], max[2]); //
+    newverts[49] = vec3d(avg1[0], min[1], max[2]);
+    newverts[50] = vec3d(avg2[0], min[1], max[2]);
+    newverts[51] = vec3d(max[0], min[1], max[2]); //
+
+    newverts[52] = vec3d(min[0], avg1[1], max[2]);
+    newverts[53] = vec3d(avg1[0], avg1[1], max[2]);
+    newverts[54] = vec3d(avg2[0], avg1[1], max[2]);
+    newverts[55] = vec3d(max[0], avg1[1], max[2]);
+
+    newverts[56] = vec3d(min[0], avg2[1], max[2]);
+    newverts[57] = vec3d(avg1[0], avg2[1], max[2]);
+    newverts[58] = vec3d(avg2[0], avg2[1], max[2]);
+    newverts[59] = vec3d(max[0], avg2[1], max[2]);
+
+    newverts[60] = vec3d(min[0], max[1], max[2]); //
+    newverts[61] = vec3d(avg1[0], max[1], max[2]);
+    newverts[62] = vec3d(avg2[0], max[1], max[2]);
+    newverts[63] = vec3d(max[0], max[1], max[2]); //
+
+    for (auto v : newverts){
+        if (vertices.find(v) == vertices.end()){
+            uint fresh_vid = mesh.vert_add(v);
+            vertices[v] = fresh_vid;
+        }
     }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -595,10 +424,11 @@ int main(int argc, char *argv[])
     std::map<vec3d, uint> vertices;
 
     GLcanvas gui;
-    /*
+
     gui.push_obj(&mesh);
     gui.show();
 
+    /*
     Profiler profiler;
 
     gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -632,30 +462,20 @@ int main(int argc, char *argv[])
     };
     */
 
-    split27(0, mesh, vertices);
 
-    split27(4, mesh, vertices);
+    std::vector<bool> transition_verts;
+
+    split27(0, mesh, vertices, transition_verts);
+
+    /*
+    split27(4, mesh, vertices, transition_verts);
+
 
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
     for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
 
     Polyhedralmesh<> inputMesh(mesh.vector_verts(), mesh.vector_faces(), mesh.vector_polys(), polys_face_winding);
     Polyhedralmesh<> outputMesh;
-
-    //find all vertices that needs the schemes
-    std::vector<bool> transition_verts(mesh.num_verts());
-
-    std::vector<std::vector<uint>> verts_per_face(mesh.num_faces());
-    for (uint fid = 0; fid<mesh.num_faces(); fid++){
-        verts_per_face[fid] = mesh.face_verts_id(fid); //capire quando ci sono hanging nodes (non funziona così)
-    }
-
-
-    for (uint i=0; i<mesh.num_verts(); i++){
-        if(i<8){
-            transition_verts[i]=true;
-        }
-    }
 
 
     hex_transition_install_3ref(inputMesh, transition_verts, outputMesh);
@@ -668,8 +488,10 @@ int main(int argc, char *argv[])
 
     gui.push_obj(&mesh2);
     gui.show();
+    */
 
-    VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh2, &gui);
+    //VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh, &gui);
+    VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();
