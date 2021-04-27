@@ -57,11 +57,18 @@ CINO_INLINE
 void orient_fake(std::vector<vec3d>              & verts,
                  std::vector<std::vector<uint>>  & faces,
                  std::vector<std::vector<uint>>  & polys,
-                 std::vector<std::vector<bool>>  & winding){
+                 std::vector<std::vector<bool>>  & winding,
+                 SchemeInfo                      & info,
+                 const vec3d                     & poly_centroid){
 
     verts.reserve(Face::verts.size()/3);
 
-    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid], Face::verts[vid+1], Face::verts[vid+2]));
+    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
 
     polys = Face::polys;
 
@@ -81,8 +88,8 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
                                       std::vector<std::vector<uint>>  & faces,
                                       std::vector<std::vector<uint>>  & polys,
                                       std::vector<std::vector<bool>>  & winding,
-                                const SchemeInfo                      & info,
-                                const vec3d                             poly_centroid){
+                                      SchemeInfo                      & info,
+                                const vec3d                           & poly_centroid){
 
 
     switch(info.type){
@@ -90,13 +97,13 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
             orient_full(verts, faces, polys, winding);
             break;           
         case HexTransition::TRANSITION:
-            orient_fake(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding, info, poly_centroid);
             break;
         case HexTransition::FACE:
-            orient_fake(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding, info, poly_centroid);
             break;
         case HexTransition::TWO_ADJ_FACES:
-            orient_fake(verts, faces, polys, winding);
+            orient_fake(verts, faces, polys, winding, info, poly_centroid);
             break;
         //case ***** ne mancano
 

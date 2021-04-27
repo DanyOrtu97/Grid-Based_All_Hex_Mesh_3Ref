@@ -63,7 +63,10 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
     std::vector<vec3d> newverts(64);
 
-    if(mesh.num_polys() <= 1) for(auto v: verts) vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
+    if(mesh.num_polys() <= 1) for(auto v: verts){
+        vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
+        transition_verts.push_back(false);
+    }
 
     //z = min
     newverts[0] = vec3d(min[0], min[1], min[2]); //
@@ -153,6 +156,10 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
         if (vertices.find(v) == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
+            transition_verts.push_back(!mesh.vert_is_on_srf(fresh_vid));
+        }
+        else{
+            transition_verts[vertices[v]] = !mesh.vert_is_on_srf(vertices[v]);
         }
     }
 
@@ -425,10 +432,11 @@ int main(int argc, char *argv[])
 
     GLcanvas gui;
 
+     /*
     gui.push_obj(&mesh);
     gui.show();
 
-    /*
+
     Profiler profiler;
 
     gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -467,7 +475,7 @@ int main(int argc, char *argv[])
 
     split27(0, mesh, vertices, transition_verts);
 
-    /*
+
     split27(4, mesh, vertices, transition_verts);
 
 
@@ -488,10 +496,10 @@ int main(int argc, char *argv[])
 
     gui.push_obj(&mesh2);
     gui.show();
-    */
 
-    //VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh, &gui);
-    VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
+
+    VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh2, &gui);
+    //VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
 
     return a.exec();

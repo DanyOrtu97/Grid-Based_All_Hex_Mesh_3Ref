@@ -72,8 +72,8 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
                                       std::vector<std::vector<uint>>  & faces,
                                       std::vector<std::vector<uint>>  & polys,
                                       std::vector<std::vector<bool>>  & winding,
-                                const SchemeInfo                      & info,
-                                const vec3d                             poly_centroid);
+                                      SchemeInfo                      & info,
+                                const vec3d                           & poly_centroid);
 
 
 }
