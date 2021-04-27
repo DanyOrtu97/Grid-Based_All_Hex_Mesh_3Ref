@@ -525,7 +525,6 @@ namespace Face{
         {13, 29, 18, 35, 47, 14},
         {15, 23, 19, 29, 48, 28},
         {12, 28, 11, 34, 14, 17},
-        { 6, 25,  5, 31,  8,  1},
         { 6, 21, 12, 37, 50, 51},
     };
 
@@ -538,11 +537,10 @@ namespace Face{
         {false,  true,  true, false,  true,  true},
         {false,  true,  true, false,  true,  true},
         { true, false,  true, false, false,  true},
-        {false,  true,  true, false,  true,  true},
+        {false,  true,  true,  true,  true,  true},
         {false,  true,  true, false,  true,  true},
         {false,  true,  true, false,  true,  true},
         { true, false, false, false, false,  true},
-        {false, false, false, false, false, false},
         {false,  true, false,  true, false,  true},
     };
 }

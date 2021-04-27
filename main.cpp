@@ -632,9 +632,9 @@ int main(int argc, char *argv[])
     };
     */
 
-    //split27(0, mesh, vertices);
+    split27(0, mesh, vertices);
 
-    //split27(4, mesh, vertices);
+    split27(4, mesh, vertices);
 
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
     for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
@@ -645,13 +645,11 @@ int main(int argc, char *argv[])
     //find all vertices that needs the schemes
     std::vector<bool> transition_verts(mesh.num_verts());
 
-    /*
+    std::vector<std::vector<uint>> verts_per_face(mesh.num_faces());
     for (uint fid = 0; fid<mesh.num_faces(); fid++){
-        if(mesh.face_verts_id[fid].size() > 4){ //capire quando ci sono hanging nodes (non funziona così)
-
-        }
+        verts_per_face[fid] = mesh.face_verts_id(fid); //capire quando ci sono hanging nodes (non funziona così)
     }
-    */
+
 
     for (uint i=0; i<mesh.num_verts(); i++){
         if(i<8){
