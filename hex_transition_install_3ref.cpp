@@ -219,11 +219,21 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
             SchemeInfo info;
             info.type = HexTransition::FACE;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
-            info.orientations.push_back(transition_verts_direction[scheme_vids[1]]);
+
+            //info.orientations.push_back(transition_verts_direction[scheme_vids[1]]);
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
-        else if (scheme_vids.size() == 8){ //TRANSITION OR TWO_ADJ_FACES OR FULL
+        else if (scheme_vids.size() == 6){ //TWO_ADJ_FACES
+            SchemeInfo info;
+            info.type = HexTransition::TWO_ADJ_FACES;
+            info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+
+            //others info about scheme to catch the orientation ****
+
+            poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+        }
+        else if (scheme_vids.size() == 8){ //TRANSITION OR FULL
             SchemeInfo info;
             info.type = HexTransition::TRANSITION;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
@@ -232,6 +242,7 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
+
     }
 
     merge_schemes_into_mesh(m_out, poly2scheme);

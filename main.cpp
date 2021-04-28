@@ -50,7 +50,7 @@ struct vert_compare
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices){
+void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices, std::vector<bool> & transition_verts){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -64,8 +64,10 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
     std::vector<vec3d> newverts(64);
 
-    if(mesh.num_polys() <= 1) for(auto v: verts) vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
-
+    if(mesh.num_polys() <= 1) for(auto v: verts){
+        vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
+        transition_verts.push_back(false);
+    }
 
     //z = min
     newverts[0] = vec3d(min[0], min[1], min[2]); //
@@ -151,10 +153,35 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
     newverts[62] = vec3d(avg2[0], max[1], max[2]);
     newverts[63] = vec3d(max[0], max[1], max[2]); //
 
+    uint conta = 0;
+    std::vector<uint> vert_to_false;
+
+    //insert vertices in map and mesh
     for (auto v : newverts){
         if (vertices.find(v) == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
+            transition_verts.push_back(false);
+        }
+
+    }
+
+
+    //find vertices to set a false in the transition_verts vector
+    for(auto vert: mesh.poly_verts_id(pid)){
+        if(transition_verts[vert]){
+            conta++;
+            vert_to_false.push_back(vert);
+        }
+    }
+
+    //calculate vertices to apply templates
+    if(mesh.num_verts() > 64){
+        if(conta == 4 || conta == 8){
+            for (auto v: vert_to_false) transition_verts[v] = ! transition_verts[v];
+        }
+        else{
+            for(auto vert: mesh.poly_verts_id(pid)) transition_verts[vert] = true;
         }
     }
 
@@ -412,39 +439,6 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
     mesh.updateGL();
 }
 
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void find_hanging(DrawableHexmesh<M,V,E,F,P> & mesh, std::vector<bool> & transition_verts){
-
-    std::vector<uint> prova;
-    //prova = mesh.get_surface_verts();
-
-
-    for (uint vid=0; vid<mesh.num_verts(); vid++){
-        if((mesh.adj_v2e(vid).size() >= 6 || mesh.adj_v2e(vid).size() == 8 || mesh.adj_v2e(vid).size() == 9) &&
-           (mesh.adj_v2f(vid).size() == 6 || mesh.adj_v2f(vid).size() == 10 || mesh.adj_v2f(vid).size() == 15)){
-            transition_verts[vid] = true;
-        }
-        else {
-            transition_verts[vid] = false;
-        }
-
-       //prova = mesh.vert_verts_link(vid);
-
-       /*
-       prova = mesh.adj_v2e(vid);
-       prova = mesh.adj_v2f(vid);
-       prova = mesh.adj_v2p(vid);
-       prova = mesh.adj_v2v(vid);
-       */
-
-    }
-
-}
-
 }
 
 
@@ -499,17 +493,15 @@ int main(int argc, char *argv[])
         }
     };
     */
+    std::vector<bool> transition_verts;
 
 
+    split27(0, mesh, vertices, transition_verts);
 
-    split27(0, mesh, vertices);
+    split27(1, mesh, vertices, transition_verts);
 
-    split27(3, mesh, vertices);
+    split27(3, mesh, vertices, transition_verts);
 
-
-    std::vector<bool> transition_verts(mesh.num_verts());
-
-    find_hanging(mesh, transition_verts);
 
 
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
