@@ -156,10 +156,13 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
         if (vertices.find(v) == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
-            transition_verts.push_back(!mesh.vert_is_on_srf(fresh_vid));
+            if(mesh.num_polys() < 27) transition_verts.push_back(false);
+            else transition_verts.push_back(true);
         }
         else{
-            transition_verts[vertices[v]] = !mesh.vert_is_on_srf(vertices[v]);
+            if(mesh.num_polys() >= 27){
+                transition_verts[vertices[v]] = !transition_verts[vertices[v]]; //cosi porto a false anche quelli che non dovrebbero esserlo, e fa casini
+            }
         }
     }
 
@@ -475,8 +478,8 @@ int main(int argc, char *argv[])
 
     split27(0, mesh, vertices, transition_verts);
 
+    split27(2, mesh, vertices, transition_verts);
 
-    split27(4, mesh, vertices, transition_verts);
 
 
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());

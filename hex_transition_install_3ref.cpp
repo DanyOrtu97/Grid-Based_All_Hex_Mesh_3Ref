@@ -141,19 +141,25 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
     for (uint pid=0; pid<m_in.num_polys(); pid++){
         std::vector<uint> scheme_vids;
 
-        for(uint vid: m_in.poly_verts_id(pid)){
-            if(!transition_verts[vid]) scheme_vids.push_back(vid);
-        }
+        for(uint vid: m_in.poly_verts_id(pid)) if(transition_verts[vid]) scheme_vids.push_back(vid);
 
-        if (scheme_vids.size() >= 4){
+        /*
+         * Massimo abbiamo 8 vertici per poly, quindi in questo modo si cade in errore
+         * Serve un modo per associare ad ogni poly il numero di hanging nodes (che derivano dai poly vicini)
+         */
+
+        if (scheme_vids.size() == 4){ //FACE
             SchemeInfo info;
             info.type = HexTransition::FACE;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
 
+            //others info about scheme to catch the orientation ****
+
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
-
-
+        else if (scheme_vids.size() == 8){ //TRANSITION OR TWO_ADJ_FACES OR FULL
+            //we need a smarter solution to check which is the scheme to apply
+        }
     }
 
     merge_schemes_into_mesh(m_out, poly2scheme);
