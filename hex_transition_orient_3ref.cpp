@@ -37,6 +37,22 @@ namespace // anonymous
 {
 
 CINO_INLINE
+void rotate(std::vector<vec3d> &verts,
+            const std::string & axis,
+            const double &angle){
+    double rot[3][3];
+    vec3d vec(0,0,0);
+    if (axis == "x") vec.x() = 1;
+    else if (axis == "y") vec.y() = 1;
+    else vec.z() = 1;
+
+    bake_rotation_matrix(vec, angle, rot);
+    for (auto & v : verts) transform(v, rot);
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
 void orient_full(std::vector<vec3d>              & verts,
                  std::vector<std::vector<uint>>  & faces,
                  std::vector<std::vector<uint>>  & polys,
@@ -78,6 +94,17 @@ void orient_face(std::vector<vec3d>              & verts,
         v *= info.scale;
         v += poly_centroid;
     }
+
+    /*
+    switch(info.orientations[0]){
+        case PLUS_Y:  break;
+        case PLUS_X:  rotate(verts, "z", -M_PI/2); break;
+        case PLUS_Z:  rotate(verts, "x",  M_PI/2); break;
+        case MINUS_X: rotate(verts, "z",  M_PI/2); break;
+        case MINUS_Y: rotate(verts, "z",  M_PI);   break;
+        case MINUS_Z: rotate(verts, "x", -M_PI/2); break;
+    }
+    */
 
     polys = Face::polys;
 

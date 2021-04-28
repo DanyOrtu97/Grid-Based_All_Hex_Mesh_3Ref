@@ -58,7 +58,7 @@ struct SchemeInfo{
     double                  scale;
     std::vector<vec3d>      t_verts;
     std::map<uint, bool>    cuts;
-    std::vector<int>        orientation;
+    std::vector<int>        orientations;
 };
 
 
