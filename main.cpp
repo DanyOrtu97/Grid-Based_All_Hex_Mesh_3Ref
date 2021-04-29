@@ -50,7 +50,10 @@ struct vert_compare
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, uint> & vertices, std::vector<bool> & transition_verts){
+void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh,
+             std::map<vec3d, uint>                      & vertices,
+             std::vector<bool>                          & transition_verts,
+             std::vector<uint>                          & transition_faces){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -155,6 +158,8 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
     uint conta = 0;
     std::vector<uint> vert_to_false;
+    //std::vector<uint> faces;
+    //std::vector<std::vector<uint>> verts_on_face;
 
     //insert vertices in map and mesh
     for (auto v : newverts){
@@ -168,23 +173,52 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh, std::map<vec3d, 
 
 
     //find vertices to set a false in the transition_verts vector
-    for(auto vert: mesh.poly_verts_id(pid)){
-        if(transition_verts[vert]){
+    for(auto vid: mesh.poly_verts_id(pid)){
+        if(transition_verts[vid]){
             conta++;
-            vert_to_false.push_back(vert);
+            vert_to_false.push_back(vid);
         }
     }
+
+
+    //find faces to be removed from transition_faces vector
+    /*
+    for (auto fid: transition_faces){
+        faces.push_back(fid);
+        verts_on_face.push_back(mesh.face_verts_id(fid));
+    }
+    */
 
     //calculate vertices to apply templates
     if(mesh.num_verts() > 64){
+
         if(conta == 4 || conta == 8){
-            for (auto v: vert_to_false) transition_verts[v] = ! transition_verts[v];
+
+            //for (uint i=0; i<faces.size(); i++){
+                //uint conta_vert=0;
+
+            for (auto vid: vert_to_false){
+                transition_verts[vid] = ! transition_verts[vid];
+
+                /*
+                for (auto verts : verts_on_face[i])
+                    if(vid == verts) conta_vert ++;
+
+                */
+            }
+
+            /*
+            if (conta_vert == 4){
+                transition_faces.erase(faces.begin()+ i);
+            }
+            */
         }
         else{
-            for(auto vert: mesh.poly_verts_id(pid)) transition_verts[vert] = true;
+            for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+
+            for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
         }
     }
-
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     //Insert polys
@@ -494,13 +528,13 @@ int main(int argc, char *argv[])
     };
     */
     std::vector<bool> transition_verts;
+    std::vector<uint> transition_faces;
 
+    split27(0, mesh, vertices, transition_verts, transition_faces);
 
-    split27(0, mesh, vertices, transition_verts);
+    split27(1, mesh, vertices, transition_verts, transition_faces);
 
-    split27(1, mesh, vertices, transition_verts);
-
-    split27(3, mesh, vertices, transition_verts);
+    split27(3, mesh, vertices, transition_verts, transition_faces);
 
 
 
@@ -511,7 +545,7 @@ int main(int argc, char *argv[])
     Polyhedralmesh<> outputMesh;
 
 
-    hex_transition_install_3ref(inputMesh, transition_verts, outputMesh);
+    hex_transition_install_3ref(inputMesh, transition_verts, transition_faces, outputMesh);
 
 
     std::vector<std::vector<bool>> polys_face_winding2(outputMesh.num_polys());

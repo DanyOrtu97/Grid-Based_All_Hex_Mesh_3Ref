@@ -195,27 +195,39 @@ template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
                                  const std::vector<bool>            & transition_verts,
+                                 const std::vector<uint>            & transition_faces,
                                        Polyhedralmesh<M,V,E,F,P>    & m_out){
     m_out = m_in;
 
-    std::vector<uint> transition_verts_direction;
-    get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
+    //std::vector<uint> transition_verts_direction;
+    //get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
+    std::set<std::vector<uint>> verts_on_face;
+
+    for (auto fid: transition_faces){
+        verts_on_face.insert(m_in.face_verts_id(fid));
+    }
 
     for (uint pid=0; pid<m_in.num_polys(); pid++){
         std::vector<uint> scheme_vids;
 
+        std::vector<std::vector<uint>> verts_face;
         for(uint vid: m_in.poly_verts_id(pid)){
-            if(transition_verts[vid])
+            if(transition_verts[vid]){
                 scheme_vids.push_back(vid);
+            }
         }
-        /*
-         * Massimo abbiamo 8 vertici per poly, quindi in questo modo si cade in errore
-         * Serve un modo per associare ad ogni poly il numero di hanging nodes (che derivano dai poly vicini)
-         */
 
-        if (scheme_vids.size() == 4){ //FACE
+        verts_face.push_back(scheme_vids);
+        bool insert = false;
+
+        for (auto el : verts_face)
+            if (verts_on_face.find(el) != verts_on_face.end())
+                insert = true;
+
+
+        if (scheme_vids.size() == 4 && insert){ //FACE
             SchemeInfo info;
             info.type = HexTransition::FACE;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
