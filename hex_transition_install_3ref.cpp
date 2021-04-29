@@ -203,28 +203,28 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
     //get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
-    std::set<std::vector<uint>> verts_on_face;
+    std::vector<std::vector<uint>> verts_on_face;
 
-    for (auto fid: transition_faces){
-        verts_on_face.insert(m_in.face_verts_id(fid));
-    }
+    for (auto fid : transition_faces) verts_on_face.push_back(m_in.face_verts_id(fid));
+
 
     for (uint pid=0; pid<m_in.num_polys(); pid++){
         std::vector<uint> scheme_vids;
 
         std::vector<std::vector<uint>> verts_face;
-        for(uint vid: m_in.poly_verts_id(pid)){
-            if(transition_verts[vid]){
-                scheme_vids.push_back(vid);
-            }
-        }
+        for(uint vid: m_in.poly_verts_id(pid)) if(transition_verts[vid]) scheme_vids.push_back(vid);
 
-        verts_face.push_back(scheme_vids);
+        if(scheme_vids.size()>0) verts_face.push_back(scheme_vids);
         bool insert = false;
 
-        for (auto el : verts_face)
-            if (verts_on_face.find(el) != verts_on_face.end())
-                insert = true;
+        for (auto el : verts_face){
+            for (auto el2 : verts_on_face){
+                std::sort(el.begin(), el.end());
+                std::sort(el2.begin(), el2.end());
+                if (el==el2)
+                    insert = true;
+            }
+        }
 
 
         if (scheme_vids.size() == 4 && insert){ //FACE
@@ -245,7 +245,7 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
-        else if (scheme_vids.size() == 8){ //TRANSITION OR FULL
+        else if (scheme_vids.size() == 8){ //TRANSITION OR FULL (Now always TRANSITION - need changes)
             SchemeInfo info;
             info.type = HexTransition::TRANSITION;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);

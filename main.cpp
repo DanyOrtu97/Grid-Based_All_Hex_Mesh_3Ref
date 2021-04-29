@@ -158,8 +158,6 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh,
 
     uint conta = 0;
     std::vector<uint> vert_to_false;
-    //std::vector<uint> faces;
-    //std::vector<std::vector<uint>> verts_on_face;
 
     //insert vertices in map and mesh
     for (auto v : newverts){
@@ -181,43 +179,11 @@ void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh,
     }
 
 
-    //find faces to be removed from transition_faces vector
-    /*
-    for (auto fid: transition_faces){
-        faces.push_back(fid);
-        verts_on_face.push_back(mesh.face_verts_id(fid));
-    }
-    */
-
-    //calculate vertices to apply templates
+    //calculate vertices and faces to apply templates
     if(mesh.num_verts() > 64){
+        for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+        for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
 
-        if(conta == 4 || conta == 8){
-
-            //for (uint i=0; i<faces.size(); i++){
-                //uint conta_vert=0;
-
-            for (auto vid: vert_to_false){
-                transition_verts[vid] = ! transition_verts[vid];
-
-                /*
-                for (auto verts : verts_on_face[i])
-                    if(vid == verts) conta_vert ++;
-
-                */
-            }
-
-            /*
-            if (conta_vert == 4){
-                transition_faces.erase(faces.begin()+ i);
-            }
-            */
-        }
-        else{
-            for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
-
-            for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
-        }
     }
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -534,8 +500,11 @@ int main(int argc, char *argv[])
 
     split27(1, mesh, vertices, transition_verts, transition_faces);
 
-    split27(3, mesh, vertices, transition_verts, transition_faces);
+    split27(2, mesh, vertices, transition_verts, transition_faces);
 
+    split27(4, mesh, vertices, transition_verts, transition_faces);
+
+    split27(6, mesh, vertices, transition_verts, transition_faces);
 
 
     std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
