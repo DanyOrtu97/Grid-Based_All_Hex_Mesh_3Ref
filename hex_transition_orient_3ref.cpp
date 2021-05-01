@@ -95,7 +95,7 @@ void orient_face(std::vector<vec3d>              & verts,
         v += poly_centroid;
     }
 
-    /*
+
     switch(info.orientations[0]){
         case PLUS_Y:  break;
         case PLUS_X:  rotate(verts, "z", -M_PI/2); break;
@@ -104,7 +104,7 @@ void orient_face(std::vector<vec3d>              & verts,
         case MINUS_Y: rotate(verts, "z",  M_PI);   break;
         case MINUS_Z: rotate(verts, "x", -M_PI/2); break;
     }
-    */
+
 
     polys = Face::polys;
 

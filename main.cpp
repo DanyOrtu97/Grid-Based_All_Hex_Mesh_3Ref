@@ -50,7 +50,8 @@ struct vert_compare
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 // split the polygon of id "pid" of the input mesh into 27 cubes
-void split27(const uint pid, DrawableHexmesh<M,V,E,F,P> & mesh,
+void split27(const uint                                   pid,
+             DrawableHexmesh<M,V,E,F,P>                 & mesh,
              std::map<vec3d, uint>                      & vertices,
              std::vector<bool>                          & transition_verts,
              std::vector<uint>                          & transition_faces){
@@ -450,22 +451,36 @@ int main(int argc, char *argv[])
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube.mesh";
     DrawableHexmesh<> mesh(s.c_str());
+    DrawableHexmesh<> outputMesh;
 
     //vertices
     std::map<vec3d, uint> vertices;
 
-    GLcanvas gui;
-
-     /*
-    gui.push_obj(&mesh);
-    gui.show();
+    //vectors for templates application
+    std::vector<bool> transition_verts;
+    std::vector<uint> transition_faces;
 
 
+    QWidget window;
+    GLcanvas gui_input, gui_output;
+    QHBoxLayout layout;
+    layout.addWidget(&gui_input);
+    layout.addWidget(&gui_output);
+    window.setLayout(&layout);
+    window.resize(1000,600);
+    window.show();
+
+
+    /*
+     * Tool for creating new polys by mouse click
+     */
+
+    /*
     Profiler profiler;
 
-    gui.push_marker(vec2i(10, gui.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
+    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
 
-    gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
+    gui_input.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
     {
         if (e->modifiers() == Qt::ControlModifier)
         {
@@ -481,7 +496,7 @@ int main(int argc, char *argv[])
 
                 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-                split27(pid, mesh, vertices);
+                split27(pid, mesh, vertices, transition_verts, transition_faces);
 
                 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -493,12 +508,48 @@ int main(int argc, char *argv[])
         }
     };
     */
-    std::vector<bool> transition_verts;
-    std::vector<uint> transition_faces;
 
+
+    /*
+     * Template cases (for testing)
+     */
+
+    /*
+    //config template 4
+    split27(0, mesh, vertices, transition_verts, transition_faces);
+
+    split27(6, mesh, vertices, transition_verts, transition_faces);
+
+    split27(8, mesh, vertices, transition_verts, transition_faces);
+
+    split27(18, mesh, vertices, transition_verts, transition_faces);
+
+
+
+    // config template 5
     split27(0, mesh, vertices, transition_verts, transition_faces);
 
     split27(1, mesh, vertices, transition_verts, transition_faces);
+
+    split27(3, mesh, vertices, transition_verts, transition_faces);
+
+    split27(5, mesh, vertices, transition_verts, transition_faces);
+
+
+    // config template 6
+    split27(0, mesh, vertices, transition_verts, transition_faces);
+
+    split27(3, mesh, vertices, transition_verts, transition_faces);
+
+    split27(5, mesh, vertices, transition_verts, transition_faces);
+
+    split27(9, mesh, vertices, transition_verts, transition_faces);
+
+    split27(15, mesh, vertices, transition_verts, transition_faces);
+
+
+    // config template 7/8
+    split27(0, mesh, vertices, transition_verts, transition_faces);
 
     split27(2, mesh, vertices, transition_verts, transition_faces);
 
@@ -506,29 +557,27 @@ int main(int argc, char *argv[])
 
     split27(6, mesh, vertices, transition_verts, transition_faces);
 
-
-    std::vector<std::vector<bool>> polys_face_winding(mesh.num_polys());
-    for (uint pid=0; pid<mesh.num_polys(); pid++) polys_face_winding[pid] = mesh.poly_faces_winding(pid);
-
-    Polyhedralmesh<> inputMesh(mesh.vector_verts(), mesh.vector_faces(), mesh.vector_polys(), polys_face_winding);
-    Polyhedralmesh<> outputMesh;
+    split27(8, mesh, vertices, transition_verts, transition_faces);
+    */
 
 
-    hex_transition_install_3ref(inputMesh, transition_verts, transition_faces, outputMesh);
+    //base case
+    split27(0, mesh, vertices, transition_verts, transition_faces);
+    split27(1, mesh, vertices, transition_verts, transition_faces);
 
+    if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
 
-    std::vector<std::vector<bool>> polys_face_winding2(outputMesh.num_polys());
-    for (uint pid=0; pid<outputMesh.num_polys(); pid++) polys_face_winding2[pid] = outputMesh.poly_faces_winding(pid);
-    DrawablePolyhedralmesh<> mesh2(outputMesh.vector_verts(), outputMesh.vector_faces(), outputMesh.vector_polys(), polys_face_winding2);
+    outputMesh.updateGL();
 
+    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after refinements", Color::BLACK(), 12, 0);
+    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
+    gui_input.push_obj(&mesh);
+    gui_output.push_obj(&outputMesh);
 
-    gui.push_obj(&mesh2);
-    gui.show();
-
-
-    VolumeMeshControlPanel<DrawablePolyhedralmesh<>> panel(&mesh2, &gui);
-    //VolumeMeshControlPanel<DrawableHexmesh<>> panel(&mesh, &gui);
-    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui), &QShortcut::activated, [&](){panel.show();});
+    VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
+    VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_input), &QShortcut::activated, [&](){panel_input.show();});
+    QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_output), &QShortcut::activated, [&](){panel_output.show();});
 
     return a.exec();
 }

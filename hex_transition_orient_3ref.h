@@ -56,8 +56,6 @@ enum class HexTransition{
 struct SchemeInfo{
     HexTransition           type;
     double                  scale;
-    std::vector<vec3d>      t_verts;
-    std::map<uint, bool>    cuts;
     std::vector<int>        orientations;
 };
 

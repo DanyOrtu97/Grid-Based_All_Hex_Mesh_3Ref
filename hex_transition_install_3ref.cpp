@@ -71,7 +71,7 @@ struct vert_compare
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint edge_orientation(const Polyhedralmesh<M,V,E,F,P> & m, const uint vid, const uint eid)
+uint edge_orientation(const Hexmesh<M,V,E,F,P> & m, const uint vid, const uint eid)
 {
     vec3d v1 = m.vert(vid);
     vec3d v2 = m.edge_vert_id(eid, 0) == vid ? m.edge_vert(eid, 1) : m.edge_vert(eid, 0);
@@ -87,53 +87,12 @@ uint edge_orientation(const Polyhedralmesh<M,V,E,F,P> & m, const uint vid, const
     return 0;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void get_transition_verts_direction(const Polyhedralmesh<M,V,E,F,P> & m,
-                                    const std::vector<bool>         & transition_verts,
-                                          std::vector<uint>         & transition_verts_direction)
-{
-    transition_verts_direction = std::vector<uint>(m.num_verts());
-
-    std::map<vec3d, uint, vert_compare> v_map;
-    for(uint vid=0; vid<m.num_verts(); vid++) v_map[m.vert(vid)] = vid;
-
-    for(uint vid=0; vid<m.num_verts(); vid++)
-    {
-        if(transition_verts[vid] && m.adj_v2p(vid).size() == 8)
-        {
-            double length = 0;
-            for(uint eid : m.adj_v2e(vid))
-            {
-                if(m.adj_e2p(eid).size() == 4 && m.edge_length(eid) > length)
-                {
-                    length = m.edge_length(eid);
-                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
-                }
-            }
-        }
-        else if(transition_verts[vid])
-        {
-            double length = 0;
-            for(uint eid : m.adj_v2e(vid))
-            {
-                if(m.edge_length(eid) > length && v_map.find(m.edge_sample_at(eid, 0.5)) == v_map.end())
-                {
-                    length = m.edge_length(eid);
-                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
-                }
-            }
-        }
-    }
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void merge_schemes_into_mesh(Polyhedralmesh<M,V,E,F,P>            & m,
+void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
                              std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     std::map<vec3d, uint, vert_compare> v_map;
@@ -193,14 +152,11 @@ void merge_schemes_into_mesh(Polyhedralmesh<M,V,E,F,P>            & m,
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
+void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                                  const std::vector<bool>            & transition_verts,
                                  const std::vector<uint>            & transition_faces,
-                                       Polyhedralmesh<M,V,E,F,P>    & m_out){
+                                       Hexmesh<M,V,E,F,P>           & m_out){
     m_out = m_in;
-
-    //std::vector<uint> transition_verts_direction;
-    //get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
     std::vector<std::vector<uint>> verts_on_face;
@@ -232,7 +188,7 @@ void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
             info.type = HexTransition::FACE;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
 
-            //info.orientations.push_back(transition_verts_direction[scheme_vids[1]]);
+            //info.orientations.push_back(1);
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }

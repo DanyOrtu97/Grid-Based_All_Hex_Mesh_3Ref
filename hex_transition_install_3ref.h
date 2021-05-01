@@ -43,10 +43,10 @@ namespace cinolib{
  */
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void hex_transition_install_3ref(const Polyhedralmesh<M,V,E,F,P>    & m_in,
+void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                                  const std::vector<bool>            & transition_verts,
                                  const std::vector<uint>            & transition_faces,
-                                       Polyhedralmesh<M,V,E,F,P>    & m_out);
+                                       Hexmesh<M,V,E,F,P>           & m_out);
 }
 
 
