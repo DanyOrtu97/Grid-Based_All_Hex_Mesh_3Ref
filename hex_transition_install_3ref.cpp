@@ -87,6 +87,47 @@ uint edge_orientation(const Hexmesh<M,V,E,F,P> & m, const uint vid, const uint e
     return 0;
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void get_transition_verts_direction(const Hexmesh<M,V,E,F,P>        & m,
+                                    const std::vector<bool>         & transition_verts,
+                                          std::vector<uint>         & transition_verts_direction)
+{
+    transition_verts_direction = std::vector<uint>(m.num_verts());
+
+    std::map<vec3d, uint, vert_compare> v_map;
+    for(uint vid=0; vid<m.num_verts(); vid++) v_map[m.vert(vid)] = vid;
+
+    for(uint vid=0; vid<m.num_verts(); vid++)
+    {
+        if(transition_verts[vid] && m.adj_v2p(vid).size() == 8)
+        {
+            double length = 0;
+            for(uint eid : m.adj_v2e(vid))
+            {
+                if(m.adj_e2p(eid).size() == 4 && m.edge_length(eid) > length)
+                {
+                    length = m.edge_length(eid);
+                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
+                }
+            }
+        }
+        else if(transition_verts[vid])
+        {
+            double length = 0;
+            for(uint eid : m.adj_v2e(vid))
+            {
+                if(m.edge_length(eid) > length && v_map.find(m.edge_sample_at(eid, 0.5)) == v_map.end())
+                {
+                    length = m.edge_length(eid);
+                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
+                }
+            }
+        }
+    }
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -160,6 +201,8 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
     std::vector<std::vector<uint>> verts_on_face;
+    std::vector<uint> transition_verts_direction;
+    get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     for (auto fid : transition_faces) verts_on_face.push_back(m_in.face_verts_id(fid));
 
@@ -184,11 +227,45 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
 
         if (scheme_vids.size() == 4 && insert){ //FACE
+            std::vector<vec3d> poly_verts = m_in.poly_verts(pid);
+            vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
+            vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
+
             SchemeInfo info;
             info.type = HexTransition::FACE;
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
 
-            //info.orientations.push_back(1);
+            uint conta_min = 0, conta_max = 0, conta_left = 0, conta_right = 0, conta_back = 0, conta_front = 0;
+
+
+            for (auto vid : scheme_vids){
+                if(m_in.vector_verts()[vid].y() == min.y()){
+                    conta_min ++;
+                    if(m_in.vector_verts()[vid].x() == min.x()) conta_left ++;
+                    else if(m_in.vector_verts()[vid].x() == max.x()) conta_right ++;
+
+                    if(m_in.vector_verts()[vid].z() == min.z()) conta_front ++;
+                    else if(m_in.vector_verts()[vid].z() == max.z()) conta_back ++;
+
+                }
+                else if(m_in.vector_verts()[vid].y() == max.y()){
+                    conta_max ++;
+                    if(m_in.vector_verts()[vid].x() == min.x()) conta_left ++;
+                    else if(m_in.vector_verts()[vid].x() == max.x()) conta_right ++;
+
+                    if(m_in.vector_verts()[vid].z() == min.z()) conta_front ++;
+                    else if(m_in.vector_verts()[vid].z() == max.z()) conta_back ++;
+                }
+            }
+
+            if(conta_max == 4) info.orientations.push_back(0);
+            else if (conta_min == 4) info.orientations.push_back(7);
+            else if (conta_min == 2 && conta_max == 2){
+                if(conta_left == 4) info.orientations.push_back(2);
+                else if (conta_right == 4) info.orientations.push_back(1);
+                else if (conta_front == 4) info.orientations.push_back(6);
+                else if (conta_back == 4) info.orientations.push_back(5);
+            }
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }

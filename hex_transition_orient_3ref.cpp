@@ -36,18 +36,39 @@ namespace cinolib{
 namespace // anonymous
 {
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 CINO_INLINE
-void rotate(std::vector<vec3d> &verts,
-            const std::string & axis,
-            const double &angle){
+void rotate(std::vector<vec3d> & verts,
+            const std::string  & axis,
+            const double       & angle)
+{
     double rot[3][3];
     vec3d vec(0,0,0);
-    if (axis == "x") vec.x() = 1;
-    else if (axis == "y") vec.y() = 1;
-    else vec.z() = 1;
+         if(axis == "x") vec.x() = 1;
+    else if(axis == "y") vec.y() = 1;
+    else                 vec.z() = 1;
 
     bake_rotation_matrix(vec, angle, rot);
-    for (auto & v : verts) transform(v, rot);
+    for(auto & v : verts) transform(v, rot);
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void reflect(std::vector<vec3d> & verts,
+             const std::string  & axis)
+{
+    double m[3][3];
+    m[0][0] = -1; m[0][1] =  0; m[0][2] =  0;
+    m[1][0] =  0; m[1][1] = -1; m[1][2] =  0;
+    m[2][0] =  0; m[2][1] =  0; m[2][2] = -1;
+
+    if(axis.find('x') != std::string::npos) m[0][0] = 1;
+    if(axis.find('y') != std::string::npos) m[1][1] = 1;
+    if(axis.find('z') != std::string::npos) m[2][2] = 1;
+
+    for(auto & v : verts) transform(v, m);
 }
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -90,21 +111,30 @@ void orient_face(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
 
+
+
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "z", -M_PI/2); break;
+        case 2:  rotate(verts, "z",  M_PI/2); break;
+        case 3:  rotate(verts, "y", -M_PI/2); break;
+        case 4:  rotate(verts, "y",  M_PI/2); break;
+        case 5:  rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI/2); break;
+        case 7:  reflect(verts, "x"); break;
+        case 8:  reflect(verts, "y"); break;
+        case 9:  reflect(verts, "z"); break;
+    }
+
+
+
+
+
     for (auto & v: verts){
         v *= info.scale;
         v += poly_centroid;
     }
-
-
-    switch(info.orientations[0]){
-        case PLUS_Y:  break;
-        case PLUS_X:  rotate(verts, "z", -M_PI/2); break;
-        case PLUS_Z:  rotate(verts, "x",  M_PI/2); break;
-        case MINUS_X: rotate(verts, "z",  M_PI/2); break;
-        case MINUS_Y: rotate(verts, "z",  M_PI);   break;
-        case MINUS_Z: rotate(verts, "x", -M_PI/2); break;
-    }
-
 
     polys = Face::polys;
 
