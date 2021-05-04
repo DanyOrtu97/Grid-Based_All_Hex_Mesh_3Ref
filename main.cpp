@@ -545,17 +545,12 @@ int main(int argc, char *argv[])
     split27(8, mesh, vertices, transition_verts, transition_faces);
 
 
-    //failure case 1
+    //failure case 1 (BALANCING PROBLEM)
     split27(0, mesh, vertices, transition_verts, transition_faces);
     split27(2, mesh, vertices, transition_verts, transition_faces);
     split27(29, mesh, vertices, transition_verts, transition_faces);
     split27(3, mesh, vertices, transition_verts, transition_faces);
 
-
-    //failure case 2
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(8, mesh, vertices, transition_verts, transition_faces);
-    split27(10, mesh, vertices, transition_verts, transition_faces);
     */
 
 
@@ -564,6 +559,7 @@ int main(int argc, char *argv[])
     split27(0, mesh, vertices, transition_verts, transition_faces);
     split27(8, mesh, vertices, transition_verts, transition_faces);
     split27(10, mesh, vertices, transition_verts, transition_faces);
+    split27(12, mesh, vertices, transition_verts, transition_faces);
 
 
     if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
