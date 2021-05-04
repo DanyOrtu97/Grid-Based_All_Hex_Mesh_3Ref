@@ -555,23 +555,37 @@ int main(int argc, char *argv[])
 
 
 
-    //base case
+    //orientation of angle case
     split27(0, mesh, vertices, transition_verts, transition_faces);
     split27(2, mesh, vertices, transition_verts, transition_faces);
-    split27(4, mesh, vertices, transition_verts, transition_faces);
     split27(6, mesh, vertices, transition_verts, transition_faces);
     split27(15, mesh, vertices, transition_verts, transition_faces);
 
+    mesh.print_quality();
 
+    //chrono for template's application
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
 
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    //std::cout << std::endl;
+    std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
+                                                                      outputMesh.num_edges() << "E / " <<
+                                                                      outputMesh.num_faces() << "F / " <<
+                                                                      outputMesh.num_polys() << "P  [" <<
+                                                                      how_many_seconds(t0,t1) << "s]" << std::endl;
+
     outputMesh.updateGL();
+
+    outputMesh.print_quality(); //scaled jacobian : range [-1, 1] -> good [0.5, 1]
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after refinements", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.push_obj(&mesh);
     gui_output.push_obj(&outputMesh);
+
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);

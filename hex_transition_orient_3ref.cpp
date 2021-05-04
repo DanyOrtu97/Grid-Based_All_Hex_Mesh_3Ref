@@ -111,8 +111,6 @@ void orient_face(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
 
-
-
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -126,10 +124,6 @@ void orient_face(std::vector<vec3d>              & verts,
         case 8:  reflect(verts, "y"); break;
         case 9:  reflect(verts, "z"); break;
     }
-
-
-
-
 
     for (auto & v: verts){
         v *= info.scale;
@@ -156,6 +150,13 @@ void orient_transition(std::vector<vec3d>              & verts,
     verts.reserve(Transition::verts.size()/3);
 
     for (uint vid=0; vid<Transition::verts.size(); vid+=3) verts.push_back(vec3d(Transition::verts[vid]-0.5, Transition::verts[vid+1]-0.5, Transition::verts[vid+2]-0.5));
+
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "z", -M_PI/2); break;
+        case 2:  rotate(verts, "x",  M_PI/2); break;
+    }
 
     for (auto & v: verts){
         v *= info.scale;
@@ -222,8 +223,6 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
         case HexTransition::TWO_ADJ_FACES:
             orient_two_adj_faces(verts, faces, polys, winding, info, poly_centroid);
             break;
-        //case ***** ne mancano
-
     }
 
 }
