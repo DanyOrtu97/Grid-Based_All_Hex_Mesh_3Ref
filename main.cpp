@@ -557,9 +557,11 @@ int main(int argc, char *argv[])
 
     //base case
     split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(8, mesh, vertices, transition_verts, transition_faces);
-    split27(10, mesh, vertices, transition_verts, transition_faces);
-    split27(12, mesh, vertices, transition_verts, transition_faces);
+    split27(2, mesh, vertices, transition_verts, transition_faces);
+    split27(4, mesh, vertices, transition_verts, transition_faces);
+    split27(6, mesh, vertices, transition_verts, transition_faces);
+    split27(15, mesh, vertices, transition_verts, transition_faces);
+
 
 
     if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);

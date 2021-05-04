@@ -85,18 +85,18 @@ uint verts_in_common(std::vector<uint> a, std::vector<uint> b){
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool is_angle(const std::vector<uint> a, const uint pid, const Hexmesh<M,V,E,F,P> & m){
-
-
-    //inserire controlli transition_faces
-
+bool is_angle(const std::vector<uint> a, const uint pid, const Hexmesh<M,V,E,F,P> & m, const std::vector<uint> transition_faces){
     std::vector<uint> faces;
     bool is_angle = false;
 
-    for(auto fid : m.poly_faces_id(pid)){
-        if(verts_in_common(a, m.face_verts_id(fid)) == 4)
-            faces.push_back(fid);
+    for (auto face_id : transition_faces){
+        for(auto fid : m.poly_faces_id(pid)){
+            if(fid == face_id)
+                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
+                    faces.push_back(fid);
+        }
     }
+
 
     if(faces.size() == 2)
         if(m.faces_are_adjacent(faces[0], faces[1]))
@@ -109,63 +109,28 @@ bool is_angle(const std::vector<uint> a, const uint pid, const Hexmesh<M,V,E,F,P
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint edge_orientation(const Hexmesh<M,V,E,F,P> & m, const uint vid, const uint eid)
-{
-    vec3d v1 = m.vert(vid);
-    vec3d v2 = m.edge_vert_id(eid, 0) == vid ? m.edge_vert(eid, 1) : m.edge_vert(eid, 0);
-    vec3d n  = v2 - v1; n.normalize();
-    for(uint i=0; i<3; i++) n[i] = std::round(n[i]);
-    if(n.x() ==  1)  return PLUS_X;
-    if(n.x() == -1)  return MINUS_X;
-    if(n.y() ==  1)  return PLUS_Y;
-    if(n.y() == -1)  return MINUS_Y;
-    if(n.z() ==  1)  return PLUS_Z;
-    if(n.z() == -1)  return MINUS_Z;
-    assert(false);
-    return 0;
-}
+uint transition_or_full(const std::vector<uint> a, const uint pid, const Hexmesh<M,V,E,F,P> & m, const std::vector<uint> transition_faces){
+    std::vector<uint> faces;
+    uint transition_or_full = 0;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-void get_transition_verts_direction(const Hexmesh<M,V,E,F,P>        & m,
-                                    const std::vector<bool>         & transition_verts,
-                                          std::vector<uint>         & transition_verts_direction)
-{
-    transition_verts_direction = std::vector<uint>(m.num_verts());
-
-    std::map<vec3d, uint, vert_compare> v_map;
-    for(uint vid=0; vid<m.num_verts(); vid++) v_map[m.vert(vid)] = vid;
-
-    for(uint vid=0; vid<m.num_verts(); vid++)
-    {
-        if(transition_verts[vid] && m.adj_v2p(vid).size() == 8)
-        {
-            double length = 0;
-            for(uint eid : m.adj_v2e(vid))
-            {
-                if(m.adj_e2p(eid).size() == 4 && m.edge_length(eid) > length)
-                {
-                    length = m.edge_length(eid);
-                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
-                }
-            }
-        }
-        else if(transition_verts[vid])
-        {
-            double length = 0;
-            for(uint eid : m.adj_v2e(vid))
-            {
-                if(m.edge_length(eid) > length && v_map.find(m.edge_sample_at(eid, 0.5)) == v_map.end())
-                {
-                    length = m.edge_length(eid);
-                    transition_verts_direction[vid] = edge_orientation(m, vid, eid);
-                }
-            }
+    for (auto face_id : transition_faces){
+        for(auto fid : m.poly_faces_id(pid)){
+            if(fid == face_id)
+                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
+                    faces.push_back(fid);
         }
     }
+
+
+    if(faces.size() == 2)
+        transition_or_full=0;
+
+    if(faces.size() > 2)
+        transition_or_full=1;
+
+    return transition_or_full;
 }
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -239,8 +204,6 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
     std::vector<std::vector<uint>> verts_on_face;
-    std::vector<uint> transition_verts_direction;
-    get_transition_verts_direction(m_in, transition_verts, transition_verts_direction);
 
     for (auto fid : transition_faces) verts_on_face.push_back(m_in.face_verts_id(fid));
 
@@ -253,15 +216,23 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
 
         if(scheme_vids.size()>0) verts_face.push_back(scheme_vids);
-        bool insertFace = false, insertAngle = false, insertTransition=false;
+        bool insertFace = false, insertAngle = false, insertTransition=false, insert_full=false;
 
+
+        //Select the right scheme to apply
         for (auto el2 : verts_on_face){
             for (auto el : verts_face){
                 if(verts_in_common(el, el2) == 4) {
-                    if(scheme_vids.size() > 6 && verts_in_common(el, m_in.poly_verts_id(pid)) == 8) //verify for the full scheme
-                        insertTransition = true;
+                    if(scheme_vids.size() > 6 && verts_in_common(el, m_in.poly_verts_id(pid)) == 8)
+                        if(transition_or_full(el, pid, m_in, transition_faces) == 0)
+                            insertTransition = true;
+                        else if (transition_or_full(el, pid, m_in, transition_faces) == 1)
+                            insert_full = true;
+                        else if(is_angle(el, pid, m_in, transition_faces))
+                            insertAngle = true;
+                        else insertFace = true;
                     else if(scheme_vids.size() > 5 && verts_in_common(el, m_in.poly_verts_id(pid)) == 6)
-                        if(is_angle(el, pid, m_in)) //servono le transition_faces (non le uso qua invece)
+                        if(is_angle(el, pid, m_in, transition_faces))
                             insertAngle = true;
                         else insertFace = true;
                     else
@@ -306,7 +277,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
             if(conta_max == 4) info.orientations.push_back(0);
             else if (conta_min == 4) info.orientations.push_back(7);
-            else if (conta_min == 2 && conta_max == 2){
+            else /*if (conta_min == 2 && conta_max == 2)*/{
                 if(conta_left == 4) info.orientations.push_back(2);
                 else if (conta_right == 4) info.orientations.push_back(1);
                 else if (conta_front == 4) info.orientations.push_back(6);
@@ -331,6 +302,12 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
             //others info about scheme to catch the orientation ****
 
+            poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+        }
+        else if (insert_full){ //FULL
+            SchemeInfo info;
+            info.type = HexTransition::FULL;
+            info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
 
