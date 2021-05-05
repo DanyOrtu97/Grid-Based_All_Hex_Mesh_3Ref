@@ -544,6 +544,9 @@ int main(int argc, char *argv[])
     split27(6, mesh, vertices, transition_verts, transition_faces);
     split27(8, mesh, vertices, transition_verts, transition_faces);
 
+    */
+
+
 
     //failure case 1 (BALANCING PROBLEM)
     split27(0, mesh, vertices, transition_verts, transition_faces);
@@ -551,17 +554,8 @@ int main(int argc, char *argv[])
     split27(29, mesh, vertices, transition_verts, transition_faces);
     split27(3, mesh, vertices, transition_verts, transition_faces);
 
-    */
 
-
-
-    //orientation of angle case
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(2, mesh, vertices, transition_verts, transition_faces);
-    split27(6, mesh, vertices, transition_verts, transition_faces);
-    split27(15, mesh, vertices, transition_verts, transition_faces);
-
-    mesh.print_quality();
+    mesh.print_quality(); //scaled jacobian
 
     //chrono for template's application
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -579,7 +573,7 @@ int main(int argc, char *argv[])
 
     outputMesh.updateGL();
 
-    outputMesh.print_quality(); //scaled jacobian : range [-1, 1] -> good [0.5, 1]
+    outputMesh.print_quality(); //scaled jacobian
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after refinements", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);

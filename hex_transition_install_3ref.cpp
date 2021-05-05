@@ -204,12 +204,93 @@ void mark_two_adj_faces(const Hexmesh<M,V,E,F,P>    & m,
     info.type = HexTransition::TWO_ADJ_FACES;
     info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
-    //controlli e settaggio orientation
+    for (auto face_id : transition_faces){
+        for(auto fid : m.poly_faces_id(pid)){
+            if(fid == face_id)
+                faces.push_back(fid);
+        }
+    }
 
-    /*
-     *
-     * DA FINIRE
-     */
+
+    int conta_max_1 = 0, conta_max_2 = 0, conta_min_1 = 0, conta_min_2 = 0;
+    int conta_left_1 = 0, conta_left_2 = 0, conta_right_1 = 0, conta_right_2 = 0;
+    int conta_back_1 = 0, conta_back_2 = 0, conta_front_1 = 0, conta_front_2 = 0;
+
+    if(faces.size() == 2){
+        for(uint i=0; i<faces.size(); i++){
+            for(auto v : m.face_verts(faces[i])){
+                if (i == 0){
+                    if(v.y() == max.y()) conta_max_1 ++;
+                    else if(v.y() == min.y()) conta_min_1 ++;
+
+                    if(v.x() == max.x()) conta_right_1 ++;
+                    else if(v.x() == min.x()) conta_left_1 ++;
+
+                    if(v.z() == max.z()) conta_back_1 ++;
+                    else if(v.z() == min.z()) conta_front_1 ++;
+                }
+                else {
+                    if(v.y() == max.y()) conta_max_2 ++;
+                    else if(v.y() == min.y()) conta_min_2 ++;
+
+                    if(v.x() == max.x()) conta_right_2 ++;
+                    else if(v.x() == min.x()) conta_left_2 ++;
+
+                    if(v.z() == max.z()) conta_back_2 ++;
+                    else if(v.z() == min.z()) conta_front_2 ++;
+                }
+            }
+        }
+    }
+
+
+    if( (conta_max_1 == 4 || conta_max_2 == 4) &&
+        (conta_min_1 == 2 || conta_min_2 == 2) &&
+        (conta_front_1 ==4 || conta_front_2 == 4) &&
+        (conta_back_1 + conta_back_2) <= 2) info.orientations.push_back(0);
+
+    if( (conta_max_1 == 2 || conta_max_2 == 2) &&
+        (conta_min_1 == 4 || conta_min_2 == 4) &&
+        (conta_back_1 + conta_back_2) <= 2 &&
+        (conta_front_1 == 4 || conta_front_2 == 4)) info.orientations.push_back(1);
+
+    if( (conta_max_1 == 4 || conta_max_2 == 4) &&
+        (conta_min_1 == 2 || conta_min_2 == 2) &&
+        (conta_back_1 == 4 || conta_back_2 == 4) &&
+        (conta_front_1 + conta_front_2) <= 2) info.orientations.push_back(2);
+
+    if( (conta_max_1 == 4 || conta_max_2 == 4) &&
+        (conta_min_1 == 2 || conta_min_2 == 2) &&
+        (conta_right_1 == 4 || conta_right_2 == 4) &&
+        (conta_left_1 + conta_left_2) <= 2) info.orientations.push_back(3);
+
+    if( (conta_max_1 == 4 || conta_max_2 == 4) &&
+        (conta_min_1 == 2 || conta_min_2 == 2) &&
+        (conta_left_1 == 4 || conta_left_2 == 4) &&
+        (conta_right_1 + conta_right_2) <= 2) info.orientations.push_back(4);
+
+    if( (conta_max_1 == 2 || conta_max_2 == 2) &&
+        (conta_min_1 == 4 || conta_min_2 == 4) &&
+        (conta_back_1 == 4 || conta_back_2 == 4) &&
+        (conta_front_1 + conta_front_2) <= 2) info.orientations.push_back(5);
+
+    if( (conta_max_1 == 2 || conta_max_2 == 2) &&
+        (conta_min_1 == 4 || conta_min_2 == 4) &&
+        (conta_right_1 == 4 || conta_right_2 == 4) &&
+        (conta_left_1 + conta_left_2) <= 2) info.orientations.push_back(6);
+
+    if( (conta_max_1 == 2 || conta_max_2 == 2) &&
+        (conta_min_1 == 4 || conta_min_2 == 4) &&
+        (conta_left_1 == 4 || conta_left_2 == 4) &&
+        (conta_right_1 + conta_right_2) <= 2) info.orientations.push_back(7);
+
+    if( (conta_left_1 == 4 || conta_left_2 == 4) &&
+        (conta_back_1 == 4 || conta_back_2 == 4) &&
+        (conta_front_1 + conta_front_2) <= 2) info.orientations.push_back(8);
+
+    if( (conta_right_1 == 4 || conta_right_2 == 4) &&
+        (conta_back_1 == 4 || conta_back_2 == 4) &&
+        (conta_front_1 + conta_front_2) <= 2) info.orientations.push_back(9);
 
 }
 
@@ -357,7 +438,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         else if(is_angle(el, pid, m_in, transition_faces))
                             insertAngle = true;
                         else insertFace = true;
-                    else if(scheme_vids.size() > 5 && verts_in_common(el, m_in.poly_verts_id(pid)) == 6)
+                    else if(scheme_vids.size() > 5 /*&& verts_in_common(el, m_in.poly_verts_id(pid)) == 6*/)
                         if(is_angle(el, pid, m_in, transition_faces))
                             insertAngle = true;
                         else insertFace = true;
