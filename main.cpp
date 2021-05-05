@@ -554,6 +554,8 @@ int main(int argc, char *argv[])
     split27(29, mesh, vertices, transition_verts, transition_faces);
     split27(3, mesh, vertices, transition_verts, transition_faces);
 
+    //split27(53, mesh, vertices, transition_verts, transition_faces);
+
 
     mesh.print_quality(); //scaled jacobian
 
