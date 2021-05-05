@@ -510,6 +510,7 @@ int main(int argc, char *argv[])
     */
 
 
+
     /*
      * Template cases (for testing)
      */
@@ -544,9 +545,8 @@ int main(int argc, char *argv[])
     split27(6, mesh, vertices, transition_verts, transition_faces);
     split27(8, mesh, vertices, transition_verts, transition_faces);
 
+
     */
-
-
 
     //failure case 1 (BALANCING PROBLEM)
     split27(0, mesh, vertices, transition_verts, transition_faces);
@@ -554,7 +554,6 @@ int main(int argc, char *argv[])
     split27(29, mesh, vertices, transition_verts, transition_faces);
     split27(3, mesh, vertices, transition_verts, transition_faces);
 
-    //split27(53, mesh, vertices, transition_verts, transition_faces);
 
 
     mesh.print_quality(); //scaled jacobian
