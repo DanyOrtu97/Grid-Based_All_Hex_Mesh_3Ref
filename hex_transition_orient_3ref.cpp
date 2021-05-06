@@ -116,13 +116,11 @@ void orient_face(std::vector<vec3d>              & verts,
         case 0:  break; //DEFAULT
         case 1:  rotate(verts, "z", -M_PI/2); break;
         case 2:  rotate(verts, "z",  M_PI/2); break;
-        case 3:  rotate(verts, "y", -M_PI/2); break;
-        case 4:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y", -M_PI/2); break; //unusefull
+        case 4:  rotate(verts, "y",  M_PI/2); break; //unusefull
         case 5:  rotate(verts, "x",  M_PI/2); break;
         case 6:  rotate(verts, "x", -M_PI/2); break;
         case 7:  reflect(verts, "x"); break;
-        case 8:  reflect(verts, "y"); break;
-        case 9:  reflect(verts, "z"); break;
     }
 
     for (auto & v: verts){
@@ -193,11 +191,7 @@ void orient_two_adj_faces(std::vector<vec3d>              & verts,
         case 2:  rotate(verts, "x",  M_PI/2); break;
         case 3:  rotate(verts, "y", -M_PI/2); break;
         case 4:  rotate(verts, "y",  M_PI/2); break;
-        case 5:  {
-            rotate(verts, "y",  M_PI/2);
-            rotate(verts, "z",  M_PI/2);
-            break;
-        }
+        case 5:  rotate(verts, "x",  M_PI);   break;
         case 6:  {
             rotate(verts, "y",  -M_PI/2);
             rotate(verts, "z",  -M_PI/2);
@@ -209,15 +203,17 @@ void orient_two_adj_faces(std::vector<vec3d>              & verts,
             break;
         }
         case 8:  {
-            rotate(verts, "y",  -M_PI/2);
             rotate(verts, "z",  -M_PI/2);
+            rotate(verts, "y",  -M_PI);
             break;
         }
         case 9:  {
-            rotate(verts, "y",  M_PI/2);
-            rotate(verts, "z",  M_PI/2);
+            rotate(verts, "x",  M_PI/2);
+            rotate(verts, "z",  -M_PI/2);
             break;
         }
+        case 10: rotate(verts, "z", -M_PI/2); break;
+        case 11: rotate(verts, "z", M_PI/2); break;
 
     }
 

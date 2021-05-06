@@ -292,6 +292,14 @@ void mark_two_adj_faces(const Hexmesh<M,V,E,F,P>    & m,
         (conta_back_1 == 4 || conta_back_2 == 4) &&
         (conta_front_1 + conta_front_2) <= 2) info.orientations.push_back(9);
 
+    if( (conta_right_1 == 4 || conta_right_2 == 4) &&
+        (conta_front_1 == 4 || conta_front_2 == 4) &&
+        (conta_back_1 + conta_back_2) <= 2) info.orientations.push_back(10);
+
+    if( (conta_left_1 == 4 || conta_left_2 == 4) &&
+        (conta_front_1 == 4 || conta_front_2 == 4) &&
+        (conta_back_1 + conta_back_2) <= 2) info.orientations.push_back(11);
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
