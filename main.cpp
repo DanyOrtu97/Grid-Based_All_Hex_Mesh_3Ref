@@ -554,11 +554,12 @@ int main(int argc, char *argv[])
     */
 
 
-    //failure case 1 (BALANCING PROBLEM)
+    //this work
     split27(0, mesh, vertices, transition_verts, transition_faces);
     split27(2, mesh, vertices, transition_verts, transition_faces);
-    split27(29, mesh, vertices, transition_verts, transition_faces);
     split27(3, mesh, vertices, transition_verts, transition_faces);
+    split27(29, mesh, vertices, transition_verts, transition_faces);
+
 
 
 
