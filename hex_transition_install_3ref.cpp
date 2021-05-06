@@ -438,10 +438,10 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
         for (auto el2 : verts_on_face){
             for (auto el : verts_face){
                 if(verts_in_common(el, el2) == 4) {
-                    if(scheme_vids.size() > 6 && verts_in_common(el, m_in.poly_verts_id(pid)) == 8)
-                        if(transition_or_full(el, pid, m_in, transition_faces) == 0)
+                    if(scheme_vids.size() > 6 && (verts_in_common(el, m_in.poly_verts_id(pid)) == 8 || verts_in_common(el, m_in.poly_verts_id(pid)) == 7))
+                        if(transition_or_full(el, pid, m_in, transition_faces) == 0 && !is_angle(el, pid, m_in, transition_faces))
                             insertTransition = true;
-                        else if (transition_or_full(el, pid, m_in, transition_faces) == 1)
+                        else if (transition_or_full(el, pid, m_in, transition_faces) == 1 && !is_angle(el, pid, m_in, transition_faces))
                             insert_full = true;
                         else if(is_angle(el, pid, m_in, transition_faces))
                             insertAngle = true;
@@ -455,6 +455,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                 }
             }
         }
+
 
 
 
