@@ -377,6 +377,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
             }
         }
 
+
         //merge faces
         for (uint fid=0; fid<faces.size(); fid++){
             auto f = faces[fid];
@@ -394,6 +395,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
         }
 
         //merge polys
+
         for (uint pid=0; pid<polys.size(); ++pid){
             auto p = polys.at(pid);
             for (auto & fid: p) fid = f_map.at(fid);
@@ -402,6 +404,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 
             if (test_id == -1) m.poly_add(p, winding[pid]);
         }
+
     }
 }
 

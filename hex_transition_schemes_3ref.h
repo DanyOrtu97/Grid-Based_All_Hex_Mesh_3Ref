@@ -457,6 +457,8 @@ namespace Face{
             1 ,       1 ,       1 ,
     };
 
+
+
     static const std::vector<std::vector<uint>> faces = {
         { 0,  2,  5,  4},
         { 0,  1,  3,  2},
@@ -512,6 +514,7 @@ namespace Face{
         { 0,  1, 25, 24},
     };
 
+
     static const std::vector<std::vector<uint>> polys = {
         { 0, 30,  4, 36, 40, 31},
         { 2, 24,  7, 30, 41,  8},
@@ -528,6 +531,7 @@ namespace Face{
         { 6, 21, 12, 37, 50, 51},
     };
 
+
     static const std::vector<std::vector<bool>> winding = {
         { true,  true,  true,  true,  true,  true},
         { true,  true,  true, false,  true,  true},
@@ -543,6 +547,7 @@ namespace Face{
         { true, false, false, false, false,  true},
         {false,  true, false,  true, false,  true},
     };
+
 }
 
 
