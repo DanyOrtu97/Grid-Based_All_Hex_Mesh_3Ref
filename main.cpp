@@ -524,6 +524,7 @@ int main(int argc, char *argv[])
 
                 gui_output.push_obj(&outputMesh);
 
+
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
 

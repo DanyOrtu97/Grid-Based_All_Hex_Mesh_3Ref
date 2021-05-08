@@ -154,6 +154,9 @@ void mark_face(const Hexmesh<M,V,E,F,P>    & m,
     info.type = HexTransition::FACE;
     info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
+
+
+
     for (auto face_id : transition_faces){
         for(auto fid : m.poly_faces_id(pid)){
             if(fid == face_id)
@@ -164,6 +167,12 @@ void mark_face(const Hexmesh<M,V,E,F,P>    & m,
     //select the right orientation to apply
     int conta_min = 0, conta_max = 0, conta_left = 0, conta_right = 0, conta_back = 0, conta_front = 0;
 
+    //maybe is needed to do more tests
+    if(faces.size()>1){
+        uint fid = faces[3];
+        faces.clear();
+        faces.push_back(fid);
+    }
 
     if(faces.size() == 1){
         for(auto vid : m.face_verts_id(faces[0])){
