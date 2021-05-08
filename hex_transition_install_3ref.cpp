@@ -117,7 +117,7 @@ uint transition_or_full(const std::vector<uint> a,
                         const Hexmesh<M,V,E,F,P> & m,
                         const std::vector<uint> transition_faces){
     std::vector<uint> faces;
-    uint transition_or_full = 0;
+    uint transition_or_full = 3;
 
     for (auto face_id : transition_faces){
         for(auto fid : m.poly_faces_id(pid)){
@@ -144,8 +144,9 @@ CINO_INLINE
 void mark_face(const Hexmesh<M,V,E,F,P>    & m,
                const uint                    pid,
                SchemeInfo                  & info,
-               const std::vector<uint>     & scheme_vids){
+               const std::vector<uint>     & transition_faces){
 
+    std::vector<uint> faces;
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
     vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
     vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
@@ -153,28 +154,40 @@ void mark_face(const Hexmesh<M,V,E,F,P>    & m,
     info.type = HexTransition::FACE;
     info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
+    for (auto face_id : transition_faces){
+        for(auto fid : m.poly_faces_id(pid)){
+            if(fid == face_id)
+                faces.push_back(fid);
+        }
+    }
+
     //select the right orientation to apply
     int conta_min = 0, conta_max = 0, conta_left = 0, conta_right = 0, conta_back = 0, conta_front = 0;
 
-    for (auto vid : scheme_vids){
-        if(m.vector_verts()[vid].y() == min.y()){
-            conta_min ++;
-            if(m.vector_verts()[vid].x() == min.x()) conta_left ++;
-            else if(m.vector_verts()[vid].x() == max.x()) conta_right ++;
 
-            if(m.vector_verts()[vid].z() == min.z()) conta_front ++;
-            else if(m.vector_verts()[vid].z() == max.z()) conta_back ++;
+    if(faces.size() == 1){
+        for(auto vid : m.face_verts_id(faces[0])){
+            if(m.vector_verts()[vid].y() == min.y()){
+                conta_min ++;
+                if(m.vector_verts()[vid].x() == min.x()) conta_left ++;
+                else if(m.vector_verts()[vid].x() == max.x()) conta_right ++;
 
-        }
-        else if(m.vector_verts()[vid].y() == max.y()){
-            conta_max ++;
-            if(m.vector_verts()[vid].x() == min.x()) conta_left ++;
-            else if(m.vector_verts()[vid].x() == max.x()) conta_right ++;
+                if(m.vector_verts()[vid].z() == min.z()) conta_front ++;
+                else if(m.vector_verts()[vid].z() == max.z()) conta_back ++;
 
-            if(m.vector_verts()[vid].z() == min.z()) conta_front ++;
-            else if(m.vector_verts()[vid].z() == max.z()) conta_back ++;
+            }
+            else if(m.vector_verts()[vid].y() == max.y()){
+                conta_max ++;
+                if(m.vector_verts()[vid].x() == min.x()) conta_left ++;
+                else if(m.vector_verts()[vid].x() == max.x()) conta_right ++;
+
+                if(m.vector_verts()[vid].z() == min.z()) conta_front ++;
+                else if(m.vector_verts()[vid].z() == max.z()) conta_back ++;
+            }
         }
     }
+
+
 
     if(conta_max == 4) info.orientations.push_back(0);
     else if (conta_min == 4) info.orientations.push_back(7);
@@ -465,7 +478,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
         if (insertFace){ //FACE
             SchemeInfo info;
 
-            mark_face(m_in, pid, info, scheme_vids);
+            mark_face(m_in, pid, info, transition_faces);
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }

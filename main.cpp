@@ -475,7 +475,10 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-    /*
+    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
+    gui_input.push_obj(&mesh);
+
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -503,93 +506,37 @@ int main(int argc, char *argv[])
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
                 mesh.updateGL();
+                mesh.print_quality(); //scaled jacobian
+
+
+                //chrono for template's application
+                std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
+
+                if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
+
+                std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
+
+                std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
+                                                                                  outputMesh.num_edges() << "E / " <<
+                                                                                  outputMesh.num_faces() << "F / " <<
+                                                                                  outputMesh.num_polys() << "P  [" <<
+                                                                                  how_many_seconds(t0o,t1o) << "s]" << std::endl;
+
+                gui_output.push_obj(&outputMesh);
+
+                outputMesh.updateGL();
+                outputMesh.print_quality(); //scaled jacobian
+
                 c->updateGL();
+
             }
         }
     };
-    */
 
 
-
-    /*
-     * Template cases (for testing)
-     */
-
-    /*
-    //config template 4
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(6, mesh, vertices, transition_verts, transition_faces);
-    split27(8, mesh, vertices, transition_verts, transition_faces);
-    split27(18, mesh, vertices, transition_verts, transition_faces);
-
-
-    // config template 5
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(1, mesh, vertices, transition_verts, transition_faces);
-    split27(3, mesh, vertices, transition_verts, transition_faces);
-    split27(5, mesh, vertices, transition_verts, transition_faces);
-
-
-    // config template 6
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(3, mesh, vertices, transition_verts, transition_faces);
-    split27(5, mesh, vertices, transition_verts, transition_faces);
-    split27(9, mesh, vertices, transition_verts, transition_faces);
-    split27(15, mesh, vertices, transition_verts, transition_faces);
-
-
-    // config template 7/8
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(2, mesh, vertices, transition_verts, transition_faces);
-    split27(4, mesh, vertices, transition_verts, transition_faces);
-    split27(6, mesh, vertices, transition_verts, transition_faces);
-    split27(8, mesh, vertices, transition_verts, transition_faces);
-
-
-    //failure case 1 (BALANCING PROBLEM)
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(2, mesh, vertices, transition_verts, transition_faces);
-    split27(29, mesh, vertices, transition_verts, transition_faces);
-    split27(3, mesh, vertices, transition_verts, transition_faces);
-    */
-
-
-
-
-    split27(0, mesh, vertices, transition_verts, transition_faces);
-    split27(2, mesh, vertices, transition_verts, transition_faces);
-
-
-
-    mesh.print_quality(); //scaled jacobian
-
-
-
-    //chrono for template's application
-    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
-
-    if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
-
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
-    //std::cout << std::endl;
-    std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
-                                                                      outputMesh.num_edges() << "E / " <<
-                                                                      outputMesh.num_faces() << "F / " <<
-                                                                      outputMesh.num_polys() << "P  [" <<
-                                                                      how_many_seconds(t0,t1) << "s]" << std::endl;
-
-    outputMesh.updateGL();
-
-
-    outputMesh.print_quality(); //scaled jacobian
-
-
-
-    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after refinements", Color::BLACK(), 12, 0);
-    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
-    gui_input.push_obj(&mesh);
+    if(mesh.num_verts() < 64) outputMesh = mesh;
     gui_output.push_obj(&outputMesh);
+    outputMesh.updateGL();
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
