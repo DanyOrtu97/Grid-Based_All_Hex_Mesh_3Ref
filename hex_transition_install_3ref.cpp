@@ -402,9 +402,6 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 
             for (auto & vid: p) vid = v_map[verts.at(vid)];
 
-            //int test_id = m.poly_id(p);
-
-            //if (test_id == -1)
             m.poly_add(p);
         }
 

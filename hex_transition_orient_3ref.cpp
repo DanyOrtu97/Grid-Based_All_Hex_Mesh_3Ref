@@ -104,9 +104,7 @@ void orient_face(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
 
-    //std::cout << " -- orientation : "<< info.orientations[0]<<std::endl;
 
-    /*
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -117,7 +115,7 @@ void orient_face(std::vector<vec3d>              & verts,
         case 5:  rotate(verts, "x",  M_PI/2); break;
         case 6:  rotate(verts, "x", -M_PI/2); break;
         case 7:  reflect(verts, "x"); break;
-    }*/
+    }
 
     for (auto & v: verts){
         v *= info.scale;

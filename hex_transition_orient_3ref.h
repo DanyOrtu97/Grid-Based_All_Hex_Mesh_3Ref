@@ -44,9 +44,6 @@ enum class HexTransition{
     TRANSITION,
     FACE,
     TWO_ADJ_FACES,
-    /*
-     * Ne mancano, saranno da aggiungere via via che si trovano
-     */
 };
 
 /*

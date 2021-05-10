@@ -493,11 +493,15 @@ int main(int argc, char *argv[])
 
             if (c->unproject(click, p))
             {
+                std::cout<< "###############################" <<std::endl;
+
                 profiler.push("Pick Polys");
 
                 uint pid = mesh.pick_poly(p);
                 profiler.pop();
 
+
+                //chrono for subdivision
                 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
                 split27(pid, mesh, vertices, transition_verts, transition_faces);
@@ -507,7 +511,6 @@ int main(int argc, char *argv[])
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
                 mesh.updateGL();
-                mesh.print_quality(); //scaled jacobian
 
 
                 //chrono for template's application
@@ -517,6 +520,7 @@ int main(int argc, char *argv[])
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
+                std::cout << std::endl;
                 std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
                                                                                   outputMesh.num_edges() << "E / " <<
                                                                                   outputMesh.num_faces() << "F / " <<
@@ -536,9 +540,7 @@ int main(int argc, char *argv[])
     };
 
 
-    if(mesh.num_verts() < 64) outputMesh = mesh;
-    gui_output.push_obj(&outputMesh);
-    outputMesh.updateGL();
+
 
     mesh.print_quality();
 
