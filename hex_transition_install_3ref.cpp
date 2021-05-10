@@ -377,19 +377,16 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
                              std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     std::map<vec3d, uint, vert_compare> v_map;
-    std::map<uint, uint> f_map;
 
     for (uint vid=0; vid<m.num_verts(); ++vid) v_map[m.vert(vid)] = vid;
 
     for (const auto &p : poly2scheme){
         std::vector<vec3d>              verts;
-        std::vector<std::vector<uint>>  faces;
         std::vector<std::vector<uint>>  polys;
-        std::vector<std::vector<bool>>  winding;
 
         vec3d poly_centroid = m.poly_centroid(p.first);
         SchemeInfo info = p.second;
-        hex_transition_orient_3ref(verts, faces, polys, winding, info, poly_centroid);
+        hex_transition_orient_3ref(verts, polys, info, poly_centroid);
 
         //merge vertices
         for (auto & v : verts){
@@ -399,32 +396,16 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
             }
         }
 
-
-        //merge faces
-        for (uint fid=0; fid<faces.size(); fid++){
-            auto f = faces[fid];
-            for (uint &v : f) v = v_map[verts.at(v)];
-
-            int test_id = m.face_id(f);
-
-            if(test_id>0){
-                f_map[fid] = test_id;
-            }
-            else{
-                uint fresh_fid = m.face_add(f);
-                f_map[fid] = fresh_fid;
-            }
-        }
-
         //merge polys
-
         for (uint pid=0; pid<polys.size(); ++pid){
             auto p = polys.at(pid);
-            for (auto & fid: p) fid = f_map.at(fid);
 
-            int test_id = m.poly_id(p);
+            for (auto & vid: p) vid = v_map[verts.at(vid)];
 
-            if (test_id == -1) m.poly_add(p, winding[pid]);
+            //int test_id = m.poly_id(p);
+
+            //if (test_id == -1)
+            m.poly_add(p);
         }
 
     }
