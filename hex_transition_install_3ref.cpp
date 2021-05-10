@@ -169,7 +169,7 @@ void mark_face(const Hexmesh<M,V,E,F,P>    & m,
 
     //maybe is needed to do more tests
     if(faces.size()>1){
-        uint fid = faces[3];
+        uint fid = faces[faces.size()-1];
         faces.clear();
         faces.push_back(fid);
     }
