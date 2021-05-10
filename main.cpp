@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cinolib/how_many_seconds.h>
 #include <hex_transition_install_3ref.h>
+#include <cinolib/connected_components.h>
 
 namespace cinolib
 {
@@ -44,6 +45,25 @@ struct vert_compare
     }
 };
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void read_balancing(const char                       * filename,
+                    const bool                         weakly,
+                          DrawableHexmesh<M,V,E,F,P> & mesh,
+                          std::map<vec3d, uint>      & vertices,
+                          std::vector<bool>          & transition_verts,
+                          std::vector<uint>          & transition_faces){
+
+    if (weakly){
+
+    }
+    else{
+
+    }
+
+    //mesh.poly_fix_orientation();
+}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -452,6 +472,8 @@ int main(int argc, char *argv[])
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
     DrawableHexmesh<> mesh(s.c_str());
+
+
     DrawableHexmesh<> outputMesh;
 
     //vertices
@@ -533,6 +555,8 @@ int main(int argc, char *argv[])
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
 
+                std::cout<< "N° componenti connesse: " << connected_components(outputMesh) <<std::endl;
+
                 c->updateGL();
 
             }
@@ -543,6 +567,10 @@ int main(int argc, char *argv[])
 
 
     mesh.print_quality();
+
+    //Quadmesh surfaceMesh(outputMesh.get_surface_verts())
+
+
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);

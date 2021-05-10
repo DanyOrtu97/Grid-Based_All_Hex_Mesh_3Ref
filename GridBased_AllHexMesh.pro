@@ -48,7 +48,7 @@ DEFINES += CINOLIB_USES_QT
 QT += core opengl
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/include
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/eigen
-DATA_PATH       = \\\"$$PWD/../cinolib/examples/data/\\\"
+DATA_PATH       = \\\"$$PWD/../Meshes/\\\"
 DEFINES        += DATA_PATH=$$DATA_PATH
 
 # just for Linux
