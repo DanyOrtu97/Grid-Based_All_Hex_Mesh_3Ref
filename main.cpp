@@ -56,28 +56,27 @@ void read_balancing(const bool                         weakly,
                           std::vector<bool>          & transition_verts,
                           std::vector<uint>          & transition_faces){
 
-
-    mesh.poly_fix_orientation();
-
     std::vector<int> poly_labels = mesh.vector_poly_labels();
+
+    std::vector<uint> adj_p2p;
 
     if (weakly){
         for(uint pid=0; pid<poly_labels.size(); ++pid){
+            adj_p2p = mesh.adj_p2p(pid);
 
-            /*
-             * Add controls for balancing and for fill the 1x1x1 holes
-             *
-             *  Weakly Balancing
-             */
-            if(poly_labels[pid] == 2) //split27 ricorsivo (da fare)
-                split27(pid, mesh, vertices, transition_verts, transition_faces); //a little bit slow (use release mode for testing)
-
-            std::cout<< "pid : " << pid << " [ " << (pid * 100)/poly_labels.size() << "% ]" <<std::endl;
+            if(poly_labels[pid] == 2){
+                for(auto el: adj_p2p) if(poly_labels[el] == 0) poly_labels[el] = 1;
+            }
         }
     }
     else{
-
+        // still to do
     }
+
+    mesh.poly_apply_labels(poly_labels);
+    mesh.poly_color_wrt_label();
+    mesh.updateGL();
+    read(mesh, vertices, transition_verts, transition_faces);
 }
 
 
@@ -90,23 +89,37 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
           std::vector<uint>          & transition_faces){
 
 
-    mesh.poly_fix_orientation();
-    std::vector<int> poly_labels = mesh.vector_poly_labels();
+    std::vector<int> poly_labels = mesh.vector_poly_labels();   
+    int max = *std::max_element(poly_labels.begin(), poly_labels.end());
 
+    if(max > 0){
+        for(uint pid=0; pid<poly_labels.size()/40; ++pid){
+            /*
+             * Add controls for fill the 1x1x1 holes
+             */
 
-    for(uint pid=0; pid<poly_labels.size(); ++pid){
+            if(poly_labels[pid] >= 1){
+                split27(pid, mesh, vertices, transition_verts, transition_faces);
 
-        /*
-         * Add controls for fill the 1x1x1 holes
-         *
-         */
-        if(poly_labels[pid] == 2)
-            split27(pid, mesh, vertices, transition_verts, transition_faces); //a little bit slow (use release mode for testing)
+                std::vector<int> new_poly_labels = mesh.vector_poly_labels();
 
-        std::cout<< "pid : " << pid << " [ " << (pid * 100)/poly_labels.size() << "% ]" <<std::endl;
+                for (uint p=0; p<new_poly_labels.size(); p++) if(new_poly_labels[p] == -1) new_poly_labels[p] = poly_labels[pid] - 1;
+                mesh.poly_apply_labels(new_poly_labels);
+                mesh.updateGL();
+            }
+
+            std::vector<int> new_poly_labels = mesh.vector_poly_labels();
+            for (uint p=0; p<new_poly_labels.size(); p++) if(new_poly_labels[p] > 0) new_poly_labels[p]--;
+            mesh.poly_apply_labels(new_poly_labels);
+            mesh.updateGL();
+            std::cout<< "pid : " << pid << " [ " << (pid * 100)/(poly_labels.size()/40) << "% ]" <<std::endl;
+       }
+       read(mesh, vertices, transition_verts, transition_faces);
     }
-
+    else return;
 }
+
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -506,8 +519,6 @@ void split27(const uint                                   pid,
 
 }
 
-
-
 int main(int argc, char *argv[])
 {
     using namespace cinolib;
@@ -534,6 +545,7 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
+    //mesh.poly_fix_orientation();
     read_balancing(true, mesh, vertices, transition_verts, transition_faces);
 
 
