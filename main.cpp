@@ -89,32 +89,38 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
           std::vector<uint>          & transition_faces){
 
 
-    std::vector<int> poly_labels = mesh.vector_poly_labels();   
+    std::vector<int> poly_labels = mesh.vector_poly_labels();
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
 
+
+
     if(max > 0){
-        for(uint pid=0; pid<poly_labels.size()/40; ++pid){
+        std::cout<< "max = " << max << std::endl;
+
+        for(uint pid=0; pid<poly_labels.size(); ++pid){
             /*
              * Add controls for fill the 1x1x1 holes
              */
 
             if(poly_labels[pid] >= 1){
+
+                //need improvements on time -- too too slow
+
                 split27(pid, mesh, vertices, transition_verts, transition_faces);
 
                 std::vector<int> new_poly_labels = mesh.vector_poly_labels();
 
                 for (uint p=0; p<new_poly_labels.size(); p++) if(new_poly_labels[p] == -1) new_poly_labels[p] = poly_labels[pid] - 1;
+
+
                 mesh.poly_apply_labels(new_poly_labels);
                 mesh.updateGL();
-            }
 
-            std::vector<int> new_poly_labels = mesh.vector_poly_labels();
-            for (uint p=0; p<new_poly_labels.size(); p++) if(new_poly_labels[p] > 0) new_poly_labels[p]--;
-            mesh.poly_apply_labels(new_poly_labels);
-            mesh.updateGL();
-            std::cout<< "pid : " << pid << " [ " << (pid * 100)/(poly_labels.size()/40) << "% ]" <<std::endl;
-       }
-       read(mesh, vertices, transition_verts, transition_faces);
+            }
+            std::cout<< "pid : " << pid << " [ " << (pid * 100)/(poly_labels.size()) << "% ]" <<std::endl;
+        }
+
+        read(mesh, vertices, transition_verts, transition_faces);
     }
     else return;
 }
