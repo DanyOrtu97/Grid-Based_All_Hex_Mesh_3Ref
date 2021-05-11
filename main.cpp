@@ -12,6 +12,7 @@
 #include <cinolib/how_many_seconds.h>
 #include <hex_transition_install_3ref.h>
 #include <cinolib/connected_components.h>
+#include <cinolib/io/io_utilities.h>
 
 namespace cinolib
 {
@@ -45,31 +46,74 @@ struct vert_compare
     }
 };
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void read_balancing(const char                       * filename,
-                    const bool                         weakly,
+void read_balancing(const bool                         weakly,
                           DrawableHexmesh<M,V,E,F,P> & mesh,
                           std::map<vec3d, uint>      & vertices,
                           std::vector<bool>          & transition_verts,
                           std::vector<uint>          & transition_faces){
 
-    if (weakly){
 
+    mesh.poly_fix_orientation();
+
+    std::vector<int> poly_labels = mesh.vector_poly_labels();
+
+    if (weakly){
+        for(uint pid=0; pid<poly_labels.size(); ++pid){
+
+            /*
+             * Add controls for balancing and for fill the 1x1x1 holes
+             *
+             *  Weakly Balancing
+             */
+            if(poly_labels[pid] == 2) //split27 ricorsivo (da fare)
+                split27(pid, mesh, vertices, transition_verts, transition_faces); //a little bit slow (use release mode for testing)
+
+            std::cout<< "pid : " << pid << " [ " << (pid * 100)/poly_labels.size() << "% ]" <<std::endl;
+        }
     }
     else{
 
     }
-
-    //mesh.poly_fix_orientation();
 }
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void read(DrawableHexmesh<M,V,E,F,P> & mesh,
+          std::map<vec3d, uint>      & vertices,
+          std::vector<bool>          & transition_verts,
+          std::vector<uint>          & transition_faces){
+
+
+    mesh.poly_fix_orientation();
+    std::vector<int> poly_labels = mesh.vector_poly_labels();
+
+
+    for(uint pid=0; pid<poly_labels.size(); ++pid){
+
+        /*
+         * Add controls for fill the 1x1x1 holes
+         *
+         */
+        if(poly_labels[pid] == 2)
+            split27(pid, mesh, vertices, transition_verts, transition_faces); //a little bit slow (use release mode for testing)
+
+        std::cout<< "pid : " << pid << " [ " << (pid * 100)/poly_labels.size() << "% ]" <<std::endl;
+    }
+
+}
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+//Split the polygon of id "pid" of the input mesh into 27 cubes
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-// split the polygon of id "pid" of the input mesh into 27 cubes
 void split27(const uint                                   pid,
              DrawableHexmesh<M,V,E,F,P>                 & mesh,
              std::map<vec3d, uint>                      & vertices,
@@ -299,7 +343,6 @@ void split27(const uint                                   pid,
                 vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
                 vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second};
 
-
     polys[10] = {vertices.find(vec3d(avg1[0], min[1], avg2[2]))->second,
                  vertices.find(vec3d(avg2[0], min[1], avg2[2]))->second,
                  vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
@@ -470,7 +513,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
 
 
@@ -479,9 +522,19 @@ int main(int argc, char *argv[])
     //vertices
     std::map<vec3d, uint> vertices;
 
+
     //vectors for templates application
     std::vector<bool> transition_verts;
     std::vector<uint> transition_faces;
+
+
+    //when the mesh has numverts > 8
+    for (auto v: mesh.vector_verts()){
+        vertices.insert(std::pair<vec3d, uint>(v, vertices.size()));
+        transition_verts.push_back(false);
+    }
+
+    read_balancing(true, mesh, vertices, transition_verts, transition_faces);
 
 
     QWidget window;
@@ -493,15 +546,15 @@ int main(int argc, char *argv[])
     window.resize(1000,600);
     window.show();
 
+    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
+    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
+    gui_input.push_obj(&mesh);
 
     /*
      * Tool for creating new polys by mouse click
      */
 
-    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
-    gui_input.push_obj(&mesh);
-
-
+    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -562,13 +615,33 @@ int main(int argc, char *argv[])
             }
         }
     };
-
+    */
 
 
 
     mesh.print_quality();
 
-    //Quadmesh surfaceMesh(outputMesh.get_surface_verts())
+    //chrono for template's application
+    std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
+
+    if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
+
+    std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
+
+    std::cout << std::endl;
+    std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
+                                                                      outputMesh.num_edges() << "E / " <<
+                                                                      outputMesh.num_faces() << "F / " <<
+                                                                      outputMesh.num_polys() << "P  [" <<
+                                                                      how_many_seconds(t0o,t1o) << "s]" << std::endl;
+
+    gui_output.push_obj(&outputMesh);
+
+
+    outputMesh.updateGL();
+    outputMesh.print_quality(); //scaled jacobian
+
+    std::cout<< "N° componenti connesse: " << connected_components(outputMesh) <<std::endl;
 
 
 
