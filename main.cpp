@@ -9,6 +9,7 @@
 #include <cinolib/profiler.h>
 #include <map>
 #include <algorithm>
+#include <sys/types.h>
 #include <cinolib/how_many_seconds.h>
 #include <hex_transition_install_3ref.h>
 #include <cinolib/connected_components.h>
@@ -65,6 +66,10 @@ void read_balancing(const bool                         weakly,
         for(uint pid=0; pid<poly_labels.size(); ++pid){
             adj_p2p = mesh.adj_p2p(pid);
 
+            /*
+             * Add controls for fill 1x1x1 holes
+             */
+
             if(poly_labels[pid] == 2){
                 for(auto el: adj_p2p) if(poly_labels[el] == 0) poly_labels[el] = 1;
             }
@@ -92,16 +97,13 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
-
     std::vector<uint> vector_pid;
 
-    if(max > 0){
+
+    if(max >= 1){
         std::cout<< "max = " << max << std::endl;
 
         for(uint pid=0; pid<poly_labels.size(); ++pid){
-            /*
-             * Add controls for fill the 1x1x1 holes
-             */
 
             if(poly_labels[pid] >= 1){
 
@@ -110,12 +112,15 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
                 vector_pid.push_back(pid);
 
             }
-            std::cout<< "pid : " << pid << " [ " << (pid * 100)/(poly_labels.size()) << "% ]" <<std::endl;
+            std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (poly_labels.size()) << "% ]" <<std::endl;
         }
 
+
+        //recalculate poly labels
         std::vector<int> new_poly_labels = mesh.vector_poly_labels();
 
         for (auto el: vector_pid) new_poly_labels[el] = poly_labels[el] - 1;
+
 
         int change=-1;
         for (uint p= (new_poly_labels.size() - (vector_pid.size()*26)); p<new_poly_labels.size(); p++){
@@ -158,11 +163,7 @@ void split27(const uint                                   pid,
     vec3d avg2 = avg1 + ((max-min)/3);
 
     std::vector<vec3d> newverts(64);
-
-    if(mesh.num_polys() <= 1) for(auto v: verts){
-        vertices.insert(std::pair<vec3d, uint>(v, uint(vertices.size())));
-        transition_verts.push_back(false);
-    }
+    std::vector<uint> newvertsid(64);
 
     //z = min
     newverts[0] = vec3d(min[0], min[1], min[2]); //
@@ -250,16 +251,20 @@ void split27(const uint                                   pid,
 
 
     //insert vertices in map and mesh
-    for (auto v : newverts){
-        if (vertices.find(v) == vertices.end()){
+    int conta = 0;
+    for (auto & v : newverts){
+        std::map<vec3d, uint>::iterator pair = vertices.find(v);
+        if (pair == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
+            newvertsid[conta] = fresh_vid;
             transition_verts.push_back(false);
         }
-
+        else newvertsid[conta] = pair->second;
+        conta++;
     }
 
-    //calculate vertices and faces to apply templates
+    //update vertices and faces to apply templates
     if(mesh.num_verts() > 64){
         for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
         for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
@@ -269,248 +274,33 @@ void split27(const uint                                   pid,
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     //Insert polys
-    polys[0] = {vertices.find(vec3d(min[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], min[1], min[2]))->second,
-                vertices.find(vec3d(min[0], min[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg1[1], min[2]))->second};
-
-    polys[1] = {vertices.find(vec3d(avg1[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], min[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], min[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], min[2]))->second};
-
-    polys[2] = {vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], min[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], min[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], min[2]))->second};
-
-    polys[3] = {vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg2[1], min[2]))->second};
-
-    polys[4] = {vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], min[2]))->second};
-
-    polys[5] = {vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg1[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], min[2]))->second};
-
-    polys[6] = {vertices.find(vec3d(min[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(min[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(min[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(avg1[0], max[1], min[2]))->second,
-                vertices.find(vec3d(min[0], max[1], min[2]))->second};
-
-    polys[7] = {vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(avg2[0], max[1], min[2]))->second,
-                vertices.find(vec3d(avg1[0], max[1], min[2]))->second};
-
-    polys[8] = {vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg2[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], avg2[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], max[1], avg1[2]))->second,
-                vertices.find(vec3d(max[0], max[1], min[2]))->second,
-                vertices.find(vec3d(avg2[0], max[1], min[2]))->second};
-
-    polys[9] = {vertices.find(vec3d(min[0], min[1], avg2[2]))->second,
-                vertices.find(vec3d(avg1[0], min[1], avg2[2]))->second,
-                vertices.find(vec3d(avg1[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(min[0], min[1], avg1[2]))->second,
-                vertices.find(vec3d(min[0], avg1[1], avg2[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second};
-
-    polys[10] = {vertices.find(vec3d(avg1[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], min[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second};
-
-    polys[11] = {vertices.find(vec3d(avg2[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], min[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second};
-
-    polys[12] = {vertices.find(vec3d(min[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], avg1[2]))->second};
-
-    polys[13] = {vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second};
-
-    polys[14] = {vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second};
-
-    polys[15] = {vertices.find(vec3d(min[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg1[2]))->second,
-                 vertices.find(vec3d(min[0], max[1], avg1[2]))->second};
-
-    polys[16] = {vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg1[2]))->second};
-
-    polys[17] = {vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(max[0], max[1], avg1[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg1[2]))->second};
-
-    polys[18] = {vertices.find(vec3d(min[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg1[1], avg2[2]))->second};
-
-    polys[19] = {vertices.find(vec3d(avg1[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second};
-
-    polys[20] = {vertices.find(vec3d(avg2[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], min[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], min[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second};
-
-    polys[21] = {vertices.find(vec3d(min[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], avg2[2]))->second};
-
-    polys[22] = {vertices.find(vec3d(avg1[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second};
-
-    polys[23] = {vertices.find(vec3d(avg2[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg1[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second};
-
-    polys[24] = {vertices.find(vec3d(min[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(min[0], max[1], avg2[2]))->second};
-
-    polys[25] = {vertices.find(vec3d(avg1[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg1[0], max[1], avg2[2]))->second};
-
-    polys[26] = {vertices.find(vec3d(avg2[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], avg2[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], max[1], max[2]))->second,
-                 vertices.find(vec3d(max[0], max[1], avg2[2]))->second,
-                 vertices.find(vec3d(avg2[0], max[1], avg2[2]))->second};
+    polys[0] =  {newvertsid[16], newvertsid[17],  newvertsid[1],  newvertsid[0], newvertsid[20], newvertsid[21],  newvertsid[5],  newvertsid[4]};
+    polys[1] =  {newvertsid[17], newvertsid[18],  newvertsid[2],  newvertsid[1], newvertsid[21], newvertsid[22],  newvertsid[6],  newvertsid[5]};
+    polys[2] =  {newvertsid[18], newvertsid[19],  newvertsid[3],  newvertsid[2], newvertsid[22], newvertsid[23],  newvertsid[7],  newvertsid[6]};
+    polys[3] =  {newvertsid[20], newvertsid[21],  newvertsid[5],  newvertsid[4], newvertsid[24], newvertsid[25],  newvertsid[9],  newvertsid[8]};
+    polys[4] =  {newvertsid[21], newvertsid[22],  newvertsid[6],  newvertsid[5], newvertsid[25], newvertsid[26], newvertsid[10],  newvertsid[9]};
+    polys[5] =  {newvertsid[22], newvertsid[23],  newvertsid[7],  newvertsid[6], newvertsid[26], newvertsid[27], newvertsid[11], newvertsid[10]};
+    polys[6] =  {newvertsid[24], newvertsid[25],  newvertsid[9],  newvertsid[8], newvertsid[28], newvertsid[29], newvertsid[13], newvertsid[12]};
+    polys[7] =  {newvertsid[25], newvertsid[26], newvertsid[10],  newvertsid[9], newvertsid[29], newvertsid[30], newvertsid[14], newvertsid[13]};
+    polys[8] =  {newvertsid[26], newvertsid[27], newvertsid[11], newvertsid[10], newvertsid[30], newvertsid[31], newvertsid[15], newvertsid[14]};
+    polys[9] =  {newvertsid[32], newvertsid[33], newvertsid[17], newvertsid[16], newvertsid[36], newvertsid[37], newvertsid[21], newvertsid[20]};
+    polys[10] = {newvertsid[33], newvertsid[34], newvertsid[18], newvertsid[17], newvertsid[37], newvertsid[38], newvertsid[22], newvertsid[21]};
+    polys[11] = {newvertsid[34], newvertsid[35], newvertsid[19], newvertsid[18], newvertsid[38], newvertsid[39], newvertsid[23], newvertsid[22]};
+    polys[12] = {newvertsid[36], newvertsid[37], newvertsid[21], newvertsid[20], newvertsid[40], newvertsid[41], newvertsid[25], newvertsid[24]};
+    polys[13] = {newvertsid[37], newvertsid[38], newvertsid[22], newvertsid[21], newvertsid[41], newvertsid[42], newvertsid[26], newvertsid[25]};
+    polys[14] = {newvertsid[38], newvertsid[39], newvertsid[23], newvertsid[22], newvertsid[42], newvertsid[43], newvertsid[27], newvertsid[26]};
+    polys[15] = {newvertsid[40], newvertsid[41], newvertsid[25], newvertsid[24], newvertsid[44], newvertsid[45], newvertsid[29], newvertsid[28]};
+    polys[16] = {newvertsid[41], newvertsid[42], newvertsid[26], newvertsid[25], newvertsid[45], newvertsid[46], newvertsid[30], newvertsid[29]};
+    polys[17] = {newvertsid[42], newvertsid[43], newvertsid[27], newvertsid[26], newvertsid[46], newvertsid[47], newvertsid[31], newvertsid[30]};
+    polys[18] = {newvertsid[48], newvertsid[49], newvertsid[33], newvertsid[32], newvertsid[52], newvertsid[53], newvertsid[37], newvertsid[36]};
+    polys[19] = {newvertsid[49], newvertsid[50], newvertsid[34], newvertsid[33], newvertsid[53], newvertsid[54], newvertsid[38], newvertsid[37]};
+    polys[20] = {newvertsid[50], newvertsid[51], newvertsid[35], newvertsid[34], newvertsid[54], newvertsid[55], newvertsid[39], newvertsid[38]};
+    polys[21] = {newvertsid[52], newvertsid[53], newvertsid[37], newvertsid[36], newvertsid[56], newvertsid[57], newvertsid[41], newvertsid[40]};
+    polys[22] = {newvertsid[53], newvertsid[54], newvertsid[38], newvertsid[37], newvertsid[57], newvertsid[58], newvertsid[42], newvertsid[41]};
+    polys[23] = {newvertsid[54], newvertsid[55], newvertsid[39], newvertsid[38], newvertsid[58], newvertsid[59], newvertsid[43], newvertsid[42]};
+    polys[24] = {newvertsid[56], newvertsid[57], newvertsid[41], newvertsid[40], newvertsid[60], newvertsid[61], newvertsid[45], newvertsid[44]};
+    polys[25] = {newvertsid[57], newvertsid[58], newvertsid[42], newvertsid[41], newvertsid[61], newvertsid[62], newvertsid[46], newvertsid[45]};
+    polys[26] = {newvertsid[58], newvertsid[59], newvertsid[43], newvertsid[42], newvertsid[62], newvertsid[63], newvertsid[47], newvertsid[46]};
 
 
     for(auto p : polys) mesh.poly_add(p);
@@ -521,6 +311,9 @@ void split27(const uint                                   pid,
 }
 
 }
+
+
+//:::::::::::::::::::::::::::::::::::MAIN:::::::::::::::::::::::::::::::::::::
 
 int main(int argc, char *argv[])
 {
@@ -548,9 +341,19 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
-    //mesh.poly_fix_orientation();
+
+    //chrono for refinements' application
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+
     read_balancing(true, mesh, vertices, transition_verts, transition_faces);
 
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::cout << std::endl;
+    std::cout << "Applied refinements into mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
+
+
+    mesh.poly_fix_orientation();
 
     QWidget window;
     GLcanvas gui_input, gui_output;
@@ -565,11 +368,13 @@ int main(int argc, char *argv[])
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.push_obj(&mesh);
 
+
     /*
      * Tool for creating new polys by mouse click
      */
 
     /*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -630,7 +435,7 @@ int main(int argc, char *argv[])
             }
         }
     };
-    */
+*/
 
 
 
