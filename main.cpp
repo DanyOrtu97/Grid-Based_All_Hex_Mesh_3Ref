@@ -14,6 +14,7 @@
 #include <cinolib/connected_components.h>
 #include <cinolib/io/io_utilities.h>
 
+
 namespace cinolib
 {
 
@@ -92,7 +93,7 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
     std::vector<int> poly_labels = mesh.vector_poly_labels();
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
 
-
+    std::vector<uint> vector_pid;
 
     if(max > 0){
         std::cout<< "max = " << max << std::endl;
@@ -104,21 +105,28 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
 
             if(poly_labels[pid] >= 1){
 
-                //need improvements on time -- too too slow
-
                 split27(pid, mesh, vertices, transition_verts, transition_faces);
 
-                std::vector<int> new_poly_labels = mesh.vector_poly_labels();
-
-                for (uint p=0; p<new_poly_labels.size(); p++) if(new_poly_labels[p] == -1) new_poly_labels[p] = poly_labels[pid] - 1;
-
-
-                mesh.poly_apply_labels(new_poly_labels);
-                mesh.updateGL();
+                vector_pid.push_back(pid);
 
             }
             std::cout<< "pid : " << pid << " [ " << (pid * 100)/(poly_labels.size()) << "% ]" <<std::endl;
         }
+
+        std::vector<int> new_poly_labels = mesh.vector_poly_labels();
+
+        for (auto el: vector_pid) new_poly_labels[el] = poly_labels[el] - 1;
+
+        int change=-1;
+        for (uint p= (new_poly_labels.size() - (vector_pid.size()*26)); p<new_poly_labels.size(); p++){
+            if(new_poly_labels[p] == -1){
+                if((new_poly_labels.size() - p) % 26 == 0) change ++;
+                new_poly_labels[p] = poly_labels[vector_pid[change]] - 1;
+            }
+        }
+
+        mesh.poly_apply_labels(new_poly_labels);
+        mesh.updateGL();
 
         read(mesh, vertices, transition_verts, transition_faces);
     }
@@ -240,8 +248,6 @@ void split27(const uint                                   pid,
     newverts[62] = vec3d(avg2[0], max[1], max[2]);
     newverts[63] = vec3d(max[0], max[1], max[2]); //
 
-    uint conta = 0;
-    std::vector<uint> vert_to_false;
 
     //insert vertices in map and mesh
     for (auto v : newverts){
@@ -253,22 +259,13 @@ void split27(const uint                                   pid,
 
     }
 
-
-    //find vertices to set a false in the transition_verts vector
-    for(auto vid: mesh.poly_verts_id(pid)){
-        if(transition_verts[vid]){
-            conta++;
-            vert_to_false.push_back(vid);
-        }
-    }
-
-
     //calculate vertices and faces to apply templates
     if(mesh.num_verts() > 64){
         for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
         for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
 
     }
+
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     //Insert polys
