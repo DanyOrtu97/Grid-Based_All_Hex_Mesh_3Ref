@@ -66,10 +66,6 @@ void read_balancing(const bool                         weakly,
         for(uint pid=0; pid<poly_labels.size(); ++pid){
             adj_p2p = mesh.adj_p2p(pid);
 
-            /*
-             * Add controls for fill 1x1x1 holes
-             */
-
             if(poly_labels[pid] == 2){
                 for(auto el: adj_p2p) if(poly_labels[el] == 0) poly_labels[el] = 1;
             }
@@ -82,8 +78,45 @@ void read_balancing(const bool                         weakly,
     mesh.poly_apply_labels(poly_labels);
     mesh.poly_color_wrt_label();
     mesh.updateGL();
+
+
+    //fill 1x1x1 holes
+    fill_holes(mesh);
+    fill_holes(mesh); //c'è bisosgno di farlo più volte (da fixare) - dopo la prima passata se ne creano di nuovi
+
     read(mesh, vertices, transition_verts, transition_faces);
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh){
+
+    std::vector<int> poly_labels = mesh.vector_poly_labels();
+
+    std::vector<uint> adj_p2p;
+
+    int conta_adj;
+
+    std::vector<std::pair<uint, int>> vec_conta_adj;
+
+    for(uint pid=0; pid<poly_labels.size(); ++pid){
+        conta_adj = 0;
+        adj_p2p = mesh.adj_p2p(pid);
+        for(auto el: adj_p2p) if(poly_labels[el] == poly_labels[pid] + 1) conta_adj++;
+
+        vec_conta_adj.push_back(std::pair<uint, int>(pid, conta_adj));
+    }
+
+    for (auto el: vec_conta_adj) if(el.second > 2) poly_labels[el.first] ++;
+
+
+
+    mesh.poly_apply_labels(poly_labels);
+    mesh.poly_color_wrt_label();
+    mesh.updateGL();
+}
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -96,14 +129,14 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
 
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
-    int max = *std::max_element(poly_labels.begin(), poly_labels.end());
+    int max = *std::max_element(poly_labels.begin(), poly_labels.begin()+512);
     std::vector<uint> vector_pid;
 
 
     if(max >= 1){
         std::cout<< "max = " << max << std::endl;
 
-        for(uint pid=0; pid<poly_labels.size(); ++pid){
+        for(uint pid=0; pid</*poly_labels.size()*/512 ; ++pid){
 
             if(poly_labels[pid] >= 1){
 
@@ -112,7 +145,7 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
                 vector_pid.push_back(pid);
 
             }
-            std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (poly_labels.size()) << "% ]" <<std::endl;
+            std::cout<< "pid : " << pid << " [ " << (pid * 100)/ /*(poly_labels.size())*/ 512 << "% ]" <<std::endl;
         }
 
 
@@ -352,8 +385,6 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
     std::cout << "Applied refinements into mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
 
-
-    mesh.poly_fix_orientation();
 
     QWidget window;
     GLcanvas gui_input, gui_output;
