@@ -81,24 +81,40 @@ void read_balancing(const bool                         weakly,
 
 
     //fill 1x1x1 holes
-    fill_holes(mesh);
-    fill_holes(mesh); //c'è bisosgno di farlo più volte (da fixare) - dopo la prima passata se ne creano di nuovi
-
+    std::vector<std::pair<uint, int>> vec_conta_adj;
+    while(holes_to_fill(mesh, vec_conta_adj)){
+        fill_holes(mesh, vec_conta_adj);
+        vec_conta_adj.clear();
+    }
     read(mesh, vertices, transition_verts, transition_faces);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh){
+void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh,
+                const std::vector<std::pair<uint, int>> & vec_conta_adj){
+
+    std::vector<int> poly_labels = mesh.vector_poly_labels();
+
+    for (auto el: vec_conta_adj) if(el.second > 2) poly_labels[el.first] ++;
+
+    mesh.poly_apply_labels(poly_labels);
+    mesh.poly_color_wrt_label();
+    mesh.updateGL();
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+CINO_INLINE
+bool holes_to_fill(DrawableHexmesh<M,V,E,F,P> & mesh,
+                   std::vector<std::pair<uint, int>> & vec_conta_adj){
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
 
     std::vector<uint> adj_p2p;
 
     int conta_adj;
-
-    std::vector<std::pair<uint, int>> vec_conta_adj;
 
     for(uint pid=0; pid<poly_labels.size(); ++pid){
         conta_adj = 0;
@@ -108,13 +124,10 @@ void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh){
         vec_conta_adj.push_back(std::pair<uint, int>(pid, conta_adj));
     }
 
-    for (auto el: vec_conta_adj) if(el.second > 2) poly_labels[el.first] ++;
+    for (auto el: vec_conta_adj) if(el.second > 2) return true;
 
+    return false;
 
-
-    mesh.poly_apply_labels(poly_labels);
-    mesh.poly_color_wrt_label();
-    mesh.updateGL();
 }
 
 
@@ -133,7 +146,7 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
     std::vector<uint> vector_pid;
 
 
-    if(max >= 1){
+    if(max == 2){
         std::cout<< "max = " << max << std::endl;
 
         for(uint pid=0; pid</*poly_labels.size()*/512 ; ++pid){
@@ -374,6 +387,7 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
+    mesh.print_quality();
 
     //chrono for refinements' application
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -492,7 +506,18 @@ int main(int argc, char *argv[])
     outputMesh.updateGL();
     outputMesh.print_quality(); //scaled jacobian
 
-    std::cout<< "N° componenti connesse: " << connected_components(outputMesh) <<std::endl;
+
+    //verify if the output mesh is a single connected component (of coarse without hanging noodes)
+
+    //non sembra funzionare
+
+    std::vector<std::vector<uint>> polys(outputMesh.num_polys());
+
+    for(uint pid=0; pid < outputMesh.num_polys(); pid++) polys[pid] = outputMesh.poly_verts_id(pid);
+
+    Quadmesh<> outputSurfaceMesh(outputMesh.vector_verts(), polys);
+
+    std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
 
 
