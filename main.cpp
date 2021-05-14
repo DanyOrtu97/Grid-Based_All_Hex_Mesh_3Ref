@@ -14,39 +14,11 @@
 #include <hex_transition_install_3ref.h>
 #include <cinolib/connected_components.h>
 #include <cinolib/io/io_utilities.h>
+#include <cinolib/export_surface.h>
 
 
 namespace cinolib
 {
-
-//Custom comparator operator for maps of vec3d
-struct vert_compare
-{
-    bool operator()(const vec3d & a,
-                    const vec3d & b) const
-    {
-       double eps = 1e-6;
-       if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
-       {
-           return true;
-       }
-       else if(abs(a.x()-b.x()) < eps)
-       {
-           if(a.y()-b.y() < 0.0 && abs(a.y()-b.y()) > eps)
-           {
-               return true;
-           }
-           else if(abs(a.y()-b.y()) < eps)
-           {
-               if(a.z()-b.z() < 0.0 && abs(a.z()-b.z()) > eps)
-               {
-                   return true;
-               }
-           }
-       }
-       return false;
-    }
-};
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -77,7 +49,6 @@ void read_balancing(const bool                         weakly,
 
     mesh.poly_apply_labels(poly_labels);
     mesh.poly_color_wrt_label();
-    mesh.updateGL();
 
 
     //fill 1x1x1 holes
@@ -86,6 +57,7 @@ void read_balancing(const bool                         weakly,
         fill_holes(mesh, vec_conta_adj);
         vec_conta_adj.clear();
     }
+
     read(mesh, vertices, transition_verts, transition_faces);
 }
 
@@ -101,7 +73,6 @@ void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh,
 
     mesh.poly_apply_labels(poly_labels);
     mesh.poly_color_wrt_label();
-    mesh.updateGL();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -142,14 +113,14 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
 
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
-    int max = *std::max_element(poly_labels.begin(), poly_labels.begin()+512);
+    int max = *std::max_element(poly_labels.begin(), poly_labels.end());
     std::vector<uint> vector_pid;
 
 
-    if(max == 2){
+    if(max >=1 ){
         std::cout<< "max = " << max << std::endl;
 
-        for(uint pid=0; pid</*poly_labels.size()*/512 ; ++pid){
+        for(uint pid=0; pid<poly_labels.size() ; ++pid){
 
             if(poly_labels[pid] >= 1){
 
@@ -158,7 +129,7 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
                 vector_pid.push_back(pid);
 
             }
-            std::cout<< "pid : " << pid << " [ " << (pid * 100)/ /*(poly_labels.size())*/ 512 << "% ]" <<std::endl;
+            if (pid%100==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (poly_labels.size()) << "% ]" <<std::endl;
         }
 
 
@@ -177,7 +148,6 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
         }
 
         mesh.poly_apply_labels(new_poly_labels);
-        mesh.updateGL();
 
         read(mesh, vertices, transition_verts, transition_faces);
     }
@@ -193,7 +163,7 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void split27(const uint                                   pid,
-             DrawableHexmesh<M,V,E,F,P>                 & mesh,
+             Hexmesh<M,V,E,F,P>                         & mesh,
              std::map<vec3d, uint>                      & vertices,
              std::vector<bool>                          & transition_verts,
              std::vector<uint>                          & transition_faces){
@@ -203,8 +173,12 @@ void split27(const uint                                   pid,
 
     //points for subdivision
     std::vector<vec3d> verts = mesh.poly_verts(pid);
+
+    // tstart = start()
     vec3d min = *std::min_element(verts.begin(), verts.end());
     vec3d max = *std::max_element(verts.begin(), verts.end());
+    // time = stop(tstart)
+    // var_find_min_max += time
     vec3d avg1 = min + ((max-min)/3);
     vec3d avg2 = avg1 + ((max-min)/3);
 
@@ -212,6 +186,8 @@ void split27(const uint                                   pid,
     std::vector<uint> newvertsid(64);
 
     //z = min
+
+    // t= start()
     newverts[0] = vec3d(min[0], min[1], min[2]); //
     newverts[1] = vec3d(avg1[0], min[1], min[2]);
     newverts[2] = vec3d(avg2[0], min[1], min[2]);
@@ -295,9 +271,14 @@ void split27(const uint                                   pid,
     newverts[62] = vec3d(avg2[0], max[1], max[2]);
     newverts[63] = vec3d(max[0], max[1], max[2]); //
 
+    // time = stop(start)
+    //var_new_vertices += time
+
 
     //insert vertices in map and mesh
     int conta = 0;
+
+    // start = start()
     for (auto & v : newverts){
         std::map<vec3d, uint>::iterator pair = vertices.find(v);
         if (pair == vertices.end()){
@@ -309,6 +290,8 @@ void split27(const uint                                   pid,
         else newvertsid[conta] = pair->second;
         conta++;
     }
+    // time= stop(start)
+    // var_map += time
 
     //update vertices and faces to apply templates
     if(mesh.num_verts() > 64){
@@ -352,8 +335,6 @@ void split27(const uint                                   pid,
     for(auto p : polys) mesh.poly_add(p);
 
     mesh.poly_remove(pid);
-
-    mesh.updateGL();
 }
 
 }
@@ -399,6 +380,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
     std::cout << "Applied refinements into mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
 
+    mesh.save("exp_2ref.mesh");
 
     QWidget window;
     GLcanvas gui_input, gui_output;
@@ -502,6 +484,7 @@ int main(int argc, char *argv[])
 
     gui_output.push_obj(&outputMesh);
 
+    mesh.updateGL();
 
     outputMesh.updateGL();
     outputMesh.print_quality(); //scaled jacobian
@@ -509,13 +492,9 @@ int main(int argc, char *argv[])
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
 
-    //non sembra funzionare
+    Quadmesh<> outputSurfaceMesh;
 
-    std::vector<std::vector<uint>> polys(outputMesh.num_polys());
-
-    for(uint pid=0; pid < outputMesh.num_polys(); pid++) polys[pid] = outputMesh.poly_verts_id(pid);
-
-    Quadmesh<> outputSurfaceMesh(outputMesh.vector_verts(), polys);
+    export_surface(outputMesh, outputSurfaceMesh);
 
     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 

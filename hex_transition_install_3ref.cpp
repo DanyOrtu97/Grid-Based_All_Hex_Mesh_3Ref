@@ -93,7 +93,7 @@ bool is_angle(const std::vector<uint> a,
     bool is_angle = false;
 
     for (auto face_id : transition_faces){
-        for(auto fid : m.poly_faces_id(pid)){
+        for(auto &fid : m.poly_faces_id(pid)){
             if(fid == face_id)
                 if(verts_in_common(a, m.face_verts_id(fid)) == 4)
                     faces.push_back(fid);

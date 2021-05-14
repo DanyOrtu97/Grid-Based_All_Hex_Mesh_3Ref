@@ -56,3 +56,5 @@ unix:!macx {
 DEFINES += GL_GLEXT_PROTOTYPES
 LIBS    += -lGLU
 }
+
+#DEFINES += NDEBUG
