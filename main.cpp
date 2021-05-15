@@ -24,61 +24,61 @@ namespace cinolib
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void read_balancing(const bool                         weakly,
-                          DrawableHexmesh<M,V,E,F,P> & mesh,
-                          std::map<vec3d, uint>      & vertices,
-                          std::vector<bool>          & transition_verts,
-                          std::vector<uint>          & transition_faces){
+void balancing(const bool                         weakly,
+                     Hexmesh<M,V,E,F,P>         & mesh){
+
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
+    std::vector<int> new_poly_labels = mesh.vector_poly_labels();
 
     std::vector<uint> adj_p2p;
+
+
 
     if (weakly){
         for(uint pid=0; pid<poly_labels.size(); ++pid){
             adj_p2p = mesh.adj_p2p(pid);
 
-            if(poly_labels[pid] == 2){
-                for(auto el: adj_p2p) if(poly_labels[el] == 0) poly_labels[el] = 1;
-            }
+            if(poly_labels[pid] == 2)
+                for(auto el: adj_p2p) if(poly_labels[el] == 0) new_poly_labels[el] = 1;
+
         }
     }
     else{
         // still to do
     }
 
-    mesh.poly_apply_labels(poly_labels);
+    mesh.poly_apply_labels(new_poly_labels);
     mesh.poly_color_wrt_label();
 
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-    //fill 1x1x1 holes
-    std::vector<std::pair<uint, int>> vec_conta_adj;
-    while(holes_to_fill(mesh, vec_conta_adj)){
-        fill_holes(mesh, vec_conta_adj);
-        vec_conta_adj.clear();
-    }
+    std::cout << std::endl;
+    std::cout << "Balancing of the mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
 
-    read(mesh, vertices, transition_verts, transition_faces);
 }
+
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void fill_holes(DrawableHexmesh<M,V,E,F,P> & mesh,
+void fill_holes(      Hexmesh<M,V,E,F,P> & mesh,
                 const std::vector<std::pair<uint, int>> & vec_conta_adj){
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
 
-    for (auto el: vec_conta_adj) if(el.second > 2) poly_labels[el.first] ++;
+    for (auto el: vec_conta_adj) if(el.second > 2 && el.second < 6) poly_labels[el.first] ++;
 
     mesh.poly_apply_labels(poly_labels);
     mesh.poly_color_wrt_label();
 }
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool holes_to_fill(DrawableHexmesh<M,V,E,F,P> & mesh,
+bool holes_to_fill(Hexmesh<M,V,E,F,P> & mesh,
                    std::vector<std::pair<uint, int>> & vec_conta_adj){
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
@@ -95,32 +95,34 @@ bool holes_to_fill(DrawableHexmesh<M,V,E,F,P> & mesh,
         vec_conta_adj.push_back(std::pair<uint, int>(pid, conta_adj));
     }
 
-    for (auto el: vec_conta_adj) if(el.second > 2) return true;
+    for (auto el: vec_conta_adj) if(el.second > 2 && el.second < 6) return true;
 
     return false;
 
 }
 
 
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void read(DrawableHexmesh<M,V,E,F,P> & mesh,
-          std::map<vec3d, uint>      & vertices,
-          std::vector<bool>          & transition_verts,
-          std::vector<uint>          & transition_faces){
+void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
+                       std::map<vec3d, uint, vert_compare>      & vertices,
+                       std::vector<bool>                        & transition_verts,
+                       std::vector<uint>                        & transition_faces){
 
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
     std::vector<uint> vector_pid;
 
 
-    if(max >=1 ){
-        std::cout<< "max = " << max << std::endl;
+    for(int i = 0; i < max; i++){
+        vector_pid.clear();
+        std::cout << std::endl;
+        std::cout<< "Refinements of level " << i+1 << std::endl;
 
-        for(uint pid=0; pid<poly_labels.size() ; ++pid){
+        for(uint pid=0; pid<poly_labels.size(); ++pid){
 
             if(poly_labels[pid] >= 1){
 
@@ -148,23 +150,23 @@ void read(DrawableHexmesh<M,V,E,F,P> & mesh,
         }
 
         mesh.poly_apply_labels(new_poly_labels);
+        poly_labels = mesh.vector_poly_labels();
 
-        read(mesh, vertices, transition_verts, transition_faces);
     }
-    else return;
+
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+    std::cout << std::endl;
+    std::cout << "Applied refinements : " << how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 
-
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//Split the polygon of id "pid" of the input mesh into 27 cubes
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void split27(const uint                                   pid,
              Hexmesh<M,V,E,F,P>                         & mesh,
-             std::map<vec3d, uint>                      & vertices,
+             std::map<vec3d, uint, vert_compare>        & vertices,
              std::vector<bool>                          & transition_verts,
              std::vector<uint>                          & transition_faces){
 
@@ -354,7 +356,7 @@ int main(int argc, char *argv[])
     DrawableHexmesh<> outputMesh;
 
     //vertices
-    std::map<vec3d, uint> vertices;
+    std::map<vec3d, uint, vert_compare> vertices;
 
 
     //vectors for templates application
@@ -370,17 +372,25 @@ int main(int argc, char *argv[])
 
     mesh.print_quality();
 
-    //chrono for refinements' application
-    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    balancing(true, mesh);
 
-    read_balancing(true, mesh, vertices, transition_verts, transition_faces);
 
-    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    /*
+    //fill 1x1x1 holes (problems -> too much polys)
+    std::chrono::high_resolution_clock::time_point t0f = std::chrono::high_resolution_clock::now();
+    std::vector<std::pair<uint, int>> vec_conta_adj;
+    while(holes_to_fill(mesh, vec_conta_adj)){
+        fill_holes(mesh, vec_conta_adj);
+        vec_conta_adj.clear();
+    }
+    std::chrono::high_resolution_clock::time_point t1f = std::chrono::high_resolution_clock::now();
+
 
     std::cout << std::endl;
-    std::cout << "Applied refinements into mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
+    std::cout << "Filling 1x1x1 holes of the mesh : " << how_many_seconds(t0f,t1f) << "s]" << std::endl;
+    */
 
-    mesh.save("exp_2ref.mesh");
+    apply_refinements(mesh, vertices, transition_verts, transition_faces);
 
     QWidget window;
     GLcanvas gui_input, gui_output;
@@ -469,18 +479,18 @@ int main(int argc, char *argv[])
     mesh.print_quality();
 
     //chrono for template's application
-    std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
 
-    std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
     std::cout << std::endl;
     std::cout << "Applied 3 refinement templates into the mesh : " << outputMesh.num_verts() << "V / " <<
                                                                       outputMesh.num_edges() << "E / " <<
                                                                       outputMesh.num_faces() << "F / " <<
                                                                       outputMesh.num_polys() << "P  [" <<
-                                                                      how_many_seconds(t0o,t1o) << "s]" << std::endl;
+                                                                      how_many_seconds(t0,t1) << "s]" << std::endl;
 
     gui_output.push_obj(&outputMesh);
 
@@ -491,7 +501,6 @@ int main(int argc, char *argv[])
 
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
-
     Quadmesh<> outputSurfaceMesh;
 
     export_surface(outputMesh, outputSurfaceMesh);

@@ -510,6 +510,8 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
+
+        if (pid%500==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (m_in.num_polys()) << "% ]" <<std::endl;
     }
 
     merge_schemes_into_mesh(m_out, poly2scheme);
