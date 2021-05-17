@@ -211,6 +211,63 @@ void orient_two_adj_faces(std::vector<vec3d>              & verts,
     polys = Two_Adj_Faces::polys;
 }
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_three_adj_faces(std::vector<vec3d>              & verts,
+                            std::vector<std::vector<uint>>  & polys,
+                            SchemeInfo                      & info,
+                            const vec3d                     & poly_centroid){
+
+    verts.reserve(Three_Adj_Faces::verts.size()/3);
+
+    for (uint vid=0; vid<Three_Adj_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Three_Adj_Faces::verts[vid]-0.5, Three_Adj_Faces::verts[vid+1]-0.5, Three_Adj_Faces::verts[vid+2]-0.5));
+
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Three_Adj_Faces::polys;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_three_adj_faces_sharing_vertex(std::vector<vec3d>              & verts,
+                                           std::vector<std::vector<uint>>  & polys,
+                                           SchemeInfo                      & info,
+                                           const vec3d                     & poly_centroid){
+
+    verts.reserve(Three_Adj_Faces_sharing_vertex::verts.size()/3);
+
+    for (uint vid=0; vid<Three_Adj_Faces_sharing_vertex::verts.size(); vid+=3) verts.push_back(vec3d(Three_Adj_Faces_sharing_vertex::verts[vid]-0.5,
+                                                                                                     Three_Adj_Faces_sharing_vertex::verts[vid+1]-0.5,
+                                                                                                     Three_Adj_Faces_sharing_vertex::verts[vid+2]-0.5));
+
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y", -M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y", -M_PI); break;
+        case 4:  rotate(verts, "z", -M_PI/2); break;
+        case 5:  reflect(verts, "x"); break;
+        case 6: rotate(verts, "z",  M_PI); break;
+        case 7:  {
+            reflect(verts, "y");
+            rotate(verts, "x",  M_PI/2); break;
+        }
+    }
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Three_Adj_Faces_sharing_vertex::polys;
+}
 } // end anonymous namespace
 
 
@@ -235,6 +292,12 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
             break;
         case HexTransition::TWO_ADJ_FACES:
             orient_two_adj_faces(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::THREE_ADJ_FACES:
+            orient_three_adj_faces(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::THREE_ADJ_FACES_SHARING_VERTEX:
+            orient_three_adj_faces_sharing_vertex(verts, polys, info, poly_centroid);
             break;
     }
 

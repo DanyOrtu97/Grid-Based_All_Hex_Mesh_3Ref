@@ -55,33 +55,20 @@ void balancing(const bool                         weakly,
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
     std::cout << std::endl;
-    std::cout << "Balancing of the mesh : " << how_many_seconds(t0,t1) << "s]" << std::endl;
+    std::cout << "Balancing of the mesh [" << how_many_seconds(t0,t1) << "s]" << std::endl;
 
 }
+
+
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void fill_holes(      Hexmesh<M,V,E,F,P> & mesh,
-                const std::vector<std::pair<uint, int>> & vec_conta_adj){
+void fill_holes(Hexmesh<M,V,E,F,P> & mesh){
 
     std::vector<int> poly_labels = mesh.vector_poly_labels();
-
-    for (auto el: vec_conta_adj) if(el.second > 2 && el.second < 6) poly_labels[el.first] ++;
-
-    mesh.poly_apply_labels(poly_labels);
-    mesh.poly_color_wrt_label();
-}
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool holes_to_fill(Hexmesh<M,V,E,F,P> & mesh,
-                   std::vector<std::pair<uint, int>> & vec_conta_adj){
-
-    std::vector<int> poly_labels = mesh.vector_poly_labels();
+    std::vector<std::pair<uint, int>> vec_conta_adj;
 
     std::vector<uint> adj_p2p;
 
@@ -95,9 +82,10 @@ bool holes_to_fill(Hexmesh<M,V,E,F,P> & mesh,
         vec_conta_adj.push_back(std::pair<uint, int>(pid, conta_adj));
     }
 
-    for (auto el: vec_conta_adj) if(el.second > 2 && el.second < 6) return true;
+    for (auto el: vec_conta_adj) if(el.second == 5) poly_labels[el.first] ++;
 
-    return false;
+    mesh.poly_apply_labels(poly_labels);
+    mesh.poly_color_wrt_label();
 
 }
 
@@ -157,7 +145,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
     std::cout << std::endl;
-    std::cout << "Applied refinements : " << how_many_seconds(t0,t1) << "s]" << std::endl;
+    std::cout << "Applied refinements [" << how_many_seconds(t0,t1) << "s]" << std::endl;
 }
 
 
@@ -176,11 +164,8 @@ void split27(const uint                                   pid,
     //points for subdivision
     std::vector<vec3d> verts = mesh.poly_verts(pid);
 
-    // tstart = start()
     vec3d min = *std::min_element(verts.begin(), verts.end());
     vec3d max = *std::max_element(verts.begin(), verts.end());
-    // time = stop(tstart)
-    // var_find_min_max += time
     vec3d avg1 = min + ((max-min)/3);
     vec3d avg2 = avg1 + ((max-min)/3);
 
@@ -189,7 +174,6 @@ void split27(const uint                                   pid,
 
     //z = min
 
-    // t= start()
     newverts[0] = vec3d(min[0], min[1], min[2]); //
     newverts[1] = vec3d(avg1[0], min[1], min[2]);
     newverts[2] = vec3d(avg2[0], min[1], min[2]);
@@ -273,14 +257,11 @@ void split27(const uint                                   pid,
     newverts[62] = vec3d(avg2[0], max[1], max[2]);
     newverts[63] = vec3d(max[0], max[1], max[2]); //
 
-    // time = stop(start)
-    //var_new_vertices += time
 
 
     //insert vertices in map and mesh
     int conta = 0;
 
-    // start = start()
     for (auto & v : newverts){
         std::map<vec3d, uint>::iterator pair = vertices.find(v);
         if (pair == vertices.end()){
@@ -292,8 +273,6 @@ void split27(const uint                                   pid,
         else newvertsid[conta] = pair->second;
         conta++;
     }
-    // time= stop(start)
-    // var_map += time
 
     //update vertices and faces to apply templates
     if(mesh.num_verts() > 64){
@@ -349,7 +328,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
     DrawableHexmesh<> mesh(s.c_str());
 
 
@@ -372,25 +351,25 @@ int main(int argc, char *argv[])
 
     mesh.print_quality();
 
-    balancing(true, mesh);
+    //balancing(true, mesh);
 
 
+
+    //fill 1x1x1 holes
     /*
-    //fill 1x1x1 holes (problems -> too much polys)
     std::chrono::high_resolution_clock::time_point t0f = std::chrono::high_resolution_clock::now();
-    std::vector<std::pair<uint, int>> vec_conta_adj;
-    while(holes_to_fill(mesh, vec_conta_adj)){
-        fill_holes(mesh, vec_conta_adj);
-        vec_conta_adj.clear();
-    }
+
+    fill_holes(mesh);
+
     std::chrono::high_resolution_clock::time_point t1f = std::chrono::high_resolution_clock::now();
 
 
     std::cout << std::endl;
-    std::cout << "Filling 1x1x1 holes of the mesh : " << how_many_seconds(t0f,t1f) << "s]" << std::endl;
+    std::cout << "Filling 1x1x1 holes of the mesh [" << how_many_seconds(t0f,t1f) << "s]" << std::endl;
     */
 
-    apply_refinements(mesh, vertices, transition_verts, transition_faces);
+    //apply_refinements(mesh, vertices, transition_verts, transition_faces);
+
 
     QWidget window;
     GLcanvas gui_input, gui_output;
@@ -410,7 +389,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-    /*
+
 
     Profiler profiler;
 
@@ -465,17 +444,16 @@ int main(int argc, char *argv[])
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
 
-                std::cout<< "N° componenti connesse: " << connected_components(outputMesh) <<std::endl;
 
                 c->updateGL();
 
             }
         }
     };
-*/
 
 
 
+    /*
     mesh.print_quality();
 
     //chrono for template's application
@@ -500,13 +478,14 @@ int main(int argc, char *argv[])
     outputMesh.print_quality(); //scaled jacobian
 
 
+
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
     Quadmesh<> outputSurfaceMesh;
 
     export_surface(outputMesh, outputSurfaceMesh);
 
     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
-
+*/
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);

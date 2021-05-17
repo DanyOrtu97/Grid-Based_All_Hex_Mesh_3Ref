@@ -44,6 +44,8 @@ enum class HexTransition{
     TRANSITION,
     FACE,
     TWO_ADJ_FACES,
+    THREE_ADJ_FACES,
+    THREE_ADJ_FACES_SHARING_VERTEX,
 };
 
 /*
