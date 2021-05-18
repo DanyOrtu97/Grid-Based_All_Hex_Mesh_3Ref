@@ -304,7 +304,12 @@ void orient_four_adj_faces( std::vector<vec3d>              & verts,
     for (uint vid=0; vid<Four_Adj_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Four_Adj_Faces::verts[vid]-0.5,
                                                                                      Four_Adj_Faces::verts[vid+1]-0.5,
                                                                                      Four_Adj_Faces::verts[vid+2]-0.5));
-
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y",  M_PI/2); break;
+        case 2:  rotate(verts, "x",  M_PI/2); break;
+    }
 
 
     for (auto & v: verts){

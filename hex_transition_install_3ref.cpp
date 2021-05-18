@@ -650,8 +650,97 @@ void mark_four_faces(const Hexmesh<M,V,E,F,P>    & m,
                       const uint                    pid,
                       SchemeInfo                  & info,
                       const std::vector<uint>       transition_faces,
-                      const bool                    sharing_two_vertex){
+                      const bool                    sharing_two_vertices){
 
+    std::vector<uint> faces;
+    std::vector<uint> poly_faces = m.poly_faces_id(pid);
+
+    std::vector<vec3d> poly_verts = m.poly_verts(pid);
+    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
+    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
+
+    for (auto face_id : transition_faces) for(auto fid : poly_faces) if(fid == face_id) faces.push_back(fid);
+
+    info.scale = m.edge_length(m.adj_p2e(pid)[0]);
+
+
+    int conta_min = 0, conta_max = 0, conta_left = 0, conta_right = 0, conta_back = 0, conta_front = 0;
+
+    if(sharing_two_vertices){
+        info.type = HexTransition::FOUR_ADJ_FACES_SHARING_TWO_VERTICES;
+
+        //do stuff for orientation
+
+    }
+    else{
+        info.type = HexTransition::FOUR_ADJ_FACES;
+
+        int conta_min1 = 0, conta_max1 = 0, conta_left1 = 0, conta_right1 = 0, conta_back1 = 0, conta_front1 = 0;
+
+        std::sort(faces.begin(), faces.end());
+        std::sort(poly_faces.begin(), poly_faces.end());
+
+        std::vector<uint> free_faces;
+
+        std::set_difference(poly_faces.begin(), poly_faces.end(), faces.begin(), faces.end(), std::back_inserter(free_faces));
+
+
+
+        for(uint face=0; face<free_faces.size(); face++){
+            if(face==0){
+                for(auto vid : m.face_verts_id(free_faces[0])){
+                    vec3d vert = m.vert(vid);
+                    if(vert.y() == min.y()){
+                        conta_min1 ++;
+                        if(vert.x() == min.x()) conta_left1 ++;
+                        else if(vert.x() == max.x()) conta_right1 ++;
+
+                        if(vert.z() == min.z()) conta_front1 ++;
+                        else if(vert.z() == max.z()) conta_back1 ++;
+
+                    }
+                    else if(vert.y() == max.y()){
+                        conta_max1 ++;
+                        if(vert.x() == min.x()) conta_left1 ++;
+                        else if(vert.x() == max.x()) conta_right1 ++;
+
+                        if(vert.z() == min.z()) conta_front1 ++;
+                        else if(vert.z() == max.z()) conta_back1 ++;
+                    }
+                }
+            }
+            else{
+                for(auto vid : m.face_verts_id(free_faces[1])){
+                    vec3d vert = m.vert(vid);
+                    if(vert.y() == min.y()){
+                        conta_min ++;
+                        if(vert.x() == min.x()) conta_left ++;
+                        else if(vert.x() == max.x()) conta_right ++;
+
+                        if(vert.z() == min.z()) conta_front ++;
+                        else if(vert.z() == max.z()) conta_back ++;
+
+                    }
+                    else if(vert.y() == max.y()){
+                        conta_max ++;
+                        if(vert.x() == min.x()) conta_left ++;
+                        else if(vert.x() == max.x()) conta_right ++;
+
+                        if(vert.z() == min.z()) conta_front ++;
+                        else if(vert.z() == max.z()) conta_back ++;
+                    }
+                }
+            }
+
+        }
+
+
+        if((conta_back1 == 4 || conta_back ==4) && (conta_front1 == 4 || conta_front == 4)) info.orientations.push_back(0);
+        else if((conta_left1 == 4 || conta_left ==4) && (conta_right1 == 4 || conta_right == 4)) info.orientations.push_back(1);
+        else if((conta_max1 == 4 || conta_max ==4) && (conta_min1 == 4 || conta_min == 4)) info.orientations.push_back(2);
+
+
+    }
 }
 
 
@@ -802,22 +891,14 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
         else if(insert4faces){
             SchemeInfo info;
 
-            //MARK...
-
-            info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
-
-            info.type = HexTransition::FOUR_ADJ_FACES;
+            mark_four_faces(m_in, pid, info, transition_faces, false);
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
         else if(insert4facesv){
             SchemeInfo info;
 
-            //MARK...
-
-            info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
-
-            info.type = HexTransition::FOUR_ADJ_FACES_SHARING_TWO_VERTICES;
+            mark_four_faces(m_in, pid, info, transition_faces, true);
 
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
