@@ -86,20 +86,10 @@ uint verts_in_common(std::vector<uint> a,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool is_3_faces_angle(const std::vector<uint>   a,
-                      const uint                 pid,
-                      const Hexmesh<M,V,E,F,P> & m,
-                      const std::vector<uint>  & transition_faces){
-    bool is_3_faces_angle = false;
+bool is_3_faces_angle(const Hexmesh<M,V,E,F,P> & m,
+                      const std::vector<uint>  & faces){
 
-    std::vector<uint> faces;
-    for (auto face_id : transition_faces){
-        for(auto &fid : m.poly_faces_id(pid)){
-            if(fid == face_id)
-                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
-                    faces.push_back(fid);
-        }
-    }
+    bool is_3_faces_angle = false;
 
     if(faces.size() == 3){
         if(m.faces_are_adjacent(faces[0], faces[1]) && m.faces_are_adjacent(faces[0], faces[2]) && m.faces_are_adjacent(faces[1], faces[2]))
@@ -113,20 +103,11 @@ bool is_3_faces_angle(const std::vector<uint>   a,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool is_4_faces_angle(const std::vector<uint>   a,
-                      const uint                 pid,
-                      const Hexmesh<M,V,E,F,P> & m,
-                      const std::vector<uint>  & transition_faces){
+bool is_4_faces_angle(const Hexmesh<M,V,E,F,P> & m,
+                      const std::vector<uint>  & faces){
+
     bool is_4_faces_angle = false;
 
-    std::vector<uint> faces;
-    for (auto face_id : transition_faces){
-        for(auto &fid : m.poly_faces_id(pid)){
-            if(fid == face_id)
-                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
-                    faces.push_back(fid);
-        }
-    }
 
     if(faces.size() == 4){
         if((m.faces_are_adjacent(faces[0], faces[1]) &&
@@ -160,21 +141,10 @@ bool is_4_faces_angle(const std::vector<uint>   a,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-bool is_angle(const std::vector<uint>   a,
-              const uint                 pid,
-              const Hexmesh<M,V,E,F,P> & m,
-              const std::vector<uint>  & transition_faces){
-    std::vector<uint> faces;
+bool is_angle(const Hexmesh<M,V,E,F,P> & m,
+              const std::vector<uint>  & faces){
+
     bool is_angle = false;
-
-    for (auto face_id : transition_faces){
-        for(auto &fid : m.poly_faces_id(pid)){
-            if(fid == face_id)
-                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
-                    faces.push_back(fid);
-        }
-    }
-
 
     if(faces.size() == 2)
         if(m.faces_are_adjacent(faces[0], faces[1]))
@@ -183,40 +153,15 @@ bool is_angle(const std::vector<uint>   a,
     return is_angle;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template<class M, class V, class E, class F, class P>
-CINO_INLINE
-bool is_face(const std::vector<uint>   a,
-             const uint                 pid,
-             const Hexmesh<M,V,E,F,P> & m,
-             const std::vector<uint>   transition_faces){
-    std::vector<uint> faces;
-    bool is_face = false;
-
-    for (auto face_id : transition_faces){
-        for(auto fid : m.poly_faces_id(pid)){
-            if(fid == face_id)
-                if(verts_in_common(a, m.face_verts_id(fid)) == 4)
-                    faces.push_back(fid);
-        }
-    }
-
-
-    if(faces.size() >= 1)
-        is_face=true;
-
-    return is_face;
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-uint how_many_faces(const std::vector<uint>   a,
-                    const uint                 pid,
-                    const Hexmesh<M,V,E,F,P> & m,
-                    const std::vector<uint>   transition_faces){
+std::vector<uint> get_faces(const std::vector<uint>    a,
+                            const uint                 pid,
+                            const Hexmesh<M,V,E,F,P> & m,
+                            const std::vector<uint>    transition_faces){
     std::vector<uint> faces;
 
     for (auto face_id : transition_faces){
@@ -227,7 +172,7 @@ uint how_many_faces(const std::vector<uint>   a,
         }
     }
 
-    return faces.size();
+    return faces;
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -237,7 +182,7 @@ CINO_INLINE
 void mark_face(const Hexmesh<M,V,E,F,P>    & m,
                const uint                    pid,
                SchemeInfo                  & info,
-               const std::vector<uint>      transition_faces){
+               const std::vector<uint>       transition_faces){
 
     std::vector<uint> faces;
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
@@ -304,7 +249,7 @@ CINO_INLINE
 void mark_two_adj_faces(const Hexmesh<M,V,E,F,P>    & m,
                         const uint                    pid,
                         SchemeInfo                  & info,
-                        const std::vector<uint>      transition_faces){
+                        const std::vector<uint>       transition_faces){
 
     std::vector<uint> faces;
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
@@ -420,7 +365,7 @@ CINO_INLINE
 void mark_transition(const Hexmesh<M,V,E,F,P>    & m,
                      const uint                    pid,
                      SchemeInfo                  & info,
-                     const std::vector<uint>     transition_faces){
+                     const std::vector<uint>       transition_faces){
 
     std::vector<uint> faces;
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
@@ -646,7 +591,7 @@ void mark_three_faces(const Hexmesh<M,V,E,F,P>    & m,
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-void mark_four_faces(const Hexmesh<M,V,E,F,P>    & m,
+void mark_four_faces(const Hexmesh<M,V,E,F,P>     & m,
                       const uint                    pid,
                       SchemeInfo                  & info,
                       const std::vector<uint>       transition_faces,
@@ -814,6 +759,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
 
         if(scheme_vids.size()>0) verts_face.push_back(scheme_vids);
+
         bool insertFace = false, insertAngle = false, insertTransition=false, insert_full=false, insert3faces = false, insert3facesv=false, insert4faces = false, insert4facesv = false;
 
 
@@ -822,18 +768,21 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
             for (auto el : verts_face){
                 if(verts_in_common(el, el2) == 4) {
                     uint verts_common = verts_in_common(el, m_in.poly_verts_id(pid));
-                    bool is_an_angle = is_angle(el, pid, m_in, transition_faces);
-                    if(scheme_vids.size() > 6 && (verts_common == 8 || verts_common == 7)){
-                        uint faces = how_many_faces(el, pid, m_in, transition_faces);
 
-                        switch (faces){
+                    std::vector<uint> faces = get_faces(el, pid, m_in, transition_faces);
+
+                    bool is_an_angle = is_angle(m_in, faces);
+
+                    if(scheme_vids.size() > 6 && (verts_common == 8 || verts_common == 7)){
+
+                        switch (faces.size()){
                             case 2: if(is_an_angle) insertAngle = true;
                                     else insertTransition = true;
                                     break;
-                            case 3: if(is_3_faces_angle(el, pid, m_in, transition_faces)) insert3facesv=true;
+                            case 3: if(is_3_faces_angle(m_in, faces)) insert3facesv=true;
                                     else insert3faces = true;
                                     break;
-                            case 4: if(is_4_faces_angle(el, pid, m_in, transition_faces)) insert4facesv = true;
+                            case 4: if(is_4_faces_angle(m_in, faces)) insert4facesv = true;
                                     else insert4faces = true;
                                     break;
                             case 6: if(is_an_angle) insertAngle = true;

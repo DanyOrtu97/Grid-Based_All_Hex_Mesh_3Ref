@@ -105,7 +105,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
 
 
@@ -351,12 +351,12 @@ int main(int argc, char *argv[])
 
     mesh.print_quality();
 
-    //balancing(true, mesh);
+    balancing(true, mesh);
 
 
 
     //fill 1x1x1 holes
-    /*
+
     std::chrono::high_resolution_clock::time_point t0f = std::chrono::high_resolution_clock::now();
 
     fill_holes(mesh);
@@ -366,9 +366,9 @@ int main(int argc, char *argv[])
 
     std::cout << std::endl;
     std::cout << "Filling 1x1x1 holes of the mesh [" << how_many_seconds(t0f,t1f) << "s]" << std::endl;
-    */
 
-    //apply_refinements(mesh, vertices, transition_verts, transition_faces);
+
+    apply_refinements(mesh, vertices, transition_verts, transition_faces);
 
 
     QWidget window;
@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
      */
 
 
-
+    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -450,10 +450,10 @@ int main(int argc, char *argv[])
             }
         }
     };
+    */
 
 
 
-    /*
     mesh.print_quality();
 
     //chrono for template's application
@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
     outputMesh.updateGL();
     outputMesh.print_quality(); //scaled jacobian
 
-
+    outputMesh.save("result_output.mesh");
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
     Quadmesh<> outputSurfaceMesh;
@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
     export_surface(outputMesh, outputSurfaceMesh);
 
     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
-*/
+
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
