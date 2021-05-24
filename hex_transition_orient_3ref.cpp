@@ -71,6 +71,75 @@ void reflect(std::vector<vec3d> & verts,
     for(auto & v : verts) transform(v, m);
 }
 
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_edge(std::vector<vec3d>              & verts,
+                 std::vector<std::vector<uint>>  & polys,
+                 SchemeInfo                      & info,
+                 const vec3d                     & poly_centroid){
+
+    verts.reserve(Edge::verts.size()/3);
+
+    for (uint vid=0; vid<Edge::verts.size(); vid+=3) verts.push_back(vec3d(Edge::verts[vid]-0.5, Edge::verts[vid+1]-0.5, Edge::verts[vid+2]-0.5));
+
+
+    /*switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "z", -M_PI/2); break;
+        case 2:  rotate(verts, "z",  M_PI/2); break;
+        case 3:  rotate(verts, "y", -M_PI/2); break; //unusefull
+        case 4:  rotate(verts, "y",  M_PI/2); break; //unusefull
+        case 5:  rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI/2); break;
+        case 7:  reflect(verts, "x"); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Edge::polys;
+
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_face(std::vector<vec3d>              & verts,
+                 std::vector<std::vector<uint>>  & polys,
+                 SchemeInfo                      & info,
+                 const vec3d                     & poly_centroid){
+
+    verts.reserve(Face::verts.size()/3);
+
+    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
+
+
+    /*switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "z", -M_PI/2); break;
+        case 2:  rotate(verts, "z",  M_PI/2); break;
+        case 3:  rotate(verts, "y", -M_PI/2); break; //unusefull
+        case 4:  rotate(verts, "y",  M_PI/2); break; //unusefull
+        case 5:  rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI/2); break;
+        case 7:  reflect(verts, "x"); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Face::polys;
+
+}
+
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
@@ -92,257 +161,7 @@ void orient_full(std::vector<vec3d>              & verts,
 
 }
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-CINO_INLINE
-void orient_face(std::vector<vec3d>              & verts,
-                 std::vector<std::vector<uint>>  & polys,
-                 SchemeInfo                      & info,
-                 const vec3d                     & poly_centroid){
-
-    verts.reserve(Face::verts.size()/3);
-
-    for (uint vid=0; vid<Face::verts.size(); vid+=3) verts.push_back(vec3d(Face::verts[vid]-0.5, Face::verts[vid+1]-0.5, Face::verts[vid+2]-0.5));
-
-
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "z", -M_PI/2); break;
-        case 2:  rotate(verts, "z",  M_PI/2); break;
-        case 3:  rotate(verts, "y", -M_PI/2); break; //unusefull
-        case 4:  rotate(verts, "y",  M_PI/2); break; //unusefull
-        case 5:  rotate(verts, "x",  M_PI/2); break;
-        case 6:  rotate(verts, "x", -M_PI/2); break;
-        case 7:  reflect(verts, "x"); break;
-    }
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Face::polys;
-
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_transition(std::vector<vec3d>              & verts,
-                       std::vector<std::vector<uint>>  & polys,
-                       SchemeInfo                      & info,
-                       const vec3d                     & poly_centroid){
-
-    verts.reserve(Transition::verts.size()/3);
-
-    for (uint vid=0; vid<Transition::verts.size(); vid+=3) verts.push_back(vec3d(Transition::verts[vid]-0.5, Transition::verts[vid+1]-0.5, Transition::verts[vid+2]-0.5));
-
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "z", -M_PI/2); break;
-        case 2:  rotate(verts, "x",  M_PI/2); break;
-    }
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Transition::polys;
-
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_two_adj_faces(std::vector<vec3d>              & verts,
-                          std::vector<std::vector<uint>>  & polys,
-                          SchemeInfo                      & info,
-                          const vec3d                     & poly_centroid){
-
-    verts.reserve(Two_Adj_Faces::verts.size()/3);
-
-    for (uint vid=0; vid<Two_Adj_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Two_Adj_Faces::verts[vid]-0.5, Two_Adj_Faces::verts[vid+1]-0.5, Two_Adj_Faces::verts[vid+2]-0.5));
-
-
-
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "x", -M_PI/2); break;
-        case 2:  rotate(verts, "x",  M_PI/2); break;
-        case 3:  rotate(verts, "y", -M_PI/2); break;
-        case 4:  rotate(verts, "y",  M_PI/2); break;
-        case 5:  rotate(verts, "x",  M_PI);   break;
-        case 6:  {
-            rotate(verts, "y",  -M_PI/2);
-            rotate(verts, "z",  -M_PI/2);
-            break;
-        }
-        case 7:  {
-            rotate(verts, "y",  M_PI/2);
-            rotate(verts, "z",  M_PI/2);
-            break;
-        }
-        case 8:  {
-            rotate(verts, "z",  -M_PI/2);
-            rotate(verts, "y",  -M_PI);
-            break;
-        }
-        case 9:  {
-            rotate(verts, "x",  M_PI/2);
-            rotate(verts, "z",  -M_PI/2);
-            break;
-        }
-        case 10: rotate(verts, "z", -M_PI/2); break;
-        case 11: rotate(verts, "z", M_PI/2); break;
-
-    }
-
-
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Two_Adj_Faces::polys;
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_three_adj_faces(std::vector<vec3d>              & verts,
-                            std::vector<std::vector<uint>>  & polys,
-                            SchemeInfo                      & info,
-                            const vec3d                     & poly_centroid){
-
-    verts.reserve(Three_Adj_Faces::verts.size()/3);
-
-    for (uint vid=0; vid<Three_Adj_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Three_Adj_Faces::verts[vid]-0.5,
-                                                                                      Three_Adj_Faces::verts[vid+1]-0.5,
-                                                                                      Three_Adj_Faces::verts[vid+2]-0.5));
-
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "z", -M_PI/2); break;
-        case 2:  rotate(verts, "y",  M_PI); break;
-        case 3:  rotate(verts, "y",  M_PI);
-                 rotate(verts, "z", -M_PI/2); break;
-        case 4:  rotate(verts, "y", -M_PI/2); break;
-        case 5:  rotate(verts, "y", -M_PI/2);
-                 rotate(verts, "x", -M_PI/2); break;
-        case 6:  rotate(verts, "y",  M_PI/2); break;
-        case 7:  rotate(verts, "y",  M_PI/2);
-                 rotate(verts, "x", -M_PI/2); break;
-        case 8:  rotate(verts, "x",  M_PI/2); break;
-        case 9:  rotate(verts, "x",  M_PI/2);
-                 rotate(verts, "y", -M_PI/2); break;
-        case 10:  rotate(verts, "x", -M_PI/2); break;
-        case 11:  rotate(verts, "x", -M_PI/2);
-                  rotate(verts, "y", -M_PI/2);
-                    break;
-    }
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Three_Adj_Faces::polys;
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_three_adj_faces_sharing_vertex(std::vector<vec3d>              & verts,
-                                           std::vector<std::vector<uint>>  & polys,
-                                           SchemeInfo                      & info,
-                                           const vec3d                     & poly_centroid){
-
-    verts.reserve(Three_Adj_Faces_Sharing_Vertex::verts.size()/3);
-
-    for (uint vid=0; vid<Three_Adj_Faces_Sharing_Vertex::verts.size(); vid+=3) verts.push_back(vec3d(Three_Adj_Faces_Sharing_Vertex::verts[vid]-0.5,
-                                                                                                     Three_Adj_Faces_Sharing_Vertex::verts[vid+1]-0.5,
-                                                                                                     Three_Adj_Faces_Sharing_Vertex::verts[vid+2]-0.5));
-
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "y", -M_PI/2); break;
-        case 2:  rotate(verts, "y",  M_PI/2); break;
-        case 3:  rotate(verts, "y", -M_PI); break;
-        case 4:  rotate(verts, "z", -M_PI/2); break;
-        case 5:  reflect(verts, "x"); break;
-        case 6:  rotate(verts, "z",  M_PI); break;
-        case 7:  rotate(verts, "y",  M_PI);
-                 rotate(verts, "z",  M_PI/2); break;
-                 break;
-    }
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Three_Adj_Faces_Sharing_Vertex::polys;
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_four_adj_faces( std::vector<vec3d>              & verts,
-                            std::vector<std::vector<uint>>  & polys,
-                            SchemeInfo                      & info,
-                            const vec3d                     & poly_centroid){
-
-    verts.reserve(Four_Adj_Faces::verts.size()/3);
-
-    for (uint vid=0; vid<Four_Adj_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Four_Adj_Faces::verts[vid]-0.5,
-                                                                                     Four_Adj_Faces::verts[vid+1]-0.5,
-                                                                                     Four_Adj_Faces::verts[vid+2]-0.5));
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "y",  M_PI/2); break;
-        case 2:  rotate(verts, "x",  M_PI/2); break;
-    }
-
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Four_Adj_Faces::polys;
-}
-
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_four_adj_faces_sharing_two_vertices(std::vector<vec3d>              & verts,
-                                                std::vector<std::vector<uint>>  & polys,
-                                                SchemeInfo                      & info,
-                                                const vec3d                     & poly_centroid){
-
-    verts.reserve(Four_Adj_Faces_Sharing_Two_Vertices::verts.size()/3);
-
-    for (uint vid=0; vid<Four_Adj_Faces_Sharing_Two_Vertices::verts.size(); vid+=3) verts.push_back(vec3d(Four_Adj_Faces_Sharing_Two_Vertices::verts[vid]-0.5,
-                                                                                                          Four_Adj_Faces_Sharing_Two_Vertices::verts[vid+1]-0.5,
-                                                                                                          Four_Adj_Faces_Sharing_Two_Vertices::verts[vid+2]-0.5));
-
-
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
-    }
-
-    polys = Four_Adj_Faces_Sharing_Two_Vertices::polys;
-}
 
 } // end anonymous namespace
 
@@ -358,29 +177,14 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
 
 
     switch(info.type){
-        case HexTransition::FULL:
-            orient_full(verts, polys, info, poly_centroid);
-            break;           
-        case HexTransition::TRANSITION:
-            orient_transition(verts, polys, info, poly_centroid);
+        case HexTransition::EDGE:
+            orient_edge(verts, polys, info, poly_centroid);
             break;
         case HexTransition::FACE:
             orient_face(verts, polys, info, poly_centroid);
-            break;
-        case HexTransition::TWO_ADJ_FACES:
-            orient_two_adj_faces(verts, polys, info, poly_centroid);
-            break;
-        case HexTransition::THREE_ADJ_FACES:
-            orient_three_adj_faces(verts, polys, info, poly_centroid);
-            break;
-        case HexTransition::THREE_ADJ_FACES_SHARING_VERTEX:
-            orient_three_adj_faces_sharing_vertex(verts, polys, info, poly_centroid);
-            break;
-        case HexTransition::FOUR_ADJ_FACES:
-            orient_four_adj_faces(verts, polys, info, poly_centroid);
-            break;
-        case HexTransition::FOUR_ADJ_FACES_SHARING_TWO_VERTICES:
-            orient_four_adj_faces_sharing_two_vertices(verts, polys, info, poly_centroid);
+            break;           
+        case HexTransition::FULL:
+            orient_full(verts, polys, info, poly_centroid);
             break;
     }
 

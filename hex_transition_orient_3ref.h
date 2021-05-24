@@ -40,14 +40,9 @@ namespace cinolib{
  *
  */
 enum class HexTransition{
-    FULL,
-    TRANSITION,
+    EDGE,
     FACE,
-    TWO_ADJ_FACES,
-    THREE_ADJ_FACES,
-    THREE_ADJ_FACES_SHARING_VERTEX,
-    FOUR_ADJ_FACES,
-    FOUR_ADJ_FACES_SHARING_TWO_VERTICES,
+    FULL,
 };
 
 /*

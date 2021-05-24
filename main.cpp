@@ -90,13 +90,13 @@ void fill_holes(Hexmesh<M,V,E,F,P> & mesh){
 }
 
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
                        std::map<vec3d, uint, vert_compare>      & vertices,
-                       std::vector<bool>                        & transition_verts,
-                       std::vector<uint>                        & transition_faces){
+                       std::vector<bool>                        & transition_verts){
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
@@ -114,7 +114,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
 
             if(poly_labels[pid] >= 1){
 
-                split27(pid, mesh, vertices, transition_verts, transition_faces);
+                split27(pid, mesh, vertices, transition_verts);
 
                 vector_pid.push_back(pid);
 
@@ -155,8 +155,7 @@ CINO_INLINE
 void split27(const uint                                   pid,
              Hexmesh<M,V,E,F,P>                         & mesh,
              std::map<vec3d, uint, vert_compare>        & vertices,
-             std::vector<bool>                          & transition_verts,
-             std::vector<uint>                          & transition_faces){
+             std::vector<bool>                          & transition_verts){
 
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
@@ -275,11 +274,8 @@ void split27(const uint                                   pid,
     }
 
     //update vertices and faces to apply templates
-    if(mesh.num_verts() > 64){
-        for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
-        for(auto fid: mesh.poly_faces_id(pid)) transition_faces.push_back(fid);
+    if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
 
-    }
 
     //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -328,7 +324,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
     DrawableHexmesh<> mesh(s.c_str());
 
 
@@ -340,7 +336,6 @@ int main(int argc, char *argv[])
 
     //vectors for templates application
     std::vector<bool> transition_verts;
-    std::vector<uint> transition_faces;
 
 
     //when the mesh has numverts > 8
@@ -351,25 +346,11 @@ int main(int argc, char *argv[])
 
     mesh.print_quality();
 
+    /*
     balancing(true, mesh);
 
-
-
-    //fill 1x1x1 holes
-
-    std::chrono::high_resolution_clock::time_point t0f = std::chrono::high_resolution_clock::now();
-
-    fill_holes(mesh);
-
-    std::chrono::high_resolution_clock::time_point t1f = std::chrono::high_resolution_clock::now();
-
-
-    std::cout << std::endl;
-    std::cout << "Filling 1x1x1 holes of the mesh [" << how_many_seconds(t0f,t1f) << "s]" << std::endl;
-
-
-    apply_refinements(mesh, vertices, transition_verts, transition_faces);
-
+    apply_refinements(mesh, vertices, transition_verts);
+    */
 
     QWidget window;
     GLcanvas gui_input, gui_output;
@@ -380,7 +361,7 @@ int main(int argc, char *argv[])
     window.resize(1000,600);
     window.show();
 
-    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
+    //gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.push_obj(&mesh);
 
@@ -388,7 +369,6 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
-
 
     /*
     Profiler profiler;
@@ -415,7 +395,7 @@ int main(int argc, char *argv[])
                 //chrono for subdivision
                 std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-                split27(pid, mesh, vertices, transition_verts, transition_faces);
+                split27(pid, mesh, vertices, transition_verts);
 
                 std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -427,7 +407,7 @@ int main(int argc, char *argv[])
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
-                if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
+                hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -452,8 +432,12 @@ int main(int argc, char *argv[])
     };
     */
 
+    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+    gui_output.push_obj(&outputMesh);
+    outputMesh.updateGL();
+    outputMesh.print_quality(); //scaled jacobian
 
-
+    /*
     mesh.print_quality();
 
     //chrono for template's application
@@ -476,10 +460,10 @@ int main(int argc, char *argv[])
 
     outputMesh.updateGL();
     outputMesh.print_quality(); //scaled jacobian
-
-    outputMesh.save("result_output.mesh");
+    */
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
+
     Quadmesh<> outputSurfaceMesh;
 
     export_surface(outputMesh, outputSurfaceMesh);
