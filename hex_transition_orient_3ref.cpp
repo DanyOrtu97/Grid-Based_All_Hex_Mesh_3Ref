@@ -243,6 +243,7 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
 
 
     switch(info.type){
+        case HexTransition::NODE: break;
         case HexTransition::EDGE:
             orient_edge(verts, polys, info, poly_centroid);
             break;
