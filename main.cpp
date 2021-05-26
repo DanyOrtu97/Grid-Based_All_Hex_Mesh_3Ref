@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-    /*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -430,12 +430,7 @@ int main(int argc, char *argv[])
             }
         }
     };
-    */
 
-    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
-    gui_output.push_obj(&outputMesh);
-    outputMesh.updateGL();
-    outputMesh.print_quality(); //scaled jacobian
 
     /*
     mesh.print_quality();
@@ -464,12 +459,13 @@ int main(int argc, char *argv[])
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
 
-    Quadmesh<> outputSurfaceMesh;
+    if(outputMesh.num_polys() > 0 ){
+        Quadmesh<> outputSurfaceMesh;
 
-    export_surface(outputMesh, outputSurfaceMesh);
+        export_surface(outputMesh, outputSurfaceMesh);
 
-    std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
-
+        std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+    }
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
