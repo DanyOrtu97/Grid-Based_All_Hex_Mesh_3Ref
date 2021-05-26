@@ -344,6 +344,8 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
+    bool added_newverts = true;
+
     mesh.print_quality();
 
     /*
@@ -352,19 +354,15 @@ int main(int argc, char *argv[])
     apply_refinements(mesh, vertices, transition_verts);
     */
 
-    QWidget window;
+
     GLcanvas gui_input, gui_output;
-    QHBoxLayout layout;
-    layout.addWidget(&gui_input);
-    layout.addWidget(&gui_output);
-    window.setLayout(&layout);
-    window.resize(1000,600);
-    window.show();
 
     //gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.push_obj(&mesh);
 
+    gui_input.show();
+    gui_output.show();
 
     /*
      * Tool for creating new polys by mouse click
@@ -407,7 +405,7 @@ int main(int argc, char *argv[])
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
-                hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+                hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -424,6 +422,14 @@ int main(int argc, char *argv[])
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
 
+                if(outputMesh.num_polys() > 0 ){
+                    Quadmesh<> outputSurfaceMesh;
+
+                    export_surface(outputMesh, outputSurfaceMesh);
+
+                    std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+                }
+
 
                 c->updateGL();
 
@@ -438,7 +444,9 @@ int main(int argc, char *argv[])
     //chrono for template's application
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-    if(mesh.num_verts() >= 64) hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh);
+    if(mesh.num_verts() >= 64)
+        while (added_newverts)
+            hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh, added_newverts);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -455,7 +463,7 @@ int main(int argc, char *argv[])
 
     outputMesh.updateGL();
     outputMesh.print_quality(); //scaled jacobian
-    */
+
 
     //verify if the output mesh is a single connected component (of coarse without hanging noodes)
 
@@ -466,7 +474,7 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
     }
-
+*/
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);

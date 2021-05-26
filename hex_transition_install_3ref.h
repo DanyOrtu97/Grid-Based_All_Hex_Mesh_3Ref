@@ -49,7 +49,8 @@ template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                                        std::vector<bool>            & transition_verts,
-                                       Hexmesh<M,V,E,F,P>           & m_out);
+                                       Hexmesh<M,V,E,F,P>           & m_out,
+                                       bool                         & added_newverts);
 }
 
 
