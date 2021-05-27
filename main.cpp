@@ -105,7 +105,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max-1; i++){
+    for(int i = 0; i < max; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -324,51 +324,39 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
-
-
     DrawableHexmesh<> outputMesh;
 
-    //vertices
+    GLcanvas gui_input, gui_output;
+
+    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
+    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
+    gui_input.show();
+    gui_output.show();
+
+
     std::map<vec3d, uint, vert_compare> vertices;
-
-
-    //vectors for templates application
     std::vector<bool> transition_verts;
+    bool added_newverts = true;
 
 
-    //when the mesh has numverts > 8
     for (auto v: mesh.vector_verts()){
         vertices.insert(std::pair<vec3d, uint>(v, vertices.size()));
         transition_verts.push_back(false);
     }
 
-    bool added_newverts = true;
 
-    mesh.print_quality();
-
-    /*
     balancing(true, mesh);
 
     apply_refinements(mesh, vertices, transition_verts);
-    */
 
-
-    GLcanvas gui_input, gui_output;
-
-    //gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
-    gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
-    gui_input.push_obj(&mesh);
-
-    gui_input.show();
-    gui_output.show();
 
     /*
      * Tool for creating new polys by mouse click
      */
 
-
+    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -399,7 +387,7 @@ int main(int argc, char *argv[])
 
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
-                mesh.updateGL();
+
 
 
                 //chrono for template's application
@@ -418,7 +406,7 @@ int main(int argc, char *argv[])
 
                 gui_output.push_obj(&outputMesh);
 
-
+                mesh.updateGL();
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
 
@@ -436,17 +424,13 @@ int main(int argc, char *argv[])
             }
         }
     };
+    */
 
 
-    /*
-    mesh.print_quality();
-
-    //chrono for template's application
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
-    if(mesh.num_verts() >= 64)
-        while (added_newverts)
-            hex_transition_install_3ref(mesh, transition_verts, transition_faces, outputMesh, added_newverts);
+    while (added_newverts)
+        hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -458,14 +442,14 @@ int main(int argc, char *argv[])
                                                                       how_many_seconds(t0,t1) << "s]" << std::endl;
 
     gui_output.push_obj(&outputMesh);
+    gui_input.push_obj(&mesh);
 
     mesh.updateGL();
-
     outputMesh.updateGL();
+
+    mesh.print_quality();
     outputMesh.print_quality(); //scaled jacobian
 
-
-    //verify if the output mesh is a single connected component (of coarse without hanging noodes)
 
     if(outputMesh.num_polys() > 0 ){
         Quadmesh<> outputSurfaceMesh;
@@ -474,7 +458,7 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
     }
-*/
+
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);

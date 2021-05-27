@@ -325,12 +325,13 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
                     }
             }
 
+
             added_newverts=true;
 
             setOrientationInfo3(m, info, vertices, pid);
 
         }
-        else{ //2C
+        else{ //2C (#### Verify added vertices ####)
             info.type = HexTransition::TWO_FACES;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -418,54 +419,34 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
-    else{ //3B or 3C
+    else{ //3B, 3C (#### Verify added vertices ####)
 
-        int eid=-1;
-        uint free_edge;
+        int free_edge = -1;
 
-        for(uint e_id : m.adj_p2e(pid)){
-            if (m.edge_contains_vert(e_id,vertices[0]) && m.edge_contains_vert(e_id,vertices[1]) ||
-                m.edge_contains_vert(e_id,vertices[1]) && m.edge_contains_vert(e_id,vertices[2]) ||
-                m.edge_contains_vert(e_id,vertices[2]) && m.edge_contains_vert(e_id,vertices[0])) eid = (int)e_id;
-            else if(! m.edge_contains_vert(e_id,vertices[0]) && ! m.edge_contains_vert(e_id,vertices[1]) && ! m.edge_contains_vert(e_id,vertices[2]))
-                free_edge = e_id;
-        }
+        for(uint eid : m.adj_p2e(pid))
+            if(! m.edge_contains_vert(eid, vertices[0]) &&
+               ! m.edge_contains_vert(eid, vertices[1]) &&
+               ! m.edge_contains_vert(eid, vertices[2]))
+               free_edge = (int)eid;
 
         uint vid0 = m.edge_vert_ids(free_edge)[0];
         uint vid1 = m.edge_vert_ids(free_edge)[1];
 
-        if(eid != -1){ //3B
-            info.type = HexTransition::TWO_FACES;
-            info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
-            for (auto vid: poly_verts_id){
-                if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2]){
-                    vertices.push_back(vid);
-                    transition_verts[vid] = true;
-                }
+        info.type = HexTransition::TWO_FACES;
+        info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
+        for (auto vid: poly_verts_id){
+            if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2]){
+                vertices.push_back(vid);
+                transition_verts[vid] = true;
             }
 
-            added_newverts=true;
-
-            setOrientationInfo6(m, info, vertices, pid);
-
         }
-        else{ //3C
-            info.type = HexTransition::TWO_FACES;
-            info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
-            for (auto vid: poly_verts_id){
-                if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2]){
-                    vertices.push_back(vid);
-                    transition_verts[vid] = true;
-                }
-            }
+        added_newverts=true;
 
-            added_newverts=true;
-
-            setOrientationInfo6(m, info, vertices, pid);
-        }
+        setOrientationInfo6(m, info, vertices, pid);
 
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
 
@@ -516,7 +497,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
 
 
-        if(free_edge != -1){ // 4B, 4C, 4D, 4E
+        if(free_edge != -1){ // 4B, 4C, 4D, 4E (#### Verify added vertices ####)
             info.type = HexTransition::TWO_FACES;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -580,7 +561,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
            free_edge = (int)eid;
 
 
-    if(free_edge != -1){ // 5A, 5B
+    if(free_edge != -1){ // 5A, 5B (#### Verify added vertices ####)
         info.type = HexTransition::TWO_FACES;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -645,19 +626,6 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(free_edge != -1){ // 6A
         info.type = HexTransition::TWO_FACES;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-
-        for (auto vid: poly_verts_id){
-            uint vid0 = m.edge_vert_ids(free_edge)[0];
-            uint vid1 = m.edge_vert_ids(free_edge)[1];
-
-            if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2] && vid != vertices[3] && vid != vertices[4] && vid != vertices[5]){
-                vertices.push_back(vid);
-                transition_verts[vid] = true;
-            }
-
-        }
-
-        added_newverts=true;
 
         setOrientationInfo6(m, info, vertices, pid);
     }
@@ -778,7 +746,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                     break;
         }
 
-        if(pid > 500 && pid%500==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (m_in.num_polys()) << "% ]" <<std::endl;
+        if(pid > 5000 && pid%5000==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (m_in.num_polys()) << "% ]" <<std::endl;
     }
 
     merge_schemes_into_mesh(m_out, poly2scheme);
