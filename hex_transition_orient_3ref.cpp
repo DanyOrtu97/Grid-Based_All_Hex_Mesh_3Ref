@@ -91,13 +91,12 @@ void orient_edge(std::vector<vec3d>              & verts,
         case 1:  rotate(verts, "z",  M_PI/2); break;
         case 2:  rotate(verts, "y",  M_PI/2); break;
         case 3:  rotate(verts, "y", -M_PI/2); break;
-        case 4:  reflect(verts, "x"); break;
-        case 5:  reflect(verts, "x");
-                 rotate(verts, "z", -M_PI/2); break;
-        case 6:  reflect(verts, "x");
-                 rotate(verts, "y",  M_PI/2); break;
-        case 7:  reflect(verts, "x");
-                 rotate(verts, "y", -M_PI/2); break;
+        case 4:  rotate(verts, "z", -M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI); break;
+        case 6:  rotate(verts, "y",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 7:  rotate(verts, "y", -M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
         case 8:  rotate(verts, "x", -M_PI/2); break;
         case 9:  rotate(verts, "x",  M_PI/2); break;
         case 10: rotate(verts, "x", -M_PI/2);
@@ -180,42 +179,48 @@ void orient_two_edges(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Two_Edges::verts.size(); vid+=3) verts.push_back(vec3d(Two_Edges::verts[vid]-0.5, Two_Edges::verts[vid+1]-0.5, Two_Edges::verts[vid+2]-0.5));
 
-    //da revisionare ###############################################
-
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "y", -M_PI/2); break;
-        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 1:  rotate(verts, "y",  M_PI/2); break;
+        case 2:  rotate(verts, "y", -M_PI/2); break;
         case 3:  rotate(verts, "y",  M_PI); break;
-        case 4:  reflect(verts, "x"); break;
-        case 5:  reflect(verts, "x");
-                 rotate(verts, "y", -M_PI/2); break;
-        case 6:  reflect(verts, "x");
+        case 4:  rotate(verts, "x", -M_PI);
                  rotate(verts, "y",  M_PI/2); break;
-        case 7:  reflect(verts, "x");
+        case 5:  rotate(verts, "x", -M_PI);
                  rotate(verts, "y",  M_PI); break;
-        case 8:  rotate(verts, "x", -M_PI/2); break;
-        case 9:  reflect(verts, "x");
-                 rotate(verts, "x", -M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI); break;
+        case 7:  rotate(verts, "x", -M_PI);
+                 rotate(verts, "y", -M_PI); break;
+        case 8:  rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 9:  rotate(verts, "x", -M_PI/2); break;
         case 10: rotate(verts, "z", -M_PI/2);
                  rotate(verts, "y",  M_PI/2);
                  rotate(verts, "z", -M_PI/2); break;
         case 11: rotate(verts, "z", -M_PI/2);
                  rotate(verts, "y",  M_PI/2); break;
-        case 12: rotate(verts, "y",  M_PI);
+        case 12: rotate(verts, "x",  M_PI/2); break;
+        case 13: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
+        case 14: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 15: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI); break;
+        case 16: rotate(verts, "z",  M_PI/2);
                  rotate(verts, "x",  M_PI/2); break;
-        case 13: break;
-        case 14: break;
-        case 15: break;
-        case 16: break;
-        case 17: break;
-        case 18: break;
-        case 19: break;
-        case 20: break;
-        case 21: break;
-        case 22: break;
-        case 23: break;
+        case 17: rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI); break;
+        case 18: rotate(verts, "z",  M_PI/2); break;
+        case 19: rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 20: rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x",  M_PI); break;
+        case 21: rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 22: rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 23: rotate(verts, "z", -M_PI/2); break;
 
     }
 
@@ -240,28 +245,24 @@ void orient_two_faces(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Two_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Two_Faces::verts[vid]-0.5, Two_Faces::verts[vid+1]-0.5, Two_Faces::verts[vid+2]-0.5));
 
-    //da revisionare ###############################################
-
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
         case 1:  rotate(verts, "y", -M_PI/2); break;
         case 2:  rotate(verts, "y",  M_PI/2); break;
-        case 3:  rotate(verts, "y",  M_PI/2); break;
-        case 4:  rotate(verts, "y",  M_PI/2); break;
-        case 5:  rotate(verts, "z", -M_PI/2); break;
-        case 6:  rotate(verts, "z", -M_PI/2);
-                 rotate(verts, "y", -M_PI/2); break;
-        case 7:  rotate(verts, "z", -M_PI/2);
+        case 3:  rotate(verts, "y",  M_PI); break;
+        case 4:  rotate(verts, "z",  M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x",  M_PI/2); break;
+        case 7:  rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 8:  rotate(verts, "z",  M_PI/2); break;
+        case 9:  rotate(verts, "z", -M_PI/2);
                  rotate(verts, "x", -M_PI/2); break;
-        case 8:  rotate(verts, "z",  M_PI/2);
-                 rotate(verts, "x",  M_PI/2); break;
-        case 9:  rotate(verts, "z",  M_PI/2);
-                 rotate(verts, "y",  M_PI); break;
-        case 10: rotate(verts, "z", -M_PI/2);
-                 rotate(verts, "x",  M_PI/2); break;
-        case 11: rotate(verts, "z",  M_PI/2);
-                 rotate(verts, "x",  M_PI/2); break;
+        case 10: rotate(verts, "x", -M_PI/2); break;
+        case 11: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
     }
 
     for (auto & v: verts){

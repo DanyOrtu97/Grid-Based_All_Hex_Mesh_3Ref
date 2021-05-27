@@ -332,6 +332,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         }
         else{ //2C (#### Verify added vertices ####)
+
             info.type = HexTransition::TWO_FACES;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -355,7 +356,6 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
             added_newverts=true;
 
             setOrientationInfo6(m, info, vertices, pid);
-
         }
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
@@ -417,10 +417,8 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         setOrientationInfo4(m, info, vertices, pid);
 
-        poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
     else{ //3B, 3C (#### Verify added vertices ####)
-
         int free_edge = -1;
 
         for(uint eid : m.adj_p2e(pid))
@@ -448,9 +446,9 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         setOrientationInfo6(m, info, vertices, pid);
 
-        poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
 
     }
+    poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
 }
 
 
@@ -498,6 +496,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
 
         if(free_edge != -1){ // 4B, 4C, 4D, 4E (#### Verify added vertices ####)
+
             info.type = HexTransition::TWO_FACES;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -517,6 +516,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
             setOrientationInfo6(m, info, vertices, pid);
         }
         else{ // 4F
+
             info.type = HexTransition::FULL;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -562,6 +562,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
 
     if(free_edge != -1){ // 5A, 5B (#### Verify added vertices ####)
+
         info.type = HexTransition::TWO_FACES;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -581,6 +582,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
         setOrientationInfo6(m, info, vertices, pid);
     }
     else{ // 5C
+
         info.type = HexTransition::FULL;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -630,6 +632,7 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
         setOrientationInfo6(m, info, vertices, pid);
     }
     else{ // 6B, 6C
+
         info.type = HexTransition::FULL;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -706,6 +709,13 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
     // tstart = start()
     // time = stop(tstart)
     // var_find_min_max += time
+    uint conta2=0;
+    uint conta3=0;
+    uint conta4=0;
+    uint conta5=0;
+    uint conta6=0;
+    uint conta7=0;
+    uint conta8=0;
 
     for (uint pid=0; pid<m_in.num_polys(); pid++){
         std::vector<uint> vertices;
@@ -713,19 +723,23 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
         for(uint vid: poly_verts_id) if(transition_verts[vid]) vertices.push_back(vid);
 
-
         SchemeInfo info;
         //Select the right scheme to apply
         switch (vertices.size()){
             case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, added_newverts);
+            conta2++;
                     break;
             case 3: mark3vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, added_newverts);
+            conta3++;
                     break;
             case 4: mark4vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, added_newverts);
+            conta4++;
                     break;
             case 5: mark5vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, added_newverts);
+            conta5++;
                     break;
             case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, added_newverts);
+            conta6++;
                     break;
             case 7:
                     for (auto vid: poly_verts_id){
@@ -738,16 +752,21 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                     info.type = HexTransition::FULL;
                     info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                     poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                    conta7++;
                     break;
             case 8:
                     info.type = HexTransition::FULL;
                     info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                     poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                    conta8++;
                     break;
         }
 
-        if(pid > 5000 && pid%5000==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (m_in.num_polys()) << "% ]" <<std::endl;
     }
+
+    //debug print
+    std::cout << "c2 : " << conta2 << ", "<< "c3 : " << conta3 << ", "<< "c4 : " << conta4 << ", "
+              << "c5 : " << conta5 << ", "<< "c6 : " << conta6 << ", "<< "c7 : " << conta7 << ", "<< "c8 : " << conta8 << ", "<<std::endl;
 
     merge_schemes_into_mesh(m_out, poly2scheme);
 

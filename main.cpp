@@ -119,7 +119,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
                 vector_pid.push_back(pid);
 
             }
-            if (pid%100==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (poly_labels.size()) << "% ]" <<std::endl;
+            if (pid%1000==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (poly_labels.size()) << "% ]" <<std::endl;
         }
 
 
@@ -351,6 +351,7 @@ int main(int argc, char *argv[])
 
     apply_refinements(mesh, vertices, transition_verts);
 
+    mesh.print_quality();
 
     /*
      * Tool for creating new polys by mouse click
@@ -428,6 +429,8 @@ int main(int argc, char *argv[])
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
+    std::cout<<std::endl;
+    std::cout<< "Template application in progress ...." <<std::endl;
 
     while (added_newverts)
         hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
@@ -447,7 +450,6 @@ int main(int argc, char *argv[])
     mesh.updateGL();
     outputMesh.updateGL();
 
-    mesh.print_quality();
     outputMesh.print_quality(); //scaled jacobian
 
 
