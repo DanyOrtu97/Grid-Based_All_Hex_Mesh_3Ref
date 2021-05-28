@@ -15,6 +15,7 @@
 #include <cinolib/connected_components.h>
 #include <cinolib/io/io_utilities.h>
 #include <cinolib/export_surface.h>
+#include <numeric>
 
 
 namespace cinolib
@@ -330,7 +331,7 @@ int main(int argc, char *argv[])
 
     GLcanvas gui_input, gui_output;
 
-    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
+    //gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.show();
     gui_output.show();
@@ -338,7 +339,6 @@ int main(int argc, char *argv[])
 
     std::map<vec3d, uint, vert_compare> vertices;
     std::vector<bool> transition_verts;
-    bool added_newverts = true;
 
 
     for (auto v: mesh.vector_verts()){
@@ -347,10 +347,10 @@ int main(int argc, char *argv[])
     }
 
 
-    balancing(true, mesh);
+    //balancing(true, mesh);
     //mesh.updateGL();
 
-    apply_refinements(mesh, vertices, transition_verts);
+    //apply_refinements(mesh, vertices, transition_verts);
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-    /*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -397,9 +397,7 @@ int main(int argc, char *argv[])
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
-                added_newverts=true;
-                //while (added_newverts)
-                    hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
+                hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -431,14 +429,13 @@ int main(int argc, char *argv[])
         }
     };
 
-    */
 
+/*
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
 
-    //while (added_newverts)
-        hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
+    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -468,7 +465,7 @@ int main(int argc, char *argv[])
         //outputSurfaceMesh.save("surface_result.obj");
     }
 
-
+*/
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
