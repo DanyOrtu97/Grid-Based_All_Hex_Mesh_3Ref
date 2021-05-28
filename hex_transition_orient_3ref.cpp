@@ -257,8 +257,8 @@ void orient_two_faces(std::vector<vec3d>              & verts,
         case 6:  rotate(verts, "x",  M_PI/2); break;
         case 7:  rotate(verts, "x",  M_PI/2);
                  rotate(verts, "z",  M_PI/2); break;
-        case 8:  rotate(verts, "z",  M_PI/2); break;
-        case 9:  rotate(verts, "z", -M_PI/2);
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z",  M_PI/2);
                  rotate(verts, "x", -M_PI/2); break;
         case 10: rotate(verts, "x", -M_PI/2); break;
         case 11: rotate(verts, "x", -M_PI/2);

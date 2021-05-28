@@ -105,7 +105,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -348,10 +348,13 @@ int main(int argc, char *argv[])
 
 
     balancing(true, mesh);
+    //mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
 
     mesh.print_quality();
+    gui_output.push_obj(&outputMesh);
+    gui_input.push_obj(&mesh);
 
     /*
      * Tool for creating new polys by mouse click
@@ -394,7 +397,9 @@ int main(int argc, char *argv[])
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
-                hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
+                added_newverts=true;
+                //while (added_newverts)
+                    hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -425,14 +430,14 @@ int main(int argc, char *argv[])
             }
         }
     };
-    */
 
+    */
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
 
-    while (added_newverts)
+    //while (added_newverts)
         hex_transition_install_3ref(mesh, transition_verts, outputMesh, added_newverts);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -459,7 +464,10 @@ int main(int argc, char *argv[])
         export_surface(outputMesh, outputSurfaceMesh);
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+
+        //outputSurfaceMesh.save("surface_result.obj");
     }
+
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);

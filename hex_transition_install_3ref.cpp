@@ -388,7 +388,8 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
         is_3a=true;
 
 
-    if(is_3a){ //3A
+    if(is_3a){ //3A (maybe is better now)
+        /*
         info.type = HexTransition::FACE;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
 
@@ -416,6 +417,11 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
         added_newverts=true;
 
         setOrientationInfo4(m, info, vertices, pid);
+        */
+
+        info.type = HexTransition::TWO_EDGES;
+        info.scale = m.edge_length(m.adj_p2e(pid)[0]);
+        setOrientationInfo3(m, info, vertices, pid);
 
     }
     else{ //3B, 3C (#### Verify added vertices ####)
@@ -426,6 +432,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                ! m.edge_contains_vert(eid, vertices[1]) &&
                ! m.edge_contains_vert(eid, vertices[2]))
                free_edge = (int)eid;
+
 
         uint vid0 = m.edge_vert_ids(free_edge)[0];
         uint vid1 = m.edge_vert_ids(free_edge)[1];
@@ -491,7 +498,8 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                ! m.edge_contains_vert(eid, vertices[1]) &&
                ! m.edge_contains_vert(eid, vertices[2]) &&
                ! m.edge_contains_vert(eid, vertices[3]))
-               free_edge = (int)eid;
+                free_edge = (int)eid;
+
 
 
 
@@ -709,6 +717,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
     // tstart = start()
     // time = stop(tstart)
     // var_find_min_max += time
+
     uint conta2=0;
     uint conta3=0;
     uint conta4=0;
