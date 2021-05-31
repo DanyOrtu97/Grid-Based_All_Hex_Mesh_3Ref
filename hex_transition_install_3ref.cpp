@@ -292,9 +292,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(eid != -1){ //2A
         info.type = HexTransition::EDGE;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-
         setOrientationInfo2(m, info, vertices, pid);
-
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
     else{ //2B or 2C
@@ -307,47 +305,47 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
                 if(v0.x() == v1.x())
                     if (m.vert(vid).x() == v0.x() && vid != vertices[0] && vid != vertices[1]){
                         changed_vid.push_back(vid);
-                        changed_pid.push_back(pid);
                         break;
                     }
                 if(v0.y() == v1.y())
                     if (m.vert(vid).y() == v0.y() && vid != vertices[0] && vid != vertices[1]){
                         changed_vid.push_back(vid);
-                        changed_pid.push_back(pid);
                         break;
                     }
                 if(v0.z() == v1.z())
                     if (m.vert(vid).z() == v0.z() && vid != vertices[0] && vid != vertices[1]){
                         changed_vid.push_back(vid);
-                        changed_pid.push_back(pid);
                         break;
                     }
             }
+            changed_pid.push_back(pid);
         }
-        else{ //2C (#### Verify added vertices ####)
-            std::cout<< "2C"<<std::endl;
+        else{ //2C
+            std::vector<bool> t2_a = {true, false, false, false, false, false, true, false};
+            std::vector<bool> t2_b = {false, false, false, true, false, true, false, false};
+            std::vector<bool> t2_c = {false, false, true, false, true, false, false, false};
+            std::vector<bool> t2_d = {false, true, false, false, false, false, false, true};
+            std::vector<bool> t2;
 
+            for (auto vid: poly_verts_id) t2.push_back(transition_verts[vid]);
 
-            std::vector<bool> template2c = {false, false, false, true, false, true, false, false};
-            std::vector<bool> mask = {true, true, true, true, false, false, true, true};
-
-
-            std::vector<bool> t2c;
-
-            for (auto vid: poly_verts_id){
-                t2c.push_back(transition_verts[vid]);
+            if(t2 == t2_a){
+                std::vector<bool> mask_a = {true, true, true, true, false, false, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask_a[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-
-            //gestisci tutte le combinazioni usando maschere diverse (o cerca di orientarne una)
-            if(t2c == template2c){
-                for(int i=0; i<8; i++){
-                    if(! transition_verts[poly_verts_id[i]] && mask[i])
-                        changed_vid.push_back(poly_verts_id[i]);
-                }
-                 changed_pid.push_back(pid);
+            else if(t2 == t2_b){
+                std::vector<bool> mask_b = {true, true, true, true, false, true, true, false};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask_b[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-
-
+            else if(t2 == t2_c){
+                std::vector<bool> mask_c = {true, true, true, true, true, true, false, false};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask_c[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t2 == t2_d){
+                std::vector<bool> mask_d = {true, true, true, true, true, false, false, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask_d[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            changed_pid.push_back(pid);
         }
     }
 }
@@ -385,26 +383,26 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
         setOrientationInfo3(m, info, vertices, pid);
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
-    else{ //3B, 3C (#### Verify added vertices ####)
-        int free_edge = -1;
+    else{ //3B, 3C
+        int n_free_edge = 0;
 
         for(uint eid : m.adj_p2e(pid))
             if(! m.edge_contains_vert(eid, vertices[0]) &&
                ! m.edge_contains_vert(eid, vertices[1]) &&
                ! m.edge_contains_vert(eid, vertices[2]))
-               free_edge = (int)eid;
+               n_free_edge++;
 
-        uint vid0 = m.edge_vert_ids(free_edge)[0];
-        uint vid1 = m.edge_vert_ids(free_edge)[1];
+        if(n_free_edge == 4){ // 3B
 
-        for (auto vid: poly_verts_id){
-            if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2]){
-                //changed_vid.push_back(vid);
-                //changed_pid.push_back(pid);
-            }
+            //da fareee
 
         }
-        std::cout<< "3B/3C"<<std::endl;
+        else{  //3C
+
+
+            //da fareee
+
+        }
     }
 }
 
@@ -423,13 +421,14 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<uint>                    & changed_vid){
 
     SchemeInfo info;
-
     int fid=-1;
+
     for(uint f_id : m.adj_p2f(pid))
         if (m.face_contains_vert(f_id,vertices[0]) &&
             m.face_contains_vert(f_id,vertices[1]) &&
             m.face_contains_vert(f_id,vertices[2]) &&
-            m.face_contains_vert(f_id,vertices[3])) fid = (int)f_id;
+            m.face_contains_vert(f_id,vertices[3]))
+            fid = (int)f_id;
 
 
     if(fid != -1){ // 4A
@@ -441,35 +440,274 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
     else{ // 4B, 4C, 4D, 4E or 4F
-        int free_edge = -1;
+        int n_free_edge = 0;
 
         for(uint eid : m.adj_p2e(pid))
             if(! m.edge_contains_vert(eid, vertices[0]) &&
                ! m.edge_contains_vert(eid, vertices[1]) &&
                ! m.edge_contains_vert(eid, vertices[2]) &&
                ! m.edge_contains_vert(eid, vertices[3]))
-                free_edge = (int)eid;
+                n_free_edge ++;
+
+        int faces_3_nodes=0;
+        int conta_nodes;
+
+        for(uint f_id : m.adj_p2f(pid)){
+            conta_nodes=0;
+            if (m.face_contains_vert(f_id,vertices[0])) conta_nodes++;
+            if (m.face_contains_vert(f_id,vertices[1])) conta_nodes++;
+            if (m.face_contains_vert(f_id,vertices[2])) conta_nodes++;
+            if (m.face_contains_vert(f_id,vertices[3])) conta_nodes++;
+
+            if(conta_nodes == 3) faces_3_nodes++;
+        }
+
+        if(n_free_edge == 3){ // 4B, 4C
+            if(faces_3_nodes==3){ // 4B
+                std::cout<<"4B"<<std::endl;
+                std::vector<vec3d> poly_verts = m.poly_verts(pid);
+                vec3d min_v = *std::min_element(poly_verts.begin(), poly_verts.end());
+                vec3d max_v = *std::max_element(poly_verts.begin(), poly_verts.end());
+
+                uint max=0, min=0, left=0, right=0, back=0, front=0;
 
 
-        if(free_edge != -1){ // 4B, 4C, 4D, 4E (#### Verify added vertices ####)
-            for (auto vid: poly_verts_id){
-                uint vid0 = m.edge_vert_ids(free_edge)[0];
-                uint vid1 = m.edge_vert_ids(free_edge)[1];
-
-                if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2] && vid != vertices[3]){
-                    //changed_vid.push_back(vid);
-                    //changed_pid.push_back(pid);
+                for (auto vid : vertices){
+                    vec3d vert = m.vert(vid);
+                    if(vert.y() == min_v.y()){
+                        min ++;
+                        if(vert.x() == min_v.x()) left ++;
+                        else if(vert.x() == max_v.x()) right ++;
+                        if(vert.z() == min_v.z()) front ++;
+                        else if(vert.z() == max_v.z()) back ++;
+                    }
+                    else if(vert.y() == max_v.y()){
+                        max ++;
+                        if(vert.x() == min_v.x()) left ++;
+                        else if(vert.x() == max_v.x()) right ++;
+                        if(vert.z() == min_v.z()) front ++;
+                        else if(vert.z() == max_v.z()) back ++;
+                    }
                 }
+
+                if(min==3){
+                    if((left==3 && back==3) || (right==3 && front==3)){
+                        changed_vid.push_back(poly_verts_id[5]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                    else if((back==3 && right==3) || (front==3 && left==3)){
+                        changed_vid.push_back(poly_verts_id[4]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                }
+                else if(max==3){
+                    if((left==3 && back==3) || (right==3 && front==3)){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[3]);
+                    }
+                    else if((back==3 && right==3) || (front==3 && left==3)){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[2]);
+                    }
+                }
+                else if(left==3){
+                    if((back==3 && max==3) || (front==3 && min==3)){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                    else if((max==3 && front==3) || (min==3 && back==3)){
+                        changed_vid.push_back(poly_verts_id[2]);
+                        changed_vid.push_back(poly_verts_id[5]);
+                    }
+                }
+                else if(right==3){
+                    if((min==3 && back==3) || (max==3 && front==3)){
+                        changed_vid.push_back(poly_verts_id[3]);
+                        changed_vid.push_back(poly_verts_id[4]);
+                    }
+                    else if((back==3 && max==3) || (front==3 && min==3)){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                }
+                else if(back==3){
+                    if((max==3 && left==3) || (min==3 && right==3)){
+                        changed_vid.push_back(poly_verts_id[3]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                    else if((left==3 && min==3) || (right==3 && max==3)){
+                        changed_vid.push_back(poly_verts_id[2]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                }
+                else if(front==3){
+                    if((left==3 && min==3) || (right==3 && max==3)){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[4]);
+                    }
+                    else if((min==3 && right==3) || (max==3 && left==3)){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[5]);
+                    }
+                }
+
+                changed_pid.push_back(pid);
+
             }
-            std::cout<< "4B/4C/4D/4E"<<std::endl;
+            else{ //4C
+                std::cout<<"4C"<<std::endl;
+                std::vector<vec3d> poly_verts = m.poly_verts(pid);
+                vec3d min_v = *std::min_element(poly_verts.begin(), poly_verts.end());
+                vec3d max_v = *std::max_element(poly_verts.begin(), poly_verts.end());
+
+                uint max=0, min=0, left=0, right=0, back=0, front=0;
+
+
+                for (auto vid : vertices){
+                    vec3d vert = m.vert(vid);
+                    if(vert.y() == min_v.y()){
+                        min ++;
+                        if(vert.x() == min_v.x()) left ++;
+                        else if(vert.x() == max_v.x()) right ++;
+                        if(vert.z() == min_v.z()) front ++;
+                        else if(vert.z() == max_v.z()) back ++;
+                    }
+                    else if(vert.y() == max_v.y()){
+                        max ++;
+                        if(vert.x() == min_v.x()) left ++;
+                        else if(vert.x() == max_v.x()) right ++;
+                        if(vert.z() == min_v.z()) front ++;
+                        else if(vert.z() == max_v.z()) back ++;
+                    }
+                }
+
+                if(min==3){
+                    if(back==3 && right==2){
+                        changed_vid.push_back(poly_verts_id[4]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                    else if(right==3 && front==2){
+                        changed_vid.push_back(poly_verts_id[4]);
+                        changed_vid.push_back(poly_verts_id[5]);
+                    }
+                    else if(front==3 && left==2){
+                        changed_vid.push_back(poly_verts_id[5]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                    else if(left==3 && back==2){
+                        changed_vid.push_back(poly_verts_id[6]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                }
+                else if(max==3){
+                    if(back==3 && left==2){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[2]);
+                    }
+                    else if(left==3 && front==2){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[1]);
+                    }
+                    else if(front==3 && right==2){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[3]);
+                    }
+                    else if(right==3 && back==2){
+                        changed_vid.push_back(poly_verts_id[3]);
+                        changed_vid.push_back(poly_verts_id[2]);
+                    }
+                }
+                else if(left==3){
+                    if(back==3 && max==2){
+                        changed_vid.push_back(poly_verts_id[5]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                    else if(max==3 && front==2){
+                        changed_vid.push_back(poly_verts_id[6]);
+                        changed_vid.push_back(poly_verts_id[2]);
+                    }
+                    else if(front==3 && min==2){
+                        changed_vid.push_back(poly_verts_id[2]);
+                        changed_vid.push_back(poly_verts_id[1]);
+                    }
+                    else if(min==3 && back==2){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[5]);
+                    }
+                }
+                else if(right==3){
+                    if(min==2 && back==3){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[3]);
+                    }
+                    else if(back==2 && max==3){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[4]);
+                    }
+                    else if(max==2 && front==3){
+                        changed_vid.push_back(poly_verts_id[4]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                    else if(front==2 && min==3){
+                        changed_vid.push_back(poly_verts_id[7]);
+                        changed_vid.push_back(poly_verts_id[3]);
+                    }
+                }
+                else if(back==3){
+                    if(max==2 && left==3){
+                        changed_vid.push_back(poly_verts_id[3]);
+                        changed_vid.push_back(poly_verts_id[2]);
+                    }
+                    else if(left==2 && min==3){
+                        changed_vid.push_back(poly_verts_id[2]);
+                        changed_vid.push_back(poly_verts_id[6]);
+                    }
+                    else if(min==2 && right==3){
+                        changed_vid.push_back(poly_verts_id[6]);
+                        changed_vid.push_back(poly_verts_id[7]);
+                    }
+                    else if(right==2 && max==3){
+                        changed_vid.push_back(poly_verts_id[7]);
+                        changed_vid.push_back(poly_verts_id[3]);
+                    }
+                }
+                else if(front==3){
+                    if(min==3 && right==2){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[4]);
+                    }
+                    else if(right==3 && max==2){
+                        changed_vid.push_back(poly_verts_id[0]);
+                        changed_vid.push_back(poly_verts_id[1]);
+                    }
+                    else if(max==3 && left==2){
+                        changed_vid.push_back(poly_verts_id[1]);
+                        changed_vid.push_back(poly_verts_id[5]);
+                    }
+                    else if(left==3 && min==2){
+                        changed_vid.push_back(poly_verts_id[5]);
+                        changed_vid.push_back(poly_verts_id[4]);
+                    }
+                }
+
+                changed_pid.push_back(pid);
+
+            }
+        }
+        else if(n_free_edge == 2){ // 4D, 4E
+            if(faces_3_nodes==1){ // 4D
+
+
+            }
+            else{ //4E
+
+
+            }
         }
         else{ // 4F
-            for (auto vid: poly_verts_id){
-                if(transition_verts[vid]==false){
-                    changed_vid.push_back(vid);
-                    changed_pid.push_back(pid);
-                }
-            }
+            for (auto vid: poly_verts_id) if(transition_verts[vid]==false) changed_vid.push_back(vid);
+
+            changed_pid.push_back(pid);
         }
     }
 }
@@ -486,38 +724,104 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<uint>                    & changed_pid,
                          std::vector<uint>                    & changed_vid){
 
-    SchemeInfo info;
 
     int free_edge = -1;
+    int n_free_edge = 0;
 
     for(uint eid : m.adj_p2e(pid))
         if(! m.edge_contains_vert(eid, vertices[0]) &&
            ! m.edge_contains_vert(eid, vertices[1]) &&
            ! m.edge_contains_vert(eid, vertices[2]) &&
            ! m.edge_contains_vert(eid, vertices[3]) &&
-           ! m.edge_contains_vert(eid, vertices[4]))
-           free_edge = (int)eid;
-
-
-    if(free_edge != -1){ // 5A, 5B (#### Verify added vertices ####)
-        for (auto vid: poly_verts_id){
-            uint vid0 = m.edge_vert_ids(free_edge)[0];
-            uint vid1 = m.edge_vert_ids(free_edge)[1];
-
-            if(vid != vid0 && vid != vid1 && vid != vertices[0] && vid != vertices[1] && vid != vertices[2] && vid != vertices[3] && vid != vertices[4]){
-                //changed_vid.push_back(vid);
-                //changed_pid.push_back(pid);
-            }
+           ! m.edge_contains_vert(eid, vertices[4])){
+            free_edge = (int)eid;
+            n_free_edge++;
         }
-        std::cout<< "5A/5B"<<std::endl;
+
+
+    if(free_edge != -1){ // 5A, 5B
+        if(n_free_edge == 2){ // 5A
+            std::cout<<"5A"<<std::endl;
+            std::vector<vec3d> poly_verts = m.poly_verts(pid);
+            vec3d min_v = *std::min_element(poly_verts.begin(), poly_verts.end());
+            vec3d max_v = *std::max_element(poly_verts.begin(), poly_verts.end());
+
+            uint max=0, min=0, left=0, right=0, back=0, front=0;
+
+
+            for (auto vid : vertices){
+                vec3d vert = m.vert(vid);
+                if(vert.y() == min_v.y()){
+                    min ++;
+                    if(vert.x() == min_v.x()) left ++;
+                    else if(vert.x() == max_v.x()) right ++;
+                    if(vert.z() == min_v.z()) front ++;
+                    else if(vert.z() == max_v.z()) back ++;
+                }
+                else if(vert.y() == max_v.y()){
+                    max ++;
+                    if(vert.x() == min_v.x()) left ++;
+                    else if(vert.x() == max_v.x()) right ++;
+                    if(vert.z() == min_v.z()) front ++;
+                    else if(vert.z() == max_v.z()) back ++;
+                }
+            }
+
+            if(min==4){
+                if(left==3 && back==3) changed_vid.push_back(poly_verts_id[7]);
+                else if(back==3 && right==3) changed_vid.push_back(poly_verts_id[4]);
+                else if(right==3 && front==3) changed_vid.push_back(poly_verts_id[5]);
+                else if(front==3 && left==3) changed_vid.push_back(poly_verts_id[6]);
+            }
+            else if(max==4){
+                if(left==3 && back==3) changed_vid.push_back(poly_verts_id[3]);
+                else if(back==3 && right==3) changed_vid.push_back(poly_verts_id[0]);
+                else if(right==3 && front==3) changed_vid.push_back(poly_verts_id[1]);
+                else if(front==3 && left==3) changed_vid.push_back(poly_verts_id[2]);
+            }
+            else if(left==4){
+                if(back==3 && max==3) changed_vid.push_back(poly_verts_id[6]);
+                else if(max==3 && front==3) changed_vid.push_back(poly_verts_id[2]);
+                else if(front==3 && min==3) changed_vid.push_back(poly_verts_id[1]);
+                else if(min==3 && back==3) changed_vid.push_back(poly_verts_id[5]);
+            }
+            else if(right==4){
+                if(min==3 && back==3) changed_vid.push_back(poly_verts_id[3]);
+                else if(back==3 && max==3) changed_vid.push_back(poly_verts_id[0]);
+                else if(max==3 && front==3) changed_vid.push_back(poly_verts_id[4]);
+                else if(front==3 && min==3) changed_vid.push_back(poly_verts_id[7]);
+            }
+            else if(back==4){
+                if(max==3 && left==3) changed_vid.push_back(poly_verts_id[3]);
+                else if(left==3 && min==3) changed_vid.push_back(poly_verts_id[2]);
+                else if(min==3 && right==3) changed_vid.push_back(poly_verts_id[6]);
+                else if(right==3 && max==3) changed_vid.push_back(poly_verts_id[7]);
+            }
+            else if(front==4){
+                if(left==3 && min==3) changed_vid.push_back(poly_verts_id[4]);
+                else if(min==3 && right==3) changed_vid.push_back(poly_verts_id[0]);
+                else if(right==3 && max==3) changed_vid.push_back(poly_verts_id[1]);
+                else if(max==3 && left==3) changed_vid.push_back(poly_verts_id[5]);
+            }
+
+            changed_pid.push_back(pid);
+        }
+        else{ //5B
+            for(auto vid: poly_verts_id){
+                uint vid0 = m.edge_vert_ids(free_edge)[0];
+                uint vid1 = m.edge_vert_ids(free_edge)[1];
+
+                if(vid != vid0 && vid != vid1 && vid!=vertices[0] && vid!=vertices[1] && vid!=vertices[2] && vid!=vertices[3] && vid!=vertices[4]){
+                    changed_vid.push_back(vid);
+                }
+            }
+            changed_pid.push_back(pid);
+        }
     }
     else{ // 5C
-        for (auto vid: poly_verts_id){
-            if(transition_verts[vid]==false){
-                changed_vid.push_back(vid);
-                changed_pid.push_back(pid);
-            }
-        }
+        for (auto vid: poly_verts_id) if(transition_verts[vid]==false) changed_vid.push_back(vid);
+
+        changed_pid.push_back(pid);
     }
 }
 
@@ -557,12 +861,9 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
     }
     else{ // 6B, 6C
-        for (auto vid: poly_verts_id){
-            if(transition_verts[vid]==false){
-                changed_vid.push_back(vid);
-                changed_pid.push_back(pid);
-            }
-        }
+        for (auto vid: poly_verts_id) if(transition_verts[vid]==false) changed_vid.push_back(vid);
+
+        changed_pid.push_back(pid);
     }
 }
 
@@ -653,32 +954,19 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         break;
                 case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, changed_vid);
                         break;
-                case 7:
-                        for (auto vid: poly_verts_id){
-                           if(transition_verts[vid] == false){
-                                changed_vid.push_back(vid);
-                                changed_pid.push_back(pid);
-                           }
-                        }
+                case 7: for (auto vid: poly_verts_id) if(transition_verts[vid]==false) changed_vid.push_back(vid);
+                        changed_pid.push_back(pid);
                         break;
-                case 8:
-                        info.type = HexTransition::FULL;
+                case 8: info.type = HexTransition::FULL;
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
             }
 
         }
-        std::cout<< "****** ALERT *****" << std::endl;
 
-        merge_schemes_into_mesh(m_out, poly2scheme);
 
-        std::vector<uint> polys_to_remove;
-
-        for (auto p: poly2scheme) polys_to_remove.push_back(p.first);
-
-        m_out.polys_remove(polys_to_remove);
-
+        std::cout<<"DIOO"<<std::endl;
 
         if(changed_pid.size() > 0){
             added_newverts=true;
@@ -686,18 +974,30 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
             //momentaneo
             m_out = m_in;
+
+            //reset of the auxiliar vector
+            changed_vid.clear();
+            changed_pid.clear();
+            poly2scheme.clear();
         }
         else{
+            merge_schemes_into_mesh(m_out, poly2scheme);
+
+            std::vector<uint> polys_to_remove;
+
+            for (auto p: poly2scheme) polys_to_remove.push_back(p.first);
+
+            m_out.polys_remove(polys_to_remove);
+
             added_newverts=false;
         }
 
 
-       //reset of the auxiliar vector
-        changed_vid.clear();
-        changed_pid.clear();
+
 
         /*
         //insert all the neighboors of each pid
+        polys.clear();
         for(auto c_pid: changed_pid){
             for(auto poly_id: m_in.adj_p2p(c_pid)){ //non sono tutti i neighbors (da aggiustare)
                 polys.push_back(poly_id);
