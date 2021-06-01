@@ -411,72 +411,64 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
             std::vector<bool> t3_p = {true, false, false, true, false, false, true, false};
             std::vector<bool> t3_q = {false, false, true, false, true, false, false, true};
             std::vector<bool> t3_r = {false, false, false, true, false, true, true, false};
+            std::vector<bool> t3_s = {true, false, false, false, true, false, true, false};
+            std::vector<bool> t3_t = {false, false, false, true, false, true, false, true};
+            std::vector<bool> t3_u = {false, false, true, false, true, false, true, false};
+            std::vector<bool> t3_v = {false, true, false, false, false, true, false, true};
+            std::vector<bool> t3_w = {false, true, false, true, false, false, false, true};
+            std::vector<bool> t3_j = {true, false, true, false, false, false, true, false};
+            std::vector<bool> t3_x = {false, true, false, true, false, true, false, false};
+            std::vector<bool> t3_z = {true, false, true, false, true, false, false, false};
 
             std::vector<bool> t3;
 
             for (auto vid: poly_verts_id) t3.push_back(transition_verts[vid]);
 
-            if(t3 == t3_a){
+            if(t3 == t3_a || t3 == t3_m){
                 std::vector<bool> mask = {true, true, false, true, true, true, false, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_b){
+            else if(t3 == t3_b || t3 == t3_v){
                 std::vector<bool> mask = {true, true, false, false, true, true, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_c){
+            else if(t3 == t3_c || t3 == t3_e){
                 std::vector<bool> mask = {true, true, true, false, true, true, true, false};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_d){
+            else if(t3 == t3_d || t3 == t3_z){
                 std::vector<bool> mask = {true, true, true, true, true, true, false, false};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_e){
-                std::vector<bool> mask = {true, true, true, false, true, true, true, false};
-                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
-            }
-            else if(t3 == t3_f){
+            else if(t3 == t3_f || t3 == t3_u){
                 std::vector<bool> mask = {false, true, true, false, true, true, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_g){
+            else if(t3 == t3_g || t3 == t3_o){
                 std::vector<bool> mask = {false, true, true, true, false, true, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_h){
+            else if(t3 == t3_h || t3 == t3_x){
                 std::vector<bool> mask = {true, true, true, true, false, true, true, false};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_i){
+            else if(t3 == t3_i || t3 == t3_q){
                 std::vector<bool> mask = {true, false, true, true, true, false, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_l){
+            else if(t3 == t3_l || t3 == t3_s){
                 std::vector<bool> mask = {true, false, false, true, true, true, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_m){
-                std::vector<bool> mask = {true, true, false, true, true, true, false, true};
-                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
-            }
-            else if(t3 == t3_n){
+            else if(t3 == t3_n || t3 == t3_w){
                 std::vector<bool> mask = {true, true, true, true, true, false, false, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_o){
-                std::vector<bool> mask = {false, true, true, true, false, true, true, true};
-                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
-            }
-            else if(t3 == t3_p){
+            else if(t3 == t3_p || t3 == t3_j){
                 std::vector<bool> mask = {true, true, true, true, false, false, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
-            else if(t3 == t3_q){
-                std::vector<bool> mask = {true, false, true, true, true, false, true, true};
-                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
-            }
-            else if(t3 == t3_r){
+            else if(t3 == t3_r || t3 == t3_t){
                 std::vector<bool> mask = {false, false, true, true, true, true, true, true};
                 for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
             }
@@ -488,7 +480,86 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
         else{  //3C
             std::cout<<"3C"<<std::endl;
 
-            //da fareee
+            std::vector<bool> t3_a = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_b = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_c = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_d = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_e = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_f = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_g = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_h = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_i = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_l = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_m = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_n = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_o = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_p = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_q = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_r = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_s = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_t = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_u = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_v = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_w = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_j = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_x = {false, false, false, false, false, false, false, false};
+            std::vector<bool> t3_z = {false, false, false, false, false, false, false, false};
+
+            std::vector<bool> t3;
+
+            for (auto vid: poly_verts_id) t3.push_back(transition_verts[vid]);
+
+            if(t3 == t3_a || t3 == t3_m){
+                std::vector<bool> mask = {true, true, false, true, true, true, false, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_b || t3 == t3_v){
+                std::vector<bool> mask = {true, true, false, false, true, true, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_c || t3 == t3_e){
+                std::vector<bool> mask = {true, true, true, false, true, true, true, false};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_d || t3 == t3_z){
+                std::vector<bool> mask = {true, true, true, true, true, true, false, false};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_f || t3 == t3_u){
+                std::vector<bool> mask = {false, true, true, false, true, true, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_g || t3 == t3_o){
+                std::vector<bool> mask = {false, true, true, true, false, true, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_h || t3 == t3_x){
+                std::vector<bool> mask = {true, true, true, true, false, true, true, false};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_i || t3 == t3_q){
+                std::vector<bool> mask = {true, false, true, true, true, false, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_l || t3 == t3_s){
+                std::vector<bool> mask = {true, false, false, true, true, true, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_n || t3 == t3_w){
+                std::vector<bool> mask = {true, true, true, true, true, false, false, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_p || t3 == t3_j){
+                std::vector<bool> mask = {true, true, true, true, false, false, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+            else if(t3 == t3_r || t3 == t3_t){
+                std::vector<bool> mask = {false, false, true, true, true, true, true, true};
+                for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+            }
+
+
+            changed_pid.push_back(pid);
 
         }
     }
@@ -529,13 +600,16 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
     }
     else{ // 4B, 4C, 4D, 4E or 4F
         int n_free_edge = 0;
+        int free_edge=-1;
 
         for(uint eid : m.adj_p2e(pid))
             if(! m.edge_contains_vert(eid, vertices[0]) &&
                ! m.edge_contains_vert(eid, vertices[1]) &&
                ! m.edge_contains_vert(eid, vertices[2]) &&
-               ! m.edge_contains_vert(eid, vertices[3]))
+               ! m.edge_contains_vert(eid, vertices[3])){
+                free_edge = (int)eid;
                 n_free_edge ++;
+            }
 
         int faces_3_nodes=0;
         int conta_nodes;
@@ -785,12 +859,101 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
         }
         else if(n_free_edge == 2){ // 4D, 4E
             if(faces_3_nodes==1){ // 4D
+                std::cout<<"4D"<<std::endl;
+
+                std::vector<bool> t4_a = {true, true, false, true, false, false, true, false};
+                std::vector<bool> t4_b = {true, false, true, true, false, true, false, false};
+                std::vector<bool> t4_c = {false, true, true, true, true, false, false, false};
+                std::vector<bool> t4_d = {true, true, true, false, false, false, false, true};
+                std::vector<bool> t4_e = {true, false, false, false, false, true, true, true};
+                std::vector<bool> t4_f = {false, true, false, false, true, false, true, true};
+                std::vector<bool> t4_g = {false, false, true, false, true, false, true, true};
+                std::vector<bool> t4_h = {false, false, false, true, true, true, true, false};
+                std::vector<bool> t4_i = {true, false, true, false, true, false, false, true};
+                std::vector<bool> t4_l = {true, false, false, true, true, false, true, false};
+                std::vector<bool> t4_m = {true, false, false, true, false, true, false, true};
+                std::vector<bool> t4_n = {false, true, false, true, true, false, false, true};
+                std::vector<bool> t4_o = {false, true, true, false, false, true, false, true};
+                std::vector<bool> t4_p = {false, true, true, false, true, false, true, false};
+                std::vector<bool> t4_q = {true, false, true, false, true, false, false, true};
+                std::vector<bool> t4_r = {false, true, false, true, false, true, true, false};
+                std::vector<bool> t4_s = {true, false, true, false, true, true, false, false};
+                std::vector<bool> t4_t = {false, true, false, true, true, true, false, false};
+                std::vector<bool> t4_u = {true, true, false, false, false, true, false, true};
+                std::vector<bool> t4_v = {true, true, false, false, true, false, true, false};
+                std::vector<bool> t4_w = {false, false, true, true, false, true, false, true};
+                std::vector<bool> t4_x = {false, true, false, true, false, false, true, true};
+                std::vector<bool> t4_j = {true, false, true, false, false, false, true, true};
+                std::vector<bool> t4_z = {false, false, true, true, true, false, true, false};
+
+                std::vector<bool> t4;
+
+                for (auto vid: poly_verts_id) t4.push_back(transition_verts[vid]);
+
+                if(t4 == t4_a || t4 == t4_j){
+                    std::vector<bool> mask = {true, true, true, true, false, false, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_b || t4 == t4_r){
+                    std::vector<bool> mask = {true, true, true, true, false, true, true, false};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_c || t4 == t4_s){
+                    std::vector<bool> mask = {true, true, true, true, true, true, false, false};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_d || t4 == t4_n){
+                    std::vector<bool> mask = {true, true, true, true, true, false, false, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_e || t4 == t4_l){
+                    std::vector<bool> mask = {true, false, false, true, true, true, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_f || t4 == t4_u){
+                    std::vector<bool> mask = {true, true, false, false, true, true, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_g || t4 == t4_p){
+                    std::vector<bool> mask = {false, true, true, false, true, true, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_h || t4 == t4_w){
+                    std::vector<bool> mask = {false, false, true, true, true, true, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_i || t4 == t4_z){
+                    std::vector<bool> mask = {true, false, true, true, true, false, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_m || t4 == t4_t){
+                    std::vector<bool> mask = {true, true, false, true, true, true, false, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_o || t4 == t4_x){
+                    std::vector<bool> mask = {false, true, true, true, false, true, true, true};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+                if(t4 == t4_q || t4 == t4_v){
+                    std::vector<bool> mask = {true, true, true, false, true, true, true, false};
+                    for(int i=0; i<8; i++) if(! transition_verts[poly_verts_id[i]] && mask[i]) changed_vid.push_back(poly_verts_id[i]);
+                }
+
+                changed_pid.push_back(pid);
 
 
             }
             else{ //4E
+                std::cout<<"4E"<<std::endl;
+                for(auto vid: poly_verts_id){
+                    uint vid0 = m.edge_vert_ids(free_edge)[0];
+                    uint vid1 = m.edge_vert_ids(free_edge)[1];
 
-
+                    if(vid != vid0 && vid != vid1 && vid!=vertices[0] && vid!=vertices[1] && vid!=vertices[2] && vid!=vertices[3]){
+                        changed_vid.push_back(vid);
+                    }
+                }
+                changed_pid.push_back(pid);
             }
         }
         else{ // 4F
