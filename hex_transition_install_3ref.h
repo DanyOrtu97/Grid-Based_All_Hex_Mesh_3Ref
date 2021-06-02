@@ -31,6 +31,7 @@
 #define HEX_TRANSITION_INSTALL_3REF_H
 
 #include <cinolib/meshes/meshes.h>
+#include <stdlib.h> //DA TOGLIERE
 #include <map>
 
 namespace cinolib{

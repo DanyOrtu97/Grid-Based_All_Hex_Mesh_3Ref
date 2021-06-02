@@ -347,11 +347,11 @@ int main(int argc, char *argv[])
     }
 
 
-    //balancing(true, mesh);
-    //mesh.updateGL();
+    /*balancing(true, mesh);
+    mesh.updateGL();
 
-    //apply_refinements(mesh, vertices, transition_verts);
-
+    apply_refinements(mesh, vertices, transition_verts);
+*/
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-
+    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -428,9 +428,15 @@ int main(int argc, char *argv[])
             }
         }
     };
+    */
+
+    for(int i=0; i<100; i++){
+        uint pid = rand() % 4096;
+        split27(pid, mesh, vertices, transition_verts);
+    }
 
 
-/*
+
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -465,7 +471,7 @@ int main(int argc, char *argv[])
         //outputSurfaceMesh.save("surface_result.obj");
     }
 
-*/
+
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
