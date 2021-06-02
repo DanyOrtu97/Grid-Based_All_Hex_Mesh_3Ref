@@ -347,11 +347,11 @@ int main(int argc, char *argv[])
     }
 
 
-    /*balancing(true, mesh);
+    balancing(true, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-*/
+
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
@@ -430,10 +430,6 @@ int main(int argc, char *argv[])
     };
     */
 
-    for(int i=0; i<100; i++){
-        uint pid = rand() % 4096;
-        split27(pid, mesh, vertices, transition_verts);
-    }
 
 
 
@@ -468,7 +464,6 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-        //outputSurfaceMesh.save("surface_result.obj");
     }
 
 
