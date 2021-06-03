@@ -346,7 +346,6 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
-
     balancing(true, mesh);
     mesh.updateGL();
 
@@ -359,8 +358,8 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
-
     /*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -420,6 +419,8 @@ int main(int argc, char *argv[])
                     export_surface(outputMesh, outputSurfaceMesh);
 
                     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+
+                    outputSurfaceMesh.save("a_caso.obj");
                 }
 
 
@@ -428,9 +429,7 @@ int main(int argc, char *argv[])
             }
         }
     };
-    */
-
-
+*/
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
