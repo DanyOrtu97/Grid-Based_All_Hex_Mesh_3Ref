@@ -191,7 +191,7 @@ void orient_two_edges(std::vector<vec3d>              & verts,
                  rotate(verts, "y",  M_PI); break;
         case 6:  rotate(verts, "x", -M_PI); break;
         case 7:  rotate(verts, "x", -M_PI);
-                 rotate(verts, "y", -M_PI); break;
+                 rotate(verts, "y", -M_PI/2); break;
         case 8:  rotate(verts, "x", -M_PI/2);
                  rotate(verts, "z",  M_PI/2); break;
         case 9:  rotate(verts, "x", -M_PI/2); break;

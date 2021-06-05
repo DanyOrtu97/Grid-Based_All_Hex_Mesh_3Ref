@@ -361,6 +361,7 @@ int main(int argc, char *argv[])
      */
 
 
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -398,6 +399,7 @@ int main(int argc, char *argv[])
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
                 hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+                std::cout<< "Template application in progress ...." <<std::endl;
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -430,7 +432,8 @@ int main(int argc, char *argv[])
             }
         }
     };
-/*
+
+    /*
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -464,8 +467,8 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-    }*/
-
+    }
+*/
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
