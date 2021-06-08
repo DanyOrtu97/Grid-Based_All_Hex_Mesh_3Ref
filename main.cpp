@@ -346,20 +346,22 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }
 
-    /*
-    balancing(true, mesh);
+
+    /*balancing(true, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
     */
+
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
+
+
     /*
      * Tool for creating new polys by mouse click
      */
-
 
 
     Profiler profiler;
@@ -434,8 +436,6 @@ int main(int argc, char *argv[])
     };
 
     /*
-
-
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -468,7 +468,8 @@ int main(int argc, char *argv[])
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
     }
-*/
+    */
+
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);

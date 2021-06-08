@@ -45,8 +45,8 @@ class TwseventreeNode
        ~TwseventreeNode();
         const TwseventreeNode *father;
         TwseventreeNode       *children[27] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-                                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
-                                              nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+                                                nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+                                                nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
         bool              is_inner = false;
         AABB              bbox;
         std::vector<uint> item_indices; // index Twseventree::items, avoiding to store a copy of the same object multiple times in each node it appears

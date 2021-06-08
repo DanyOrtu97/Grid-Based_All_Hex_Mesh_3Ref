@@ -40,12 +40,11 @@ namespace cinolib{
  *
  */
 enum class HexTransition{
-    NODE,
+    D_NODE,
+    D_EDGE,
     EDGE,
     FACE,
     FULL,
-    TWO_EDGES,
-    TWO_FACES,
 };
 
 /*
