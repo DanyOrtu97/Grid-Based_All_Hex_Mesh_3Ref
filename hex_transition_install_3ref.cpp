@@ -72,10 +72,10 @@ struct vert_compare
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfoDnode(const Hexmesh<M,V,E,F,P>    & m,
-                             SchemeInfo                  & info,
-                             std::vector<uint>           & vertices,
-                             const uint                    pid){
+void set_orientation_Dnode(const Hexmesh<M,V,E,F,P>    & m,
+                           SchemeInfo                  & info,
+                           std::vector<uint>           & vertices,
+                           const uint                    pid){
 
 
 
@@ -86,11 +86,10 @@ void setOrientationInfoDnode(const Hexmesh<M,V,E,F,P>    & m,
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfoDEdge(const Hexmesh<M,V,E,F,P>    & m,
-                             SchemeInfo                  & info,
-                             std::vector<uint>           & vertices,
-                             const uint                    pid){
-
+void set_orientation_Dedge(const Hexmesh<M,V,E,F,P>    & m,
+                           SchemeInfo                  & info,
+                           std::vector<uint>           & vertices,
+                           const uint                    pid){
 
 
 }
@@ -99,10 +98,10 @@ void setOrientationInfoDEdge(const Hexmesh<M,V,E,F,P>    & m,
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfoEdge(const Hexmesh<M,V,E,F,P>    & m,
-                            SchemeInfo                  & info,
-                            std::vector<uint>           & vertices,
-                            const uint                    pid){
+void set_orientation_edge(const Hexmesh<M,V,E,F,P>    & m,
+                          SchemeInfo                  & info,
+                          std::vector<uint>           & vertices,
+                          const uint                    pid){
 
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
     vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
@@ -149,10 +148,10 @@ void setOrientationInfoEdge(const Hexmesh<M,V,E,F,P>    & m,
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfoFace(const Hexmesh<M,V,E,F,P>    & m,
-                            SchemeInfo                  & info,
-                            std::vector<uint>           & vertices,
-                            const uint                    pid){
+void set_orientation_face(const Hexmesh<M,V,E,F,P>    & m,
+                          SchemeInfo                  & info,
+                          std::vector<uint>           & vertices,
+                          const uint                    pid){
 
     std::vector<vec3d> poly_verts = m.poly_verts(pid);
     vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
@@ -184,6 +183,95 @@ void setOrientationInfoFace(const Hexmesh<M,V,E,F,P>    & m,
     else if (conta_back == 4) info.orientations.push_back(3);
     else if (conta_front == 4) info.orientations.push_back(4);
     else if (conta_max == 4) info.orientations.push_back(5);
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
+std::set<uint> decoupling_node_analysis(Hexmesh<M,V,E,F,P> & m){
+
+
+    std::set<uint> L;
+
+    for(int pid=0; pid < m.num_polys(); pid++){
+        //if pid matches a pattern from figure 9
+            //mark the node as level0
+        //if pid matches a pattern from figure 10
+            //mark the node as level1
+    }
+
+    //for auto leaf h
+        //if h contains decoupling nodes && h does not match a pattern from figure 11
+            //for auto pid in sibling(h)
+                //if pid is a leaf && pid is not marked for refinement
+                    //L.insert(pid);
+
+    return L;
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
+void sibling_refining(Hexmesh<M,V,E,F,P>                   & m,
+                      std::unordered_map<uint, SchemeInfo> & poly2scheme){
+
+
+    SchemeInfo info;
+
+
+    //for auto h: internal
+        //for auto pid: siblings(h)
+            //if pid is a leaf && pid is not marked for refinement
+                //mark pid for ref
+
+    //if(mark)
+        //for auto pid
+            //info.type = HexTransition::FULL;
+            //info.scale = m.edge_length(m.adj_p2e(pid)[0];
+            //poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+            //for(auto vid: m.poly_verts_id(pid)) transition_verts[vid]=true;
+
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
+void gap_filling(Hexmesh<M,V,E,F,P>                   & m,
+                 std::unordered_map<uint, SchemeInfo> & poly2scheme){
+
+
+    SchemeInfo info;
+
+    bool mesh_changed=true;
+
+
+    while(mesh_changed){
+        //mark h for level 0 ref if matches a pattern from figure 10
+
+        //for auto h: central child node
+            //if h matches a pattern from figure 20
+                //for auto pid: siblings(h)
+                    //if pid is a leaf && pid is not marked for refinement
+                        //mark pid for ref
+
+        //if(mark)
+            //for auto pid
+                //info.type = HexTransition::FULL;
+                //info.scale = m.edge_length(m.adj_p2e(pid)[0];
+                //poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                //for(auto vid: m.poly_verts_id(pid)) transition_verts[vid]=true;
+        //else
+            //mesh_changed=false;
+
+    }
+
+
 
 }
 
@@ -241,25 +329,61 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
 
-    std::unordered_map<uint, bool> decoupling_verts;
+    std::unordered_map<uint, bool> decoupling_verts_l0;
+    std::unordered_map<uint, bool> decoupling_verts_l1;
 
+    SchemeInfo info;
 
-    //Sibling refinement algorithm
+    sibling_refining(m_in, poly2scheme); //octree (marked pid)
+
     while(true){
-        // gap filling algorithm
 
-        std::set<uint> L; //decoupling node analysis algorithm (set di polys)
+        gap_filling(m_in, poly2scheme); //octree (marked pid)
+
+        std::set<uint> L = decoupling_node_analysis(m_in); //octree (marked pid)
 
         if(L.size() == 0){
             break;
         }
         else{
-            //apply refinement on each pid in L
+            for(auto pid: L){
+                info.type = HexTransition::FULL;
+                info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0];
+                poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+
+                for(auto vid: m_in.poly_verts_id(pid)) transition_verts[vid]=true;
+            }
         }
     }
 
     //apply level 0 node decoupling
+    for(int pid=0; pid<m_in.num_polys();pid++){
+        std::vector<uint> vertices;
+        std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
+
+        for(uint vid: poly_verts_id) vertices.push_back(decoupling_verts_l0.find(vid));
+
+        int pattern; //funzione per trovare il pattern dati i vertici a true
+
+        switch(pattern){
+
+        }
+    }
+
+
     //apply level 1 node decoupling
+    for(int pid=0; pid<m_in.num_polys();pid++){
+        std::vector<uint> vertices;
+        std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
+
+        for(uint vid: poly_verts_id) vertices.push_back(decoupling_verts_l1.find(vid));
+
+        int pattern; //funzione per trovare il pattern dati i vertici a true
+
+        switch(pattern){
+
+        }
+    }
 
 
     //apply refinement templates (edge controlled)
@@ -270,8 +394,6 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
         for(uint vid: poly_verts_id) if(transition_verts[vid]) vertices.push_back(vid);
 
         int pattern; //funzione per trovare il pattern dati i vertici a true
-
-        SchemeInfo info;
 
         switch(pattern){
 
