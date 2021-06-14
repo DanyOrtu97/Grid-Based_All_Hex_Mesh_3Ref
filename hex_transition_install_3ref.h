@@ -44,8 +44,8 @@ namespace cinolib{
  * is set to true in correspondence of the vertices where transition schemes must be applied.
  *
  *
- * Transition_faces is a vector having all the faces where transition schemes must be applied
  */
+
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,

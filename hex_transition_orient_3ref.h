@@ -35,22 +35,17 @@
 
 namespace cinolib{
 
-/*
- * Cosa è
- *
- */
+
 enum class HexTransition{
-    D_NODE,
-    D_EDGE,
+    NODE,
     EDGE,
     FACE,
     FULL,
+    TWO_EDGES,
+    TWO_FACES,
 };
 
-/*
- * Cosa è
- *
- */
+
 struct SchemeInfo{
     HexTransition           type;
     double                  scale;
@@ -59,10 +54,7 @@ struct SchemeInfo{
 
 
 
-/*
- * Cosa fa la funzione
- *
- */
+
 CINO_INLINE
 void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
                                       std::vector<std::vector<uint>>  & polys,
