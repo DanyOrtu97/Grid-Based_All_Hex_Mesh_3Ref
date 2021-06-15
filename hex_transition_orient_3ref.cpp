@@ -84,27 +84,21 @@ void orient_node(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Node::verts.size(); vid+=3) verts.push_back(vec3d(Node::verts[vid]-0.5, Node::verts[vid+1]-0.5, Node::verts[vid+2]-0.5));
 
-   /*
+
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "z",  M_PI/2); break;
-        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 1:  rotate(verts, "y",  M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI); break;
         case 3:  rotate(verts, "y", -M_PI/2); break;
-        case 4:  rotate(verts, "z", -M_PI/2); break;
-        case 5:  rotate(verts, "z",  M_PI); break;
-        case 6:  rotate(verts, "y",  M_PI/2);
-                 rotate(verts, "x", -M_PI/2); break;
-        case 7:  rotate(verts, "y", -M_PI/2);
-                 rotate(verts, "x",  M_PI/2); break;
-        case 8:  rotate(verts, "x", -M_PI/2); break;
-        case 9:  rotate(verts, "x",  M_PI/2); break;
-        case 10: rotate(verts, "x", -M_PI/2);
+        case 4:  rotate(verts, "x", -M_PI/2); break;
+        case 5:  rotate(verts, "x", -M_PI/2);
                  rotate(verts, "y",  M_PI/2); break;
-        case 11: rotate(verts, "y", -M_PI/2);
-                 rotate(verts, "z",  M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "y",  M_PI); break;
+        case 7:  rotate(verts, "x", -M_PI); break;
     }
-*/
+
 
     for (auto & v: verts){
         v *= info.scale;

@@ -70,6 +70,51 @@ struct vert_compare
 
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
+void setOrientationInfo1(const Hexmesh<M,V,E,F,P>    & m,
+                         SchemeInfo                  & info,
+                         std::vector<uint>           & vertices,
+                         const uint                    pid){
+
+    std::vector<vec3d> poly_verts = m.poly_verts(pid);
+    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
+    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
+
+    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
+
+    for (auto vid : vertices){
+        vec3d vert = m.vert(vid);
+        if(vert.y() == min.y()){
+            conta_min ++;
+            if(vert.x() == min.x()) conta_left ++;
+            else if(vert.x() == max.x()) conta_right ++;
+            if(vert.z() == min.z()) conta_front ++;
+            else if(vert.z() == max.z()) conta_back ++;
+        }
+        else if(vert.y() == max.y()){
+            conta_max ++;
+            if(vert.x() == min.x()) conta_left ++;
+            else if(vert.x() == max.x()) conta_right ++;
+            if(vert.z() == min.z()) conta_front ++;
+            else if(vert.z() == max.z()) conta_back ++;
+        }
+    }
+
+    if (conta_min == 1 && conta_left == 1 && conta_back==1) info.orientations.push_back(0);
+    else if (conta_min == 1 && conta_right == 1 && conta_back==1) info.orientations.push_back(1);
+    else if (conta_min == 1 && conta_right == 1 && conta_front==1) info.orientations.push_back(2);
+    else if (conta_min == 1 && conta_left == 1 && conta_front==1) info.orientations.push_back(3);
+    else if (conta_max == 1 && conta_left == 1 && conta_back==1) info.orientations.push_back(4);
+    else if (conta_max == 1 && conta_right == 1 && conta_back==1) info.orientations.push_back(5);
+    else if (conta_max == 1 && conta_right == 1 && conta_front==1) info.orientations.push_back(6);
+    else if (conta_max == 1 && conta_left == 1 && conta_front==1) info.orientations.push_back(7);
+
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+template <class M, class V, class E, class F, class P>
+CINO_INLINE
 void setOrientationInfo2(const Hexmesh<M,V,E,F,P>    & m,
                          SchemeInfo                  & info,
                          std::vector<uint>           & vertices,
@@ -1069,7 +1114,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
     for(uint i=0;i<m_in.num_polys();i++) polys.push_back(i);
 
     while(added_newverts){
-        for(int vid=0; vid<m_in.num_verts(); vid++) decoupling_nodes.push_back(false);
+        for(uint vid=0; vid<m_in.num_verts(); vid++) decoupling_nodes.push_back(false);
 
 
         for (auto pid: polys){
@@ -1131,6 +1176,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                 switch (v_lv0.size()){
                     case 1: info.type = HexTransition::NODE;
                             info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+                            setOrientationInfo1(m_in, info, v_lv0, pid);
                             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                             break;
                 }
