@@ -327,6 +327,7 @@ int main(int argc, char *argv[])
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
     DrawableHexmesh<> mesh(s.c_str());
+    DrawableHexmesh<> decouplingMesh;
     DrawableHexmesh<> outputMesh;
 
     GLcanvas gui_input, gui_output;
@@ -400,8 +401,11 @@ int main(int argc, char *argv[])
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
-                hex_transition_install_3ref(mesh, transition_verts, outputMesh);
                 std::cout<< "Template application in progress ...." <<std::endl;
+
+                hex_transition_install_3refDecoupling(mesh, transition_verts, decouplingMesh);
+                decouplingMesh.updateGL();
+                hex_transition_install_3ref(decouplingMesh, transition_verts, outputMesh);
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
