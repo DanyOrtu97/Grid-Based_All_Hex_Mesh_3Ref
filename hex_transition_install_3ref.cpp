@@ -38,8 +38,7 @@ namespace // anonymous
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //Custom comparator operator for maps of vec3d
-struct vert_compare
-{
+struct vert_compare {
     bool operator()(const vec3d & a,
                     const vec3d & b) const
     {
@@ -66,250 +65,206 @@ struct vert_compare
     }
 };
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfo1(const Hexmesh<M,V,E,F,P>    & m,
-                         SchemeInfo                  & info,
-                         std::vector<uint>           & vertices,
-                         const uint                    pid){
-
-    std::vector<vec3d> poly_verts = m.poly_verts(pid);
-    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
-    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
-
-    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
-
-    for (auto vid : vertices){
-        vec3d vert = m.vert(vid);
-        if(vert.y() == min.y()){
-            conta_min ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-        else if(vert.y() == max.y()){
-            conta_max ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-    }
-
-    if (conta_min == 1 && conta_left == 1 && conta_back==1) info.orientations.push_back(0);
-    else if (conta_min == 1 && conta_right == 1 && conta_back==1) info.orientations.push_back(1);
-    else if (conta_min == 1 && conta_right == 1 && conta_front==1) info.orientations.push_back(2);
-    else if (conta_min == 1 && conta_left == 1 && conta_front==1) info.orientations.push_back(3);
-    else if (conta_max == 1 && conta_left == 1 && conta_back==1) info.orientations.push_back(4);
-    else if (conta_max == 1 && conta_right == 1 && conta_back==1) info.orientations.push_back(5);
-    else if (conta_max == 1 && conta_right == 1 && conta_front==1) info.orientations.push_back(6);
-    else if (conta_max == 1 && conta_left == 1 && conta_front==1) info.orientations.push_back(7);
+void setOrientationInfo1(SchemeInfo                  & info,
+                         std::vector<bool>           & decoupling_nodes,
+                         std::vector<uint>           & poly_verts_id){
 
 
+    std::vector<bool> t2_a = {true, false, false, false, false, false, false, false};
+    std::vector<bool> t2_b = {false, true, false, false, false, false, false, false};
+    std::vector<bool> t2_c = {false, false, true, false, false, false, false, false};
+    std::vector<bool> t2_d = {false, false, false, true, false, false, false, false};
+    std::vector<bool> t2_e = {false, false, false, false, true, false, false, false};
+    std::vector<bool> t2_f = {false, false, false, false, false, true, false, false};
+    std::vector<bool> t2_g = {false, false, false, false, false, false, true, false};
+    std::vector<bool> t2_h = {false, false, false, false, false, false, false, true};
+
+
+    std::vector<bool> t2;
+
+    for (auto vid: poly_verts_id) t2.push_back(decoupling_nodes[vid]);
+
+    if (t2 == t2_a) info.orientations.push_back(0);
+    else if (t2 == t2_b) info.orientations.push_back(1);
+    else if (t2 == t2_c) info.orientations.push_back(2);
+    else if (t2 == t2_d) info.orientations.push_back(3);
+    else if (t2 == t2_e) info.orientations.push_back(4);
+    else if (t2 == t2_f) info.orientations.push_back(5);
+    else if (t2 == t2_g) info.orientations.push_back(6);
+    else if (t2 == t2_h) info.orientations.push_back(7);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class M, class V, class E, class F, class P>
-CINO_INLINE
-void setOrientationInfo2(const Hexmesh<M,V,E,F,P>    & m,
-                         SchemeInfo                  & info,
-                         std::vector<uint>           & vertices,
-                         const uint                    pid){
-
-    std::vector<vec3d> poly_verts = m.poly_verts(pid);
-    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
-    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
-
-    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
-
-    for (auto vid : vertices){
-        vec3d vert = m.vert(vid);
-        if(vert.y() == min.y()){
-            conta_min ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-        else if(vert.y() == max.y()){
-            conta_max ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-    }
-
-    if (conta_min == 2 && conta_left == 2) info.orientations.push_back(0);
-    else if (conta_min == 2 && conta_right == 2) info.orientations.push_back(1);
-    else if (conta_min == 2 && conta_back == 2) info.orientations.push_back(2);
-    else if (conta_min == 2 && conta_front == 2) info.orientations.push_back(3);
-    else if (conta_max == 2 && conta_left == 2) info.orientations.push_back(4);
-    else if (conta_max == 2 && conta_right == 2) info.orientations.push_back(5);
-    else if (conta_max == 2 && conta_back == 2) info.orientations.push_back(6);
-    else if (conta_max == 2 && conta_front == 2) info.orientations.push_back(7);
-    else if (conta_left == 2 && conta_back == 2) info.orientations.push_back(8);
-    else if (conta_left == 2 && conta_front == 2) info.orientations.push_back(9);
-    else if (conta_right == 2 && conta_back == 2) info.orientations.push_back(10);
-    else if (conta_right == 2 && conta_front == 2) info.orientations.push_back(11);
-
-
-}
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfo3(const Hexmesh<M,V,E,F,P>    & m,
-                         SchemeInfo                  & info,
-                         std::vector<uint>           & vertices,
-                         const uint                    pid){
-
-    std::vector<vec3d> poly_verts = m.poly_verts(pid);
-    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
-    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
-
-    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
-
-    for (auto vid : vertices){
-        vec3d vert = m.vert(vid);
-        if(vert.y() == min.y()){
-            conta_min ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-        else if(vert.y() == max.y()){
-            conta_max ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-    }
-
-    if (conta_min == 3 && conta_left == 2 && conta_back == 2) info.orientations.push_back(0);
-    else if (conta_min == 3 && conta_right == 2 && conta_back == 2) info.orientations.push_back(1);
-    else if (conta_min == 3 && conta_left == 2 && conta_front == 2) info.orientations.push_back(2);
-    else if (conta_min == 3 && conta_right == 2 && conta_front == 2) info.orientations.push_back(3);
-    else if (conta_max == 3 && conta_left == 2 && conta_back == 2) info.orientations.push_back(4);
-    else if (conta_max == 3 && conta_right == 2 && conta_back == 2) info.orientations.push_back(5);
-    else if (conta_max == 3 && conta_left == 2 && conta_front == 2) info.orientations.push_back(6);
-    else if (conta_max == 3 && conta_right == 2 && conta_front == 2) info.orientations.push_back(7);
-    else if (conta_back == 3 && conta_left == 2 && conta_min == 2) info.orientations.push_back(8);
-    else if (conta_back == 3 && conta_left == 2 && conta_max == 2) info.orientations.push_back(9);
-    else if (conta_back == 3 && conta_right == 2 && conta_min == 2) info.orientations.push_back(10);
-    else if (conta_back == 3 && conta_right == 2 && conta_max == 2) info.orientations.push_back(11);
-    else if (conta_front == 3 && conta_left == 2 && conta_min == 2) info.orientations.push_back(12);
-    else if (conta_front == 3 && conta_left == 2 && conta_max == 2) info.orientations.push_back(13);
-    else if (conta_front == 3 && conta_right == 2 && conta_min == 2) info.orientations.push_back(14);
-    else if (conta_front == 3 && conta_right == 2 && conta_max == 2) info.orientations.push_back(15);
-    else if (conta_right == 3 && conta_front == 2 && conta_min == 2) info.orientations.push_back(16);
-    else if (conta_right == 3 && conta_front == 2 && conta_max == 2) info.orientations.push_back(17);
-    else if (conta_right == 3 && conta_back == 2 && conta_min == 2) info.orientations.push_back(18);
-    else if (conta_right == 3 && conta_back == 2 && conta_max == 2) info.orientations.push_back(19);
-    else if (conta_left == 3 && conta_front == 2 && conta_min == 2) info.orientations.push_back(20);
-    else if (conta_left == 3 && conta_front == 2 && conta_max == 2) info.orientations.push_back(21);
-    else if (conta_left == 3 && conta_back == 2 && conta_min == 2) info.orientations.push_back(22);
-    else if (conta_left == 3 && conta_back == 2 && conta_max == 2) info.orientations.push_back(23);
+void setOrientationInfo2(SchemeInfo                  & info,
+                         std::vector<bool>           & transition_verts,
+                         std::vector<uint>           & poly_verts_id){
 
 
+    std::vector<bool> t2_a = {true, false, false, true, false, false, false, false};
+    std::vector<bool> t2_b = {false, true, true, false, false, false, false, false};
+    std::vector<bool> t2_c = {true, true, false, false, false, false, false, false};
+    std::vector<bool> t2_d = {false, false, true, true, false, false, false, false};
+    std::vector<bool> t2_e = {false, false, false, false, true, false, false, true};
+    std::vector<bool> t2_f = {false, false, false, false, false, true, true, false};
+    std::vector<bool> t2_g = {false, false, false, false, true, true, false, false};
+    std::vector<bool> t2_h = {false, false, false, false, false, false, true, true};
+    std::vector<bool> t2_i = {true, false, false, false, true, false, false, false};
+    std::vector<bool> t2_l = {false, false, false, true, false, false, false, true};
+    std::vector<bool> t2_m = {false, true, false, false, false, true, false, false};
+    std::vector<bool> t2_n = {false, false, true, false, false, false, true, false};
 
-}
+    std::vector<bool> t2;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    for (auto vid: poly_verts_id) t2.push_back(transition_verts[vid]);
 
-template <class M, class V, class E, class F, class P>
-CINO_INLINE
-void setOrientationInfo4(const Hexmesh<M,V,E,F,P>    & m,
-                         SchemeInfo                  & info,
-                         std::vector<uint>           & vertices,
-                         const uint                    pid){
-
-    std::vector<vec3d> poly_verts = m.poly_verts(pid);
-    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
-    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
-
-    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
-
-    for (auto vid : vertices){
-        vec3d vert = m.vert(vid);
-        if(vert.y() == min.y()){
-            conta_min ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-        else if(vert.y() == max.y()){
-            conta_max ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-    }
-
-    if (conta_min == 4) info.orientations.push_back(0);
-    else if (conta_right == 4) info.orientations.push_back(1);
-    else if (conta_left == 4) info.orientations.push_back(2);
-    else if (conta_back == 4) info.orientations.push_back(3);
-    else if (conta_front == 4) info.orientations.push_back(4);
-    else if (conta_max == 4) info.orientations.push_back(5);
+    if (t2 == t2_a) info.orientations.push_back(0);
+    else if (t2 == t2_b) info.orientations.push_back(1);
+    else if (t2 == t2_c) info.orientations.push_back(2);
+    else if (t2 == t2_d) info.orientations.push_back(3);
+    else if (t2 == t2_e) info.orientations.push_back(4);
+    else if (t2 == t2_f) info.orientations.push_back(5);
+    else if (t2 == t2_g) info.orientations.push_back(6);
+    else if (t2 == t2_h) info.orientations.push_back(7);
+    else if (t2 == t2_i) info.orientations.push_back(8);
+    else if (t2 == t2_l) info.orientations.push_back(9);
+    else if (t2 == t2_m) info.orientations.push_back(10);
+    else if (t2 == t2_n) info.orientations.push_back(11);
 
 }
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class M, class V, class E, class F, class P>
 CINO_INLINE
-void setOrientationInfo6(const Hexmesh<M,V,E,F,P>    & m,
-                         SchemeInfo                  & info,
-                         std::vector<uint>           & vertices,
-                         const uint                    pid){
+void setOrientationInfo3(SchemeInfo                  & info,
+                         std::vector<bool>           & transition_verts,
+                         std::vector<uint>           & poly_verts_id){
 
-    std::vector<vec3d> poly_verts = m.poly_verts(pid);
-    vec3d min = *std::min_element(poly_verts.begin(), poly_verts.end());
-    vec3d max = *std::max_element(poly_verts.begin(), poly_verts.end());
 
-    uint conta_max = 0, conta_min = 0, conta_back = 0, conta_front = 0, conta_left = 0, conta_right = 0;
+    std::vector<bool> t2_a = {true, true, false, true, false, false, false, false};
+    std::vector<bool> t2_b = {true, true, true, false, false, false, false, false};
+    std::vector<bool> t2_c = {true, false, true, true, false, false, false, false};
+    std::vector<bool> t2_d = {false, true, true, true, false, false, false, false};
+    std::vector<bool> t2_e = {false, false, false, false, true, true, false, true};
+    std::vector<bool> t2_f = {false, false, false, false, true, true, true, false};
+    std::vector<bool> t2_g = {false, false, false, false, true, false, true, true};
+    std::vector<bool> t2_h = {false, false, false, false, false, true, true, true};
+    std::vector<bool> t2_i = {true, true, false, false, true, false, false, false};
+    std::vector<bool> t2_j = {true, false, false, false, true, true, false, false};
+    std::vector<bool> t2_k = {true, true, false, false, false, true, false, false};
+    std::vector<bool> t2_l = {false, true, false, false, true, true, false, false};
+    std::vector<bool> t2_m = {false, false, true, true, false, false, false, true};
+    std::vector<bool> t2_n = {false, false, false, true, false, false, true, true};
+    std::vector<bool> t2_o = {false, false, true, true, false, false, true, false};
+    std::vector<bool> t2_p = {false, false, true, false, false, false, true, true};
+    std::vector<bool> t2_q = {false, true, true, false, false, false, true, false};
+    std::vector<bool> t2_r = {false, false, true, false, false, true, true, false};
+    std::vector<bool> t2_s = {false, true, true, false, false, true, false, false};
+    std::vector<bool> t2_t = {false, true, false, false, false, true, true, false};
+    std::vector<bool> t2_u = {true, false, false, true, false, false, false, true};
+    std::vector<bool> t2_v = {false, false, false, true, true, false, false, true};
+    std::vector<bool> t2_w = {true, false, false, true, true, false, false, false};
+    std::vector<bool> t2_x = {true, false, false, false, true, false, false, true};
 
-    for (auto vid : vertices){
-        vec3d vert = m.vert(vid);
-        if(vert.y() == min.y()){
-            conta_min ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-        else if(vert.y() == max.y()){
-            conta_max ++;
-            if(vert.x() == min.x()) conta_left ++;
-            else if(vert.x() == max.x()) conta_right ++;
-            if(vert.z() == min.z()) conta_front ++;
-            else if(vert.z() == max.z()) conta_back ++;
-        }
-    }
+    std::vector<bool> t2;
 
-    if (conta_left == 4 && conta_back == 4) info.orientations.push_back(0);
-    else if (conta_left == 4 && conta_front == 4) info.orientations.push_back(1);
-    else if (conta_right == 4 && conta_back == 4) info.orientations.push_back(2);
-    else if (conta_right == 4 && conta_front == 4) info.orientations.push_back(3);
-    else if (conta_min == 4 && conta_back == 4) info.orientations.push_back(4);
-    else if (conta_min == 4 && conta_front == 4) info.orientations.push_back(5);
-    else if (conta_min == 4 && conta_left == 4) info.orientations.push_back(6);
-    else if (conta_min == 4 && conta_right == 4) info.orientations.push_back(7);
-    else if (conta_max == 4 && conta_back == 4) info.orientations.push_back(8);
-    else if (conta_max == 4 && conta_front == 4) info.orientations.push_back(9);
-    else if (conta_max == 4 && conta_left == 4) info.orientations.push_back(10);
-    else if (conta_max == 4 && conta_right == 4) info.orientations.push_back(11);
+    for (auto vid: poly_verts_id) t2.push_back(transition_verts[vid]);
+
+    if (t2 == t2_a) info.orientations.push_back(0);
+    else if (t2 == t2_b) info.orientations.push_back(1);
+    else if (t2 == t2_c) info.orientations.push_back(2);
+    else if (t2 == t2_d) info.orientations.push_back(3);
+    else if (t2 == t2_e) info.orientations.push_back(4);
+    else if (t2 == t2_f) info.orientations.push_back(5);
+    else if (t2 == t2_g) info.orientations.push_back(6);
+    else if (t2 == t2_h) info.orientations.push_back(7);
+    else if (t2 == t2_i) info.orientations.push_back(8);
+    else if (t2 == t2_j) info.orientations.push_back(9);
+    else if (t2 == t2_k) info.orientations.push_back(10);
+    else if (t2 == t2_l) info.orientations.push_back(11);
+    else if (t2 == t2_m) info.orientations.push_back(12);
+    else if (t2 == t2_n) info.orientations.push_back(13);
+    else if (t2 == t2_o) info.orientations.push_back(14);
+    else if (t2 == t2_p) info.orientations.push_back(15);
+    else if (t2 == t2_q) info.orientations.push_back(16);
+    else if (t2 == t2_r) info.orientations.push_back(17);
+    else if (t2 == t2_s) info.orientations.push_back(18);
+    else if (t2 == t2_t) info.orientations.push_back(19);
+    else if (t2 == t2_u) info.orientations.push_back(20);
+    else if (t2 == t2_v) info.orientations.push_back(21);
+    else if (t2 == t2_w) info.orientations.push_back(22);
+    else if (t2 == t2_x) info.orientations.push_back(23);
+
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+CINO_INLINE
+void setOrientationInfo4(SchemeInfo                  & info,
+                         std::vector<bool>           & transition_verts,
+                         std::vector<uint>           & poly_verts_id){
+
+
+    std::vector<bool> t2_a = {true, true, true, true, false, false, false, false};
+    std::vector<bool> t2_b = {false, true, true, false, false, true, true, false};
+    std::vector<bool> t2_c = {true, false, false, true, true, false, false, true};
+    std::vector<bool> t2_d = {true, true, false, false, true, true, false, false};
+    std::vector<bool> t2_e = {false, false, true, true, false, false, true, true};
+    std::vector<bool> t2_f = {false, false, false, false, true, true, true, true};
+
+
+    std::vector<bool> t2;
+
+    for (auto vid: poly_verts_id) t2.push_back(transition_verts[vid]);
+
+    if (t2 == t2_a) info.orientations.push_back(0);
+    else if (t2 == t2_b) info.orientations.push_back(1);
+    else if (t2 == t2_c) info.orientations.push_back(2);
+    else if (t2 == t2_d) info.orientations.push_back(3);
+    else if (t2 == t2_e) info.orientations.push_back(4);
+    else if (t2 == t2_f) info.orientations.push_back(5);
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+CINO_INLINE
+void setOrientationInfo6(SchemeInfo                  & info,
+                         std::vector<bool>           & transition_verts,
+                         std::vector<uint>           & poly_verts_id){
+
+
+    std::vector<bool> t2_a = {true, true, false, true, true, true, false, true};
+    std::vector<bool> t2_b = {true, false, true, true, true, false, true, true};
+    std::vector<bool> t2_c = {true, true, true, false, true, true, true, false};
+    std::vector<bool> t2_d = {false, true, true, true, false, true, true, true};
+    std::vector<bool> t2_e = {true, true, true, true, true, true, false, false};
+    std::vector<bool> t2_f = {true, true, true, true, false, false, true, true};
+    std::vector<bool> t2_g = {true, true, true, true, true, false, false, true};
+    std::vector<bool> t2_h = {true, true, true, true, false, true, true, false};
+    std::vector<bool> t2_i = {true, true, false, false, true, true, true, true};
+    std::vector<bool> t2_l = {false, false, true, true, true, true, true, true};
+    std::vector<bool> t2_m = {true, false, false, true, true, true, true, true};
+    std::vector<bool> t2_n = {false, true, true, false, true, true, true, true};
+
+    std::vector<bool> t2;
+
+    for (auto vid: poly_verts_id) t2.push_back(transition_verts[vid]);
+
+    if (t2 == t2_a) info.orientations.push_back(0);
+    else if (t2 == t2_b) info.orientations.push_back(1);
+    else if (t2 == t2_c) info.orientations.push_back(2);
+    else if (t2 == t2_d) info.orientations.push_back(3);
+    else if (t2 == t2_e) info.orientations.push_back(4);
+    else if (t2 == t2_f) info.orientations.push_back(5);
+    else if (t2 == t2_g) info.orientations.push_back(6);
+    else if (t2 == t2_h) info.orientations.push_back(7);
+    else if (t2 == t2_i) info.orientations.push_back(8);
+    else if (t2 == t2_l) info.orientations.push_back(9);
+    else if (t2 == t2_m) info.orientations.push_back(10);
+    else if (t2 == t2_n) info.orientations.push_back(11);
 
 }
 
@@ -320,6 +275,8 @@ CINO_INLINE
 void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
+                         std::vector<bool>                    & transition_verts,
+                         std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     SchemeInfo info;
@@ -332,7 +289,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(eid != -1){ //2A
         info.type = HexTransition::EDGE;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-        setOrientationInfo2(m, info, vertices, pid);
+        setOrientationInfo2(info, transition_verts, poly_verts_id);
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
 }
@@ -344,6 +301,8 @@ CINO_INLINE
 void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
+                         std::vector<bool>                    & transition_verts,
+                         std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     SchemeInfo info;
@@ -360,7 +319,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(n_free_edge == 5){ //3A
         info.type = HexTransition::TWO_EDGES;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-        setOrientationInfo3(m, info, vertices, pid);
+        setOrientationInfo3(info, transition_verts, poly_verts_id);
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
 }
@@ -373,6 +332,8 @@ CINO_INLINE
 void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
+                         std::vector<bool>                    & transition_verts,
+                         std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     SchemeInfo info;
@@ -389,7 +350,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(fid != -1){ // 4A
         info.type = HexTransition::FACE;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-        setOrientationInfo4(m, info, vertices, pid);
+        setOrientationInfo4(info, transition_verts, poly_verts_id);
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
 }
@@ -432,9 +393,7 @@ void mark4verticesD(const Hexmesh<M,V,E,F,P>                   & m,
     }
 
     if(n_free_edge == 3){
-        if(faces_3_nodes==3){ // 4B
-
-            std::cout<<"4B_D"<<std::endl;
+        if(faces_3_nodes==3){ // 4B_D
             std::vector<bool> t4_a = {true, true, false, true, true, false, false, false};
             std::vector<bool> t4_b = {true, true, true, false, false, true, false, false};
             std::vector<bool> t4_c = {false, true, true, true, false, false, true, false};
@@ -511,8 +470,8 @@ void mark5verticesD(const Hexmesh<M,V,E,F,P>                   & m,
         }
 
 
-    if(free_edge != -1){ // 5A, 5B
-        if(n_free_edge == 2){ // 5A
+    if(free_edge != -1){
+        if(n_free_edge == 2){ // 5A_D
             std::vector<bool> t5_a = {true, true, true, true, true, false, false, false};
             std::vector<bool> t5_b = {true, true, true, true, false, true, false, false};
             std::vector<bool> t5_c = {true, true, true, true, false, false, true, false};
@@ -601,6 +560,8 @@ CINO_INLINE
 void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
+                         std::vector<bool>                    & transition_verts,
+                         std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme){
 
     SchemeInfo info;
@@ -620,46 +581,10 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
     if(free_edge != -1){ // 6A
         info.type = HexTransition::TWO_FACES;
         info.scale = m.edge_length(m.adj_p2e(pid)[0]);
-        setOrientationInfo6(m, info, vertices, pid);
+        setOrientationInfo6(info, transition_verts, poly_verts_id);
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-template <class M, class V, class E, class F, class P>
-CINO_INLINE
-void markTemplates(const Hexmesh<M,V,E,F,P>                   & m_in,
-                         std::vector<bool>                    & transition_verts,
-                         std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & polys){
-
-
-    for (auto pid: polys){
-        std::vector<uint> vertices;
-        std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
-
-        for(uint vid: poly_verts_id) if(transition_verts[vid]) vertices.push_back(vid);
-
-        SchemeInfo info;
-
-        switch (vertices.size()){
-            case 2: mark2vertices(m_in, pid, vertices, poly2scheme);
-                    break;
-            case 3: mark3vertices(m_in, pid, vertices, poly2scheme);
-                    break;
-            case 4: mark4vertices(m_in, pid, vertices, poly2scheme);
-                    break;
-            case 6: mark6vertices(m_in, pid, vertices, poly2scheme);
-                    break;
-            case 8: info.type = HexTransition::FULL;
-                    info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
-                    poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
-                    break;
-        }
-    }
-}
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -744,11 +669,30 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
 
-    std::vector<uint> polys;
 
-    for(uint i=0;i<m_in.num_polys();i++) polys.push_back(i);
+    for (uint pid=0;pid<m_in.num_polys();pid++){
+        std::vector<uint> vertices;
+        std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
 
-    markTemplates(m_out, transition_verts, poly2scheme, polys);
+        for(uint vid: poly_verts_id) if(transition_verts[vid]) vertices.push_back(vid);
+
+        SchemeInfo info;
+
+        switch (vertices.size()){
+            case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme);
+                    break;
+            case 3: mark3vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme);
+                    break;
+            case 4: mark4vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme);
+                    break;
+            case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme);
+                    break;
+            case 8: info.type = HexTransition::FULL;
+                    info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+                    poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                    break;
+        }
+    }
 
     merge_schemes_into_mesh(m_out, poly2scheme);
 
@@ -794,7 +738,7 @@ void hex_transition_install_3refDecoupling(const Hexmesh<M,V,E,F,P>           & 
         switch (v_lv0.size()){
             case 1: info.type = HexTransition::NODE;
                     info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
-                    setOrientationInfo1(m_in, info, v_lv0, pid);
+                    setOrientationInfo1(info, decoupling_nodes, poly_verts_id);
                     poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                     break;
         }
@@ -802,12 +746,13 @@ void hex_transition_install_3refDecoupling(const Hexmesh<M,V,E,F,P>           & 
 
     merge_schemes_into_mesh(m_out, poly2scheme);
 
+    for(uint vid=transition_verts.size(); vid<m_out.num_verts(); vid++) transition_verts.push_back(false);
+
     std::vector<uint> polys_to_remove;
 
     for (auto p: poly2scheme) polys_to_remove.push_back(p.first);
 
     m_out.polys_remove(polys_to_remove);
+
 }
-
-
 }
