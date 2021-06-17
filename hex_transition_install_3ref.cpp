@@ -632,7 +632,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 
         vec3d poly_centroid = m.poly_centroid(p.first);
         SchemeInfo info = p.second;
-        hex_transition_orient_3ref(verts, polys, info, poly_centroid);
+        hex_transition_orient_3ref(verts, polys, info, poly_centroid, m.poly_verts(p.first));
 
         //merge vertices
         for (auto & v : verts){
