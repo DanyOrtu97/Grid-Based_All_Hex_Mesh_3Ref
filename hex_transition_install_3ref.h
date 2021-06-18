@@ -31,7 +31,7 @@
 #define HEX_TRANSITION_INSTALL_3REF_H
 
 #include <cinolib/meshes/meshes.h>
-#include <stdlib.h> //DA TOGLIERE
+#include <stdlib.h>
 #include <map>
 
 namespace cinolib{
@@ -53,13 +53,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                                        Hexmesh<M,V,E,F,P>           & m_out);
 
 
-template <class M, class V, class E, class F, class P>
-CINO_INLINE
-void hex_transition_install_3refDecoupling(const Hexmesh<M,V,E,F,P>           & m_in,
-                                                 std::vector<bool>            & transition_verts,
-                                                 Hexmesh<M,V,E,F,P>           & m_out);
 }
-
 
 #ifndef CINO_STATIC_LIB
 #include "hex_transition_install_3ref.cpp"

@@ -114,52 +114,12 @@ CINO_INLINE
 void orient_edge(std::vector<vec3d>              & verts,
                  std::vector<std::vector<uint>>  & polys,
                  SchemeInfo                      & info,
-                 const vec3d                     & poly_centroid,
-                 const std::vector<vec3d>        & poly_verts){
+                 const vec3d                     & poly_centroid){
 
     verts.reserve(Edge::verts.size()/3);
 
     for (uint vid=0; vid<Edge::verts.size(); vid+=3) verts.push_back(vec3d(Edge::verts[vid]-0.5, Edge::verts[vid+1]-0.5, Edge::verts[vid+2]-0.5));
 
-
-    verts[0] = poly_verts[3];
-    verts[1] = poly_verts[2];
-    verts[2] = poly_verts[7];
-    verts[3] = poly_verts[6];
-    verts[12] = poly_verts[0];
-    verts[13] = poly_verts[1];
-    verts[14] = poly_verts[4];
-    verts[15] = poly_verts[5];
-
-    verts[4] = verts[12];
-    verts[4].z() -= ((verts[12].z() - verts[0].z()) / 3 )*2;
-    verts[8] = verts[12];
-    verts[8].z() -= (verts[12].z() - verts[0].z()) / 3;
-    verts[6] = verts[12];
-    verts[6].z() -= ((verts[12].z() - verts[0].z()) / 3 )*2;
-    verts[6].y() += ((verts[2].y() - verts[0].y()) / 3 )*2;
-    verts[10] = verts[12];
-    verts[10].z() -= (verts[12].z() - verts[0].z()) / 3;
-    verts[10].y() += ((verts[2].y() - verts[0].y()) / 3 )*2;
-    verts[5] = verts[12];
-    verts[5].z() -= ((verts[12].z() - verts[0].z()) / 3 )*2;
-    verts[5].x() += ((verts[1].x() - verts[0].x()) / 3 )*2;
-    verts[9] = verts[12];
-    verts[9].z() -= (verts[12].z() - verts[0].z()) / 3;
-    verts[9].x() += ((verts[1].x() - verts[0].x()) / 3 )*2;
-    verts[7] = verts[12];
-    verts[7].z() -= ((verts[12].z() - verts[0].z()) / 3 )*2;
-    verts[7].x() += ((verts[1].x() - verts[0].x()) / 3 )*2;
-    verts[7].y() += ((verts[2].y() - verts[0].y()) / 3 )*2;
-    verts[11] = verts[12];
-    verts[11].z() -= (verts[12].z() - verts[0].z()) / 3;
-    verts[11].x() += ((verts[1].x() - verts[0].x()) / 3 )*2;
-    verts[11].y() += ((verts[2].y() - verts[0].y()) / 3 )*2;
-
-
-    for (auto & v: verts){
-        v += poly_centroid;
-    }
 
     switch(info.orientations[0])
     {
@@ -181,6 +141,11 @@ void orient_edge(std::vector<vec3d>              & verts,
                  rotate(verts, "z",  M_PI/2); break;
     }
 
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
 
 
     polys = Edge::polys;
@@ -347,6 +312,47 @@ void orient_two_faces(std::vector<vec3d>              & verts,
 
 }
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_corner(std::vector<vec3d>              & verts,
+                   std::vector<std::vector<uint>>  & polys,
+                   SchemeInfo                      & info,
+                   const vec3d                     & poly_centroid){
+
+    verts.reserve(Corner::verts.size()/3);
+
+    for (uint vid=0; vid<Corner::verts.size(); vid+=3) verts.push_back(vec3d(Corner::verts[vid]-0.5, Corner::verts[vid+1]-0.5, Corner::verts[vid+2]-0.5));
+
+    /*
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y", -M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y",  M_PI); break;
+        case 4:  rotate(verts, "z",  M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x",  M_PI/2); break;
+        case 7:  rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 10: rotate(verts, "x", -M_PI/2); break;
+        case 11: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Corner::polys;
+}
+
 } // end anonymous namespace
 
 
@@ -357,8 +363,7 @@ CINO_INLINE
 void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
                                       std::vector<std::vector<uint>>  & polys,
                                       SchemeInfo                      & info,
-                                const vec3d                           & poly_centroid,
-                                const std::vector<vec3d>              & poly_verts){
+                                const vec3d                           & poly_centroid){
 
 
     switch(info.type){
@@ -366,7 +371,7 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
             orient_node(verts, polys, info, poly_centroid);
             break;
         case HexTransition::EDGE:
-            orient_edge(verts, polys, info, poly_centroid, poly_verts);
+            orient_edge(verts, polys, info, poly_centroid);
             break;
         case HexTransition::FACE:
             orient_face(verts, polys, info, poly_centroid);
@@ -379,6 +384,9 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
             break;
         case HexTransition::TWO_FACES:
             orient_two_faces(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::CORNER:
+            orient_corner(verts, polys, info, poly_centroid);
             break;
      }
 

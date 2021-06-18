@@ -10,6 +10,7 @@
 #include <map>
 #include <algorithm>
 #include <sys/types.h>
+#include <cinolib/drawable_sphere.h>
 #include <cinolib/how_many_seconds.h>
 #include <hex_transition_install_3ref.h>
 #include <cinolib/connected_components.h>
@@ -325,14 +326,13 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
-    DrawableHexmesh<> decouplingMesh;
     DrawableHexmesh<> outputMesh;
 
     GLcanvas gui_input, gui_output;
 
-    //gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
+    gui_input.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh before templates application", Color::BLACK(), 12, 0);
     gui_output.push_marker(vec2i(10, gui_input.height()-20), "Hexmesh after templates application (hanging nodes solved)", Color::BLACK(), 12, 0);
     gui_input.show();
     gui_output.show();
@@ -348,11 +348,11 @@ int main(int argc, char *argv[])
     }
 
 
-    /*balancing(true, mesh);
+    //balancing(true, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-    */
+
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
@@ -364,7 +364,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-
+/*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -396,16 +396,19 @@ int main(int argc, char *argv[])
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
 
-
-
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
 
                 std::cout<< "Template application in progress ...." <<std::endl;
 
-                hex_transition_install_3refDecoupling(mesh, transition_verts, decouplingMesh);
-                decouplingMesh.updateGL();
-                hex_transition_install_3ref(decouplingMesh, transition_verts, outputMesh);
+                hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+
+
+                for(uint iii=0; iii<outputMesh.num_verts(); iii++){
+                    if(transition_verts[iii])
+                        outputMesh.vert_data(iii).color = Color::RED();
+                }
+
 
                 std::chrono::high_resolution_clock::time_point t1o = std::chrono::high_resolution_clock::now();
 
@@ -417,7 +420,6 @@ int main(int argc, char *argv[])
                                                                                   how_many_seconds(t0o,t1o) << "s]" << std::endl;
 
                 gui_output.push_obj(&outputMesh);
-
                 mesh.updateGL();
                 outputMesh.updateGL();
                 outputMesh.print_quality(); //scaled jacobian
@@ -429,17 +431,15 @@ int main(int argc, char *argv[])
 
                     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-                    outputSurfaceMesh.save("a_caso.obj");
                 }
 
-
                 c->updateGL();
-
             }
         }
     };
 
-    /*
+    */
+
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -472,7 +472,7 @@ int main(int argc, char *argv[])
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
     }
-    */
+
 
 
 

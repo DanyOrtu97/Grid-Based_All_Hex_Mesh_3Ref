@@ -43,6 +43,7 @@ enum class HexTransition{
     FULL,
     TWO_EDGES,
     TWO_FACES,
+    CORNER,
 };
 
 
@@ -59,8 +60,7 @@ CINO_INLINE
 void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
                                       std::vector<std::vector<uint>>  & polys,
                                       SchemeInfo                      & info,
-                                const vec3d                           & poly_centroid,
-                                const std::vector<vec3d>              & poly_verts);
+                                const vec3d                           & poly_centroid);
 
 
 }
