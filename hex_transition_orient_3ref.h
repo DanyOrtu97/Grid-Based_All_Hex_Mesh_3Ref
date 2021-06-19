@@ -43,7 +43,10 @@ enum class HexTransition{
     FULL,
     TWO_EDGES,
     TWO_FACES,
-    CORNER,
+    CORNER_4B,
+    CORNER_4C,
+    CORNER_5A,
+    CORNER_7A,
 };
 
 

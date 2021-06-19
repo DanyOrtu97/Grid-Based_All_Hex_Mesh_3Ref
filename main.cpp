@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -348,6 +348,7 @@ int main(int argc, char *argv[])
     }
 
 
+    /*
     //balancing(true, mesh);
     mesh.updateGL();
 
@@ -357,6 +358,7 @@ int main(int argc, char *argv[])
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
+    */
 
 
 

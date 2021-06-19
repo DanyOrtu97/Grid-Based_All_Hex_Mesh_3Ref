@@ -599,7 +599,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         if(n_free_edge == 3){ // 4B, 4C
             if(faces_3_nodes==3){ // 4B
-
+                /*
                 std::cout<<"4B"<<std::endl;
                 std::vector<bool> t4_a = {true, true, false, true, true, false, false, false};
                 std::vector<bool> t4_b = {true, true, true, false, false, true, false, false};
@@ -756,7 +756,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                     }
                 }
 
-                changed_pid.push_back(pid);
+                changed_pid.push_back(pid);*/
 
             }
             else{ //4C
@@ -1002,6 +1002,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
     if(free_edge != -1){ // 5A, 5B
         if(n_free_edge == 2){ // 5A
+            /*
             std::vector<bool> t5_a = {true, true, true, true, true, false, false, false};
             std::vector<bool> t5_b = {true, true, true, true, false, true, false, false};
             std::vector<bool> t5_c = {true, true, true, true, false, false, true, false};
@@ -1081,7 +1082,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
             }
 
 
-            changed_pid.push_back(pid);
+            changed_pid.push_back(pid);*/
         }
         else{ //5B
             for(auto vid: poly_verts_id){
@@ -1229,7 +1230,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         break;
                 case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
                         break;
-                case 7: info.type = HexTransition::CORNER;
+                case 7: info.type = HexTransition::CORNER_7A;
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         //setOrientationInfo7(info, transition_verts, poly_verts_id);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
@@ -1238,6 +1239,10 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
+                default: info.type = HexTransition::CORNER_4B;
+                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                         break;
             }
 
         }

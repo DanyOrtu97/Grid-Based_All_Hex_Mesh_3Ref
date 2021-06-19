@@ -315,14 +315,14 @@ void orient_two_faces(std::vector<vec3d>              & verts,
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-void orient_corner(std::vector<vec3d>              & verts,
-                   std::vector<std::vector<uint>>  & polys,
-                   SchemeInfo                      & info,
-                   const vec3d                     & poly_centroid){
+void orient_corner_4B(std::vector<vec3d>              & verts,
+                      std::vector<std::vector<uint>>  & polys,
+                      SchemeInfo                      & info,
+                      const vec3d                     & poly_centroid){
 
-    verts.reserve(Corner::verts.size()/3);
+    verts.reserve(Corner_4B::verts.size()/3);
 
-    for (uint vid=0; vid<Corner::verts.size(); vid+=3) verts.push_back(vec3d(Corner::verts[vid]-0.5, Corner::verts[vid+1]-0.5, Corner::verts[vid+2]-0.5));
+    for (uint vid=0; vid<Corner_4B::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4B::verts[vid]-0.5, Corner_4B::verts[vid+1]-0.5, Corner_4B::verts[vid+2]-0.5));
 
     /*
     switch(info.orientations[0])
@@ -350,8 +350,132 @@ void orient_corner(std::vector<vec3d>              & verts,
         v += poly_centroid;
     }
 
-    polys = Corner::polys;
+    polys = Corner_4B::polys;
 }
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_corner_4C(std::vector<vec3d>              & verts,
+                      std::vector<std::vector<uint>>  & polys,
+                      SchemeInfo                      & info,
+                      const vec3d                     & poly_centroid){
+
+    verts.reserve(Corner_4C::verts.size()/3);
+
+    for (uint vid=0; vid<Corner_4C::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4C::verts[vid]-0.5, Corner_4C::verts[vid+1]-0.5, Corner_4C::verts[vid+2]-0.5));
+
+    /*
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y", -M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y",  M_PI); break;
+        case 4:  rotate(verts, "z",  M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x",  M_PI/2); break;
+        case 7:  rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 10: rotate(verts, "x", -M_PI/2); break;
+        case 11: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Corner_4C::polys;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_corner_5A(std::vector<vec3d>              & verts,
+                      std::vector<std::vector<uint>>  & polys,
+                      SchemeInfo                      & info,
+                      const vec3d                     & poly_centroid){
+
+    verts.reserve(Corner_5A::verts.size()/3);
+
+    for (uint vid=0; vid<Corner_5A::verts.size(); vid+=3) verts.push_back(vec3d(Corner_5A::verts[vid]-0.5, Corner_5A::verts[vid+1]-0.5, Corner_5A::verts[vid+2]-0.5));
+
+    /*
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y", -M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y",  M_PI); break;
+        case 4:  rotate(verts, "z",  M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x",  M_PI/2); break;
+        case 7:  rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 10: rotate(verts, "x", -M_PI/2); break;
+        case 11: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys = Corner_5A::polys;
+}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_corner_7A(std::vector<vec3d>              & verts,
+                      std::vector<std::vector<uint>>  & polys,
+                      SchemeInfo                      & info,
+                      const vec3d                     & poly_centroid){
+
+    verts.reserve(Corner_7A::verts.size()/3);
+
+    for (uint vid=0; vid<Corner_7A::verts.size(); vid+=3) verts.push_back(vec3d(Corner_7A::verts[vid]-0.5, Corner_7A::verts[vid+1]-0.5, Corner_7A::verts[vid+2]-0.5));
+
+    /*
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y", -M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI/2); break;
+        case 3:  rotate(verts, "y",  M_PI); break;
+        case 4:  rotate(verts, "z",  M_PI/2); break;
+        case 5:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 6:  rotate(verts, "x",  M_PI/2); break;
+        case 7:  rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2); break;
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 10: rotate(verts, "x", -M_PI/2); break;
+        case 11: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2); break;
+    }*/
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    polys =  Corner_7A::polys;
+}
+
+
 
 } // end anonymous namespace
 
@@ -385,8 +509,17 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
         case HexTransition::TWO_FACES:
             orient_two_faces(verts, polys, info, poly_centroid);
             break;
-        case HexTransition::CORNER:
-            orient_corner(verts, polys, info, poly_centroid);
+        case HexTransition::CORNER_4B:
+            orient_corner_4B(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::CORNER_4C:
+            orient_corner_4C(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::CORNER_5A:
+            orient_corner_5A(verts, polys, info, poly_centroid);
+            break;
+        case HexTransition::CORNER_7A:
+            orient_corner_7A(verts, polys, info, poly_centroid);
             break;
      }
 
