@@ -1203,12 +1203,9 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     std::vector<uint> polys;
 
-    int conta_step=0;
-
     for(uint i=0;i<m_in.num_polys();i++) polys.push_back(i);
 
     while(added_newverts){
-        conta_step++;
         for (auto pid: polys){
             std::vector<uint> vertices;
             std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
@@ -1239,7 +1236,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
-                default: info.type = HexTransition::CORNER_4B;
+                default: info.type = HexTransition::CORNER_4C;
                          info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                          poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                          break;
@@ -1247,19 +1244,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
         }
 
-        //temporaneo
-        if(conta_step>50){
-            merge_schemes_into_mesh(m_out, poly2scheme);
-
-            std::vector<uint> polys_to_remove;
-
-            for (auto p: poly2scheme) polys_to_remove.push_back(p.first);
-
-            m_out.polys_remove(polys_to_remove);
-
-            added_newverts=false;
-        }
-        else if(changed_pid.size() > 0){
+        if(changed_pid.size() > 0){
             added_newverts=true;
             std::cout<<"NUOVO GIRO"<<std::endl;
 
