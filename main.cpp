@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
-    */
+*/
 
 
 
@@ -438,9 +438,9 @@ int main(int argc, char *argv[])
                 c->updateGL();
             }
         }
-    };
+    };*/
 
-    */
+
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
