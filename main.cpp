@@ -353,12 +353,12 @@ int main(int argc, char *argv[])
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-
+    */
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
-*/
+
 
 
 
@@ -438,8 +438,8 @@ int main(int argc, char *argv[])
                 c->updateGL();
             }
         }
-    };*/
-
+    };
+*/
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -474,6 +474,7 @@ int main(int argc, char *argv[])
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
     }
+
 
 
 

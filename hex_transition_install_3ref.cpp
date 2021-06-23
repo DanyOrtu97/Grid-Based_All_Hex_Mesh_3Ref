@@ -319,8 +319,69 @@ void setOrientationInfo4C(SchemeInfo                  & info,
 
     for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
 
-    //ATTENZIONE -> VERIFICA SE SERVE ALTRO TEMPLATE
 
+    if(mask == mask_a || mask == mask_b || mask == mask_c || mask == mask_d || mask == mask_e || mask == mask_f ||
+       mask == mask_g || mask == mask_h || mask == mask_i || mask == mask_l || mask == mask_m || mask == mask_n ||
+       mask == mask_o || mask == mask_p || mask == mask_q || mask == mask_r || mask == mask_s || mask == mask_t ||
+       mask == mask_u || mask == mask_v || mask == mask_w || mask == mask_x || mask == mask_y || mask == mask_z){
+
+        info.type = HexTransition::CORNER_4CA;
+        info.flag = 0;
+
+        if (mask == mask_a) info.orientations.push_back(0);
+        else if (mask == mask_b) info.orientations.push_back(1);
+        else if (mask == mask_c) info.orientations.push_back(2);
+        else if (mask == mask_d) info.orientations.push_back(3);
+        else if (mask == mask_e) info.orientations.push_back(4);
+        else if (mask == mask_f) info.orientations.push_back(5);
+        else if (mask == mask_g) info.orientations.push_back(6);
+        else if (mask == mask_h) info.orientations.push_back(7);
+        else if (mask == mask_i) info.orientations.push_back(8);
+        else if (mask == mask_l) info.orientations.push_back(9);
+        else if (mask == mask_m) info.orientations.push_back(10);
+        else if (mask == mask_n) info.orientations.push_back(11);
+        else if (mask == mask_o) info.orientations.push_back(12);
+        else if (mask == mask_p) info.orientations.push_back(13);
+        else if (mask == mask_q) info.orientations.push_back(14);
+        else if (mask == mask_r) info.orientations.push_back(15);
+        else if (mask == mask_s) info.orientations.push_back(16);
+        else if (mask == mask_t) info.orientations.push_back(17);
+        else if (mask == mask_u) info.orientations.push_back(18);
+        else if (mask == mask_v) info.orientations.push_back(19);
+        else if (mask == mask_w) info.orientations.push_back(20);
+        else if (mask == mask_x) info.orientations.push_back(21);
+        else if (mask == mask_y) info.orientations.push_back(22);
+        else if (mask == mask_z) info.orientations.push_back(23);
+    }
+    else{
+        info.type = HexTransition::CORNER_4CB;
+        info.flag = 1;
+
+        if (mask == mask_a1) info.orientations.push_back(0);
+        else if (mask == mask_b1) info.orientations.push_back(1);
+        else if (mask == mask_c1) info.orientations.push_back(2);
+        else if (mask == mask_d1) info.orientations.push_back(3);
+        else if (mask == mask_e1) info.orientations.push_back(4);
+        else if (mask == mask_f1) info.orientations.push_back(5);
+        else if (mask == mask_g1) info.orientations.push_back(6);
+        else if (mask == mask_h1) info.orientations.push_back(7);
+        else if (mask == mask_i1) info.orientations.push_back(8);
+        else if (mask == mask_l1) info.orientations.push_back(9);
+        else if (mask == mask_m1) info.orientations.push_back(10);
+        else if (mask == mask_n1) info.orientations.push_back(11);
+        else if (mask == mask_o1) info.orientations.push_back(12);
+        else if (mask == mask_p1) info.orientations.push_back(13);
+        else if (mask == mask_q1) info.orientations.push_back(14);
+        else if (mask == mask_r1) info.orientations.push_back(15);
+        else if (mask == mask_s1) info.orientations.push_back(16);
+        else if (mask == mask_t1) info.orientations.push_back(17);
+        else if (mask == mask_u1) info.orientations.push_back(18);
+        else if (mask == mask_v1) info.orientations.push_back(19);
+        else if (mask == mask_w1) info.orientations.push_back(20);
+        else if (mask == mask_x1) info.orientations.push_back(21);
+        else if (mask == mask_y1) info.orientations.push_back(22);
+        else if (mask == mask_z1) info.orientations.push_back(23);
+    }
 }
 
 
@@ -768,7 +829,6 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                 poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
             }
             else{ //4C
-                info.type = HexTransition::CORNER_4C;
                 info.scale = m.edge_length(m.adj_p2e(pid)[0]);
                 setOrientationInfo4C(info, transition_verts, poly_verts_id);
                 poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
@@ -1045,7 +1105,6 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
 
             switch (vertices.size()){
-
                 case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
                         break;
                 case 3: mark3vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
@@ -1065,8 +1124,9 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
-                default: info.type = HexTransition::CORNER_5A;
+                default: info.type = HexTransition::CORNER_7A;
                          info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+                         info.orientations.push_back(0);
                          poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                          break;
             }

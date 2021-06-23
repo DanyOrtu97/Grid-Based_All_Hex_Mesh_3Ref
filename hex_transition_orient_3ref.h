@@ -44,7 +44,8 @@ enum class HexTransition{
     TWO_EDGES,
     TWO_FACES,
     CORNER_4B,
-    CORNER_4C,
+    CORNER_4CA,
+    CORNER_4CB,
     CORNER_5A,
     CORNER_7A,
 };
@@ -54,6 +55,7 @@ struct SchemeInfo{
     HexTransition           type;
     double                  scale;
     std::vector<int>        orientations;
+    int                     flag; //usefull for 4C
 };
 
 

@@ -283,6 +283,7 @@ void orient_two_faces(std::vector<vec3d>              & verts,
 
     for (uint vid=0; vid<Two_Faces::verts.size(); vid+=3) verts.push_back(vec3d(Two_Faces::verts[vid]-0.5, Two_Faces::verts[vid+1]-0.5, Two_Faces::verts[vid+2]-0.5));
 
+
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -325,6 +326,7 @@ void orient_corner_4B(std::vector<vec3d>              & verts,
     for (uint vid=0; vid<Corner_4B::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4B::verts[vid]-0.5, Corner_4B::verts[vid+1]-0.5, Corner_4B::verts[vid+2]-0.5));
 
 
+
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -356,53 +358,16 @@ void orient_corner_4C(std::vector<vec3d>              & verts,
                       SchemeInfo                      & info,
                       const vec3d                     & poly_centroid){
 
-    verts.reserve(Corner_4C::verts.size()/3);
-
-    for (uint vid=0; vid<Corner_4C::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4C::verts[vid]-0.5, Corner_4C::verts[vid+1]-0.5, Corner_4C::verts[vid+2]-0.5));
-
-    /*
-    switch(info.orientations[0])
-    {
-        case 0:  break; //DEFAULT
-        case 1:  rotate(verts, "y", -M_PI/2); break;
-        case 2:  rotate(verts, "y",  M_PI/2); break;
-        case 3:  rotate(verts, "y",  M_PI); break;
-        case 4:  rotate(verts, "z",  M_PI/2); break;
-        case 5:  rotate(verts, "z",  M_PI/2);
-                 rotate(verts, "x",  M_PI/2); break;
-        case 6:  rotate(verts, "x",  M_PI/2); break;
-        case 7:  rotate(verts, "x",  M_PI/2);
-                 rotate(verts, "z",  M_PI/2); break;
-        case 8:  rotate(verts, "z", -M_PI/2); break;
-        case 9:  rotate(verts, "z",  M_PI/2);
-                 rotate(verts, "x", -M_PI/2); break;
-        case 10: rotate(verts, "x", -M_PI/2); break;
-        case 11: rotate(verts, "x", -M_PI/2);
-                 rotate(verts, "z", -M_PI/2); break;
-    }*/
-
-    for (auto & v: verts){
-        v *= info.scale;
-        v += poly_centroid;
+    if(info.flag==0){
+        verts.reserve(Corner_4CA::verts.size()/3);
+        for (uint vid=0; vid<Corner_4CA::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4CA::verts[vid]-0.5, Corner_4CA::verts[vid+1]-0.5, Corner_4CA::verts[vid+2]-0.5));
+    }
+    else{
+        verts.reserve(Corner_4CB::verts.size()/3);
+        for (uint vid=0; vid<Corner_4CB::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4CB::verts[vid]-0.5, Corner_4CB::verts[vid+1]-0.5, Corner_4CB::verts[vid+2]-0.5));
     }
 
-    polys = Corner_4C::polys;
-}
 
-//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-CINO_INLINE
-void orient_corner_5A(std::vector<vec3d>              & verts,
-                      std::vector<std::vector<uint>>  & polys,
-                      SchemeInfo                      & info,
-                      const vec3d                     & poly_centroid){
-
-    verts.reserve(Corner_5A::verts.size()/3);
-
-    for (uint vid=0; vid<Corner_5A::verts.size(); vid+=3) verts.push_back(vec3d(Corner_5A::verts[vid]-0.5, Corner_5A::verts[vid+1]-0.5, Corner_5A::verts[vid+2]-0.5));
-
-
-    /*
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -444,7 +409,73 @@ void orient_corner_5A(std::vector<vec3d>              & verts,
                  rotate(verts, "z",  M_PI);  break;
         case 23: rotate(verts, "x",  M_PI/2);
                  rotate(verts, "z", -M_PI/2);   break;
-    }*/
+    }
+
+    for (auto & v: verts){
+        v *= info.scale;
+        v += poly_centroid;
+    }
+
+    if(info.flag==0) polys = Corner_4CA::polys;
+    else polys = Corner_4CB::polys;
+}
+
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+CINO_INLINE
+void orient_corner_5A(std::vector<vec3d>              & verts,
+                      std::vector<std::vector<uint>>  & polys,
+                      SchemeInfo                      & info,
+                      const vec3d                     & poly_centroid){
+
+    verts.reserve(Corner_5A::verts.size()/3);
+
+    for (uint vid=0; vid<Corner_5A::verts.size(); vid+=3) verts.push_back(vec3d(Corner_5A::verts[vid]-0.5, Corner_5A::verts[vid+1]-0.5, Corner_5A::verts[vid+2]-0.5));
+
+
+
+    switch(info.orientations[0])
+    {
+        case 0:  break; //DEFAULT
+        case 1:  rotate(verts, "y",  M_PI/2); break;
+        case 2:  rotate(verts, "y",  M_PI); break;
+        case 3:  rotate(verts, "y", -M_PI/2); break;
+        case 4:  rotate(verts, "x", -M_PI); break;
+        case 5:  rotate(verts, "x", -M_PI);
+                 rotate(verts, "y", -M_PI/2); break;
+        case 6:  rotate(verts, "x", -M_PI);
+                 rotate(verts, "y", -M_PI); break;
+        case 7:  rotate(verts, "x", -M_PI);
+                 rotate(verts, "y",  M_PI/2); break;
+        case 8:  rotate(verts, "z", -M_PI/2); break;
+        case 9:  rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 10: rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x",  M_PI); break;
+        case 11: rotate(verts, "z", -M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 12: rotate(verts, "z",  M_PI/2); break;
+        case 13: rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI/2); break;
+        case 14: rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x", -M_PI); break;
+        case 15: rotate(verts, "z",  M_PI/2);
+                 rotate(verts, "x",  M_PI/2); break;
+        case 16: rotate(verts, "x", -M_PI/2); break;
+        case 17: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z",  M_PI/2);  break;
+        case 18: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z",  M_PI);  break;
+        case 19: rotate(verts, "x", -M_PI/2);
+                 rotate(verts, "z", -M_PI/2);  break;
+        case 20: rotate(verts, "x",  M_PI/2); break;
+        case 21: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI/2);  break;
+        case 22: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z",  M_PI);  break;
+        case 23: rotate(verts, "x",  M_PI/2);
+                 rotate(verts, "z", -M_PI/2);   break;
+    }
 
     for (auto & v: verts){
         v *= info.scale;
@@ -464,6 +495,7 @@ void orient_corner_7A(std::vector<vec3d>              & verts,
     verts.reserve(Corner_7A::verts.size()/3);
 
     for (uint vid=0; vid<Corner_7A::verts.size(); vid+=3) verts.push_back(vec3d(Corner_7A::verts[vid]-0.5, Corner_7A::verts[vid+1]-0.5, Corner_7A::verts[vid+2]-0.5));
+
 
 
     switch(info.orientations[0])
@@ -526,7 +558,8 @@ void hex_transition_orient_3ref(      std::vector<vec3d>              & verts,
         case HexTransition::CORNER_4B:
             orient_corner_4B(verts, polys, info, poly_centroid);
             break;
-        case HexTransition::CORNER_4C:
+        case HexTransition::CORNER_4CA:
+        case HexTransition::CORNER_4CB:
             orient_corner_4C(verts, polys, info, poly_centroid);
             break;
         case HexTransition::CORNER_5A:
