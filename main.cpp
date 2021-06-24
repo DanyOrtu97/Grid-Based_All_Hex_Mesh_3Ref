@@ -460,6 +460,9 @@ int main(int argc, char *argv[])
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
+
+    outputMesh.save("Corner_7A.mesh");
+
     mesh.updateGL();
     outputMesh.updateGL();
 
