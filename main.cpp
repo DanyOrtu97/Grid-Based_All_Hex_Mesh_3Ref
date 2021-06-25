@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-/*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -433,15 +433,17 @@ int main(int argc, char *argv[])
 
                     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
+                    outputSurfaceMesh.save("test.obj");
+
                 }
 
                 c->updateGL();
             }
         }
     };
-*/
 
 
+/*
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -461,7 +463,7 @@ int main(int argc, char *argv[])
     gui_input.push_obj(&mesh);
 
 
-    outputMesh.save("Corner_7A.mesh");
+    //outputMesh.save("Corner_5A.mesh");
 
     mesh.updateGL();
     outputMesh.updateGL();
@@ -477,6 +479,7 @@ int main(int argc, char *argv[])
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
     }
+    */
 
 
 
