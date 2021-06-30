@@ -107,7 +107,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max-1; i++){
+    for(int i = 0; i < max; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -348,12 +348,12 @@ int main(int argc, char *argv[])
     }
 
 
-    /*
-    //balancing(true, mesh);
+
+    balancing(true, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-    */
+
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-
+/*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -441,9 +441,11 @@ int main(int argc, char *argv[])
             }
         }
     };
+*/
 
 
-/*
+
+
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -479,8 +481,6 @@ int main(int argc, char *argv[])
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
     }
-    */
-
 
 
 
