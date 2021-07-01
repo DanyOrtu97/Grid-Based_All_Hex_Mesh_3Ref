@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
     gui_input.push_obj(&mesh);
 
 
-    //outputMesh.save("Corner_5A.mesh");
+    //outputMesh.save("Two_faces.mesh");
 
     mesh.updateGL();
     outputMesh.updateGL();
@@ -479,6 +479,8 @@ int main(int argc, char *argv[])
         export_surface(outputMesh, outputSurfaceMesh);
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+
+        outputSurfaceMesh.save("surface.obj");
 
     }
 

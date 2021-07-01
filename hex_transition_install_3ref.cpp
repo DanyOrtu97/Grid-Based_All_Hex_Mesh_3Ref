@@ -1119,6 +1119,11 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
+                /*default: info.type = HexTransition::TWO_FACES;
+                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
+                         info.orientations.push_back(0);
+                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
+                         break;*/
             }
 
         }
