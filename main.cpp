@@ -36,22 +36,27 @@ void balancing(const bool                         weakly,
 
     std::vector<uint> adj_p2p;
 
+    int max_label = *std::max_element(poly_labels.begin(), poly_labels.end());
 
+    while(max_label > 1){
+        poly_labels = mesh.vector_poly_labels();
+        new_poly_labels = mesh.vector_poly_labels();
+        if (weakly){
+            for(uint pid=0; pid<poly_labels.size(); ++pid){
+                adj_p2p = mesh.adj_p2p(pid);
 
-    if (weakly){
-        for(uint pid=0; pid<poly_labels.size(); ++pid){
-            adj_p2p = mesh.adj_p2p(pid);
+                for(auto el: adj_p2p) if(poly_labels[pid] - poly_labels[el] > 1) new_poly_labels[el] = poly_labels[pid] -1;
 
-            if(poly_labels[pid] == 2)
-                for(auto el: adj_p2p) if(poly_labels[el] == 0) new_poly_labels[el] = 1;
-
+            }
         }
-    }
-    else{
-        // still to do
+        else{
+            // still to do
+        }
+        max_label--;
+        mesh.poly_apply_labels(new_poly_labels);
     }
 
-    mesh.poly_apply_labels(new_poly_labels);
+
     mesh.poly_color_wrt_label();
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
@@ -107,7 +112,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -326,7 +331,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/part.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -340,6 +345,7 @@ int main(int argc, char *argv[])
 
     std::map<vec3d, uint, vert_compare> vertices;
     std::vector<bool> transition_verts;
+
 
 
     for (auto v: mesh.vector_verts()){
@@ -480,7 +486,7 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-        outputSurfaceMesh.save("surface.obj");
+        //outputSurfaceMesh.save("surface.obj");
 
     }
 
