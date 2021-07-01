@@ -112,7 +112,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max-1; i++){
+    for(int i = 0; i < max-2; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/part.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -360,6 +360,7 @@ int main(int argc, char *argv[])
 
     apply_refinements(mesh, vertices, transition_verts);
 
+    //mesh.poly_fix_orientation();
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
@@ -439,7 +440,7 @@ int main(int argc, char *argv[])
 
                     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-                    outputSurfaceMesh.save("test.obj");
+                   // outputSurfaceMesh.save("test.obj");
 
                 }
 
@@ -470,6 +471,11 @@ int main(int argc, char *argv[])
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
+    for(uint iii=0; iii<outputMesh.num_verts(); iii++){
+        if(transition_verts[iii])
+            outputMesh.vert_data(iii).color = Color::RED();
+    }
+
 
     //outputMesh.save("Two_faces.mesh");
 
@@ -489,6 +495,7 @@ int main(int argc, char *argv[])
         //outputSurfaceMesh.save("surface.obj");
 
     }
+
 
 
 

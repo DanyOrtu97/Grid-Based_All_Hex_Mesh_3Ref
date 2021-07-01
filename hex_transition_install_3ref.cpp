@@ -549,10 +549,12 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
     else{ //2B or 2C
+
         vec3d v0 = m.vert(vertices[0]);
         vec3d v1 = m.vert(vertices[1]);
 
         if(v0.x() == v1.x() || v0.y() == v1.y() || v0.z() == v1.z()){ //2B
+            std::cout<<"2B"<<std::endl;
             for (auto vid: poly_verts_id){
                 if(v0.x() == v1.x())
                     if (m.vert(vid).x() == v0.x() && vid != vertices[0] && vid != vertices[1]){
@@ -573,6 +575,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
             changed_pid.push_back(pid);
         }
         else{ //2C
+            std::cout<<"2C"<<std::endl;
             std::vector<bool> t2_a = {true, false, false, false, false, false, true, false};
             std::vector<bool> t2_b = {false, false, false, true, false, true, false, false};
             std::vector<bool> t2_c = {false, false, true, false, true, false, false, false};
@@ -644,6 +647,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                n_free_edge++;
 
         if(n_free_edge == 4){ // 3B
+            std::cout<<"3B"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, true, false, true, false, false};
             std::vector<bool> t3_b = {false, true, false, false, true, false, false, true};
             std::vector<bool> t3_c = {true, false, false, false, false, true, true, false};
@@ -726,6 +730,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         }
         else{  //3C
+            std::cout<<"3C"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, false, false, true, false, true};
             std::vector<bool> t3_b = {false, true, false, false, true, false, true, false};
             std::vector<bool> t3_c = {false, false, true, false, false, true, false, true};
@@ -832,6 +837,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
         }
         else if(n_free_edge == 2){ // 4D, 4E
             if(faces_3_nodes==1){ // 4D
+                std::cout<<"4D"<<std::endl;
                 std::vector<bool> t4_a = {true, true, false, true, false, false, true, false};
                 std::vector<bool> t4_b = {true, false, true, true, false, true, false, false};
                 std::vector<bool> t4_c = {false, true, true, true, true, false, false, false};
@@ -969,6 +975,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
             poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
         }
         else{ //5B
+            std::cout<<"5B"<<std::endl;
             for(auto vid: poly_verts_id){
                 uint vid0 = m.edge_vert_ids(free_edge)[0];
                 uint vid1 = m.edge_vert_ids(free_edge)[1];
