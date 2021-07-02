@@ -34,7 +34,11 @@ void balancing(const bool                         weakly,
     std::vector<int> poly_labels = mesh.vector_poly_labels();
     std::vector<int> new_poly_labels = mesh.vector_poly_labels();
 
+    std::vector<uint> neighs;
+
     std::vector<uint> adj_p2p;
+    std::vector<uint> adj_e2p;
+    std::vector<uint> adj_v2p;
 
     int max_label = *std::max_element(poly_labels.begin(), poly_labels.end());
 
@@ -50,7 +54,31 @@ void balancing(const bool                         weakly,
             }
         }
         else{
-            // still to do
+            for(uint pid=0; pid<poly_labels.size(); ++pid){
+                neighs.clear();
+                adj_p2p = mesh.adj_p2p(pid);
+
+                for(auto poly: adj_p2p) neighs.push_back(poly);
+
+
+                for(auto edge: mesh.adj_p2e(pid)){
+                    adj_e2p = mesh.adj_e2p(edge);
+                    for(auto poly: adj_e2p) neighs.push_back(poly);
+                }
+
+
+                for(auto vertex: mesh.adj_p2v(pid)){
+                    adj_v2p = mesh.adj_v2p(vertex);
+                    for(auto poly: adj_v2p) neighs.push_back(poly);
+                }
+
+                std::sort(neighs.begin(), neighs.end());
+                neighs.erase(std::unique(neighs.begin(), neighs.end()), neighs.end());
+
+                for(auto el: neighs) if(poly_labels[pid] - poly_labels[el] > 1) new_poly_labels[el] = poly_labels[pid] -1;
+
+            }
+
         }
         max_label--;
         mesh.poly_apply_labels(new_poly_labels);
@@ -112,7 +140,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     std::vector<uint> vector_pid;
 
 
-    for(int i = 0; i < max-2; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -355,7 +383,7 @@ int main(int argc, char *argv[])
 
 
 
-    balancing(true, mesh);
+    balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
