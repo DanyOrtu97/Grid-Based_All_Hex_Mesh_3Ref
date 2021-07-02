@@ -139,6 +139,9 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
     std::vector<uint> vector_pid;
 
+/*
+    for(uint ii = 0; ii < poly_labels.size(); ii++) poly_labels[ii]++;
+    mesh.poly_apply_labels(poly_labels);*/
 
     for(int i = 0; i < max-1; i++){
         vector_pid.clear();
@@ -383,7 +386,7 @@ int main(int argc, char *argv[])
 
 
 
-    balancing(false, mesh);
+    //balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
@@ -485,7 +488,7 @@ int main(int argc, char *argv[])
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
 
-    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+    //hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -505,7 +508,7 @@ int main(int argc, char *argv[])
     }
 
 
-    //outputMesh.save("Two_faces.mesh");
+    mesh.save("bunnyRef.mesh");
 
     mesh.updateGL();
     outputMesh.updateGL();
