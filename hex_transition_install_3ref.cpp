@@ -1064,7 +1064,9 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 
             for (auto & vid: p) vid = v_map[verts.at(vid)];
 
-            m.poly_add(p);
+            int test_id = m.poly_idv(p);
+
+            if(test_id==-1) m.poly_add(p);
         }
 
     }
@@ -1142,7 +1144,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
-                /*default: info.type = HexTransition::TWO_FACES;
+                /*default: info.type = HexTransition::CORNER_7A;
                          info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                          info.orientations.push_back(0);
                          poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
