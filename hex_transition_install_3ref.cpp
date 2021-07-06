@@ -533,9 +533,9 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<bool>                    & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & changed_pid){
+                         std::vector<uint>                    & changed_pid,
+                         SchemeInfo                           & info){
 
-    SchemeInfo info;
 
     int eid=-1;
     for(uint e_id : m.adj_p2e(pid))
@@ -615,9 +615,9 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<bool>                    & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & changed_pid){
+                         std::vector<uint>                    & changed_pid,
+                         SchemeInfo                           & info){
 
-    SchemeInfo info;
 
     bool is_3a = false;
 
@@ -777,9 +777,9 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<bool>                    & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & changed_pid){
+                         std::vector<uint>                    & changed_pid,
+                         SchemeInfo                           & info){
 
-    SchemeInfo info;
     int fid=-1;
 
     for(uint f_id : m.adj_p2f(pid))
@@ -950,9 +950,9 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<bool>                    & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & changed_pid){
+                         std::vector<uint>                    & changed_pid,
+                         SchemeInfo                           & info){
 
-    SchemeInfo info;
     int free_edge = -1;
     int n_free_edge = 0;
 
@@ -1003,9 +1003,9 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
                          std::vector<bool>                    & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
-                         std::vector<uint>                    & changed_pid){
+                         std::vector<uint>                    & changed_pid,
+                         SchemeInfo                           & info){
 
-    SchemeInfo info;
 
     int free_edge = -1;
 
@@ -1099,23 +1099,39 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
     while(added_newverts){
         for (auto pid: polys){
             std::vector<uint> vertices;
+            std::vector<vec3d> poly_vec3d;
             std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
 
-            for(uint vid: poly_verts_id) if(transition_verts[vid]) vertices.push_back(vid);
+            for(uint vid: poly_verts_id){
+                if(transition_verts[vid]) vertices.push_back(vid);
+                poly_vec3d.push_back(m_in.vert(vid));
+            }
 
             SchemeInfo info;
 
+            if(poly_vec3d[0].z() > poly_vec3d[3].z() && poly_vec3d[0].x() < poly_vec3d[1].x()){
+                info.mask_type=0;
+            }
+            else if(poly_vec3d[0].x() < poly_vec3d[3].x() && poly_vec3d[0].z() < poly_vec3d[1].z()){
+                info.mask_type=1;
+            }
+            else if(poly_vec3d[0].z() < poly_vec3d[3].z() && poly_vec3d[0].x() > poly_vec3d[1].x()){
+                info.mask_type=2;
+            }
+            else if(poly_vec3d[0].x() > poly_vec3d[3].x() && poly_vec3d[0].z() > poly_vec3d[1].z()){
+                info.mask_type=3;
+            }
 
             switch (vertices.size()){
-                case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
+                case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
-                case 3: mark3vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
+                case 3: mark3vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
-                case 4: mark4vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
+                case 4: mark4vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
-                case 5: mark5vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
+                case 5: mark5vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
-                case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid);
+                case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
                 case 7: info.type = HexTransition::CORNER_7A;
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);

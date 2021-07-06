@@ -143,7 +143,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     for(uint ii = 0; ii < poly_labels.size(); ii++) poly_labels[ii]++;
     mesh.poly_apply_labels(poly_labels);*/
 
-    for(int i = 0; i < max-1; i++){
+    for(int i = 0; i < max; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/exp_4.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -386,12 +386,10 @@ int main(int argc, char *argv[])
 
 
 
-    //balancing(false, mesh);
+    balancing(true, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-
-    //mesh.poly_fix_orientation();
 
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
@@ -488,7 +486,7 @@ int main(int argc, char *argv[])
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
 
-    //hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 

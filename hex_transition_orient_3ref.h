@@ -55,7 +55,8 @@ struct SchemeInfo{
     HexTransition           type;
     double                  scale;
     std::vector<int>        orientations;
-    int                     flag; //usefull for 4C
+    int                     flag; //usefull for 4C (0, 1)
+    int                     mask_type; //(0: default, 1: wcc x 1, 2: wcc x 2, 3: wcc x 3)
 };
 
 
