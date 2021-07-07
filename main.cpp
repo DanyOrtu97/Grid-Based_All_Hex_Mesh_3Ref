@@ -42,7 +42,8 @@ void balancing(const bool                         weakly,
 
     int max_label = *std::max_element(poly_labels.begin(), poly_labels.end());
 
-    while(max_label > 1){
+    // we need a more loop to handle all difficult cases
+    while(max_label > 0){
         poly_labels = mesh.vector_poly_labels();
         new_poly_labels = mesh.vector_poly_labels();
         if (weakly){
@@ -143,7 +144,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     for(uint ii = 0; ii < poly_labels.size(); ii++) poly_labels[ii]++;
     mesh.poly_apply_labels(poly_labels);*/
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -300,7 +301,7 @@ void split27(const uint                                   pid,
     int conta = 0;
 
     for (auto & v : newverts){
-        std::map<vec3d, uint>::iterator pair = vertices.find(v);
+        std::map<vec3d, uint, vert_compare>::iterator pair = vertices.find(v);
         if (pair == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
@@ -347,11 +348,8 @@ void split27(const uint                                   pid,
     polys[26] = {newvertsid[58], newvertsid[59], newvertsid[43], newvertsid[42], newvertsid[62], newvertsid[63], newvertsid[47], newvertsid[46]};
 
 
-    for(auto p : polys){
-        int test_id = mesh.poly_idv(p);
+    for(auto p : polys) mesh.poly_add(p);
 
-        if(test_id==-1) mesh.poly_add(p);
-    }
 
     mesh.poly_remove(pid);
 }
@@ -390,11 +388,13 @@ int main(int argc, char *argv[])
 
 
 /*
-    balancing(true, mesh);
+    balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
 */
+
+
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
@@ -469,11 +469,19 @@ int main(int argc, char *argv[])
                 if(outputMesh.num_polys() > 0 ){
                     Quadmesh<> outputSurfaceMesh;
 
-                    export_surface(mesh, outputSurfaceMesh);
+                    export_surface(outputMesh, outputSurfaceMesh);
 
                     std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-                    //outputSurfaceMesh.save("cube2exp2mesh.obj");
+                    bool manifold = true;
+
+                    for (auto eid: outputSurfaceMesh.vector_edges()){
+                        if(! outputSurfaceMesh.edge_is_manifold(eid))
+                            manifold = false;
+                    }
+
+                    std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
+                    outputSurfaceMesh.save("cube2manifold.obj");
 
                 }
 
@@ -482,8 +490,8 @@ int main(int argc, char *argv[])
         }
     };
 
+    /*
 
-/*
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
@@ -509,7 +517,7 @@ int main(int argc, char *argv[])
     }
 
 
-    //mesh.save("bunnyRef.mesh");
+
 
     mesh.updateGL();
     outputMesh.updateGL();
@@ -524,12 +532,22 @@ int main(int argc, char *argv[])
 
         std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
 
-        outputSurfaceMesh.save("exp4exp.obj");
+
+        bool manifold = true;
+
+        for (auto eid: outputSurfaceMesh.vector_edges()){
+            if(! outputSurfaceMesh.edge_is_manifold(eid))
+                manifold = false;
+        }
+
+        std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
+
+        //outputSurfaceMesh.save("batman.obj");
 
     }
 
+    //outputMesh.save("bimbaref.mesh");
 */
-
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);

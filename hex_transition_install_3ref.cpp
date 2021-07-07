@@ -42,7 +42,7 @@ struct vert_compare {
     bool operator()(const vec3d & a,
                     const vec3d & b) const
     {
-       double eps = 1e-6;
+       double eps = 1e-3;
        if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
        {
            return true;
@@ -969,6 +969,7 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
     if(free_edge != -1){ // 5A, 5B
         if(n_free_edge == 2){ // 5A
+            std::cout<<"5A"<<std::endl;
             info.type = HexTransition::CORNER_5A;
             info.scale = m.edge_length(m.adj_p2e(pid)[0]);
             setOrientationInfo5A(info, transition_verts, poly_verts_id);
@@ -1064,9 +1065,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 
             for (auto & vid: p) vid = v_map[verts.at(vid)];
 
-            int test_id = m.poly_idv(p);
-
-            if(test_id==-1) m.poly_add(p);
+            m.poly_add(p);
         }
 
     }
@@ -1135,7 +1134,8 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         break;
                 case 6: mark6vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);
                         break;
-                case 7: info.type = HexTransition::CORNER_7A;
+                case 7: //std::cout<<"7A"<<std::endl;
+                        info.type = HexTransition::CORNER_7A;
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         setOrientationInfo7(info, transition_verts, poly_verts_id);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
@@ -1144,7 +1144,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                         info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
                         break;
-                /*default: info.type = HexTransition::CORNER_7A;
+                /*default: info.type = HexTransition::TWO_FACES;
                          info.scale = m_in.edge_length(m_in.adj_p2e(pid)[0]);
                          info.orientations.push_back(0);
                          poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
