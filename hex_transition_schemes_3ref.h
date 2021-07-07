@@ -69,7 +69,7 @@
  *
  * Steps (2,3) can be done with cinolib::hex_transition_install_3ref.
  *
- * Hex_transition_install_3ref must be exectuted since all the hanging nodes are solved
+ * Hex_transition_install_3ref must be executed since all the hanging nodes are solved
  */
 
 namespace cinolib{

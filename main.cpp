@@ -364,7 +364,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube2.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -387,12 +387,12 @@ int main(int argc, char *argv[])
     }
 
 
-/*
+
     balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-*/
+
 
 
     mesh.print_quality();
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
      * Tool for creating new polys by mouse click
      */
 
-
+/*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -489,8 +489,8 @@ int main(int argc, char *argv[])
             }
         }
     };
+*/
 
-    /*
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -542,12 +542,12 @@ int main(int argc, char *argv[])
 
         std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
 
-        //outputSurfaceMesh.save("batman.obj");
+        outputSurfaceMesh.save("bunnyref.obj");
 
     }
 
-    //outputMesh.save("bimbaref.mesh");
-*/
+    outputMesh.save("bunnyref.mesh");
+
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
