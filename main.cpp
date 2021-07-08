@@ -196,6 +196,42 @@ void split27(const uint                                   pid,
              std::map<vec3d, uint, vert_compare>        & vertices,
              std::vector<bool>                          & transition_verts){
 
+
+    SchemeInfo info;
+
+    info.type = HexTransition::FULL;
+    info.scale = mesh.edge_length(mesh.adj_p2e(pid)[0]);
+
+
+    std::vector<vec3d>              verts;
+    std::vector<std::vector<uint>>  polys;
+
+    vec3d poly_centroid = mesh.poly_centroid(pid);
+
+    hex_transition_orient_3ref(verts, polys, info, poly_centroid);
+
+    //merge vertices
+    for (auto & v : verts){
+        if (vertices.find(v) == vertices.end()){
+            uint fresh_vid = mesh.vert_add(v);
+            vertices[v] = fresh_vid;
+            transition_verts.push_back(false);
+        }
+    }
+
+    if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+
+    //merge polys
+    for (uint poly=0; poly<polys.size(); ++poly){
+        auto p = polys.at(poly);
+
+        for (auto & vid: p) vid = vertices[verts.at(vid)];
+
+        mesh.poly_add(p);
+    }
+    /*
+
+
     //vector for the new polys
     std::vector<std::vector<uint>> polys(27);
 
@@ -312,7 +348,7 @@ void split27(const uint                                   pid,
         conta++;
     }
 
-    //update vertices and faces to apply templates
+    //update vertices to apply templates
     if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
 
 
@@ -350,7 +386,7 @@ void split27(const uint                                   pid,
 
     for(auto p : polys) mesh.poly_add(p);
 
-
+*/
     mesh.poly_remove(pid);
 }
 
@@ -380,9 +416,8 @@ int main(int argc, char *argv[])
     std::vector<bool> transition_verts;
 
 
-
-    for (auto v: mesh.vector_verts()){
-        vertices.insert(std::pair<vec3d, uint>(v, vertices.size()));
+    for (uint vid=0; vid<mesh.num_verts(); ++vid){
+        vertices[mesh.vert(vid)] = vid;
         transition_verts.push_back(false);
     }
 
@@ -489,9 +524,9 @@ int main(int argc, char *argv[])
             }
         }
     };
+
+
 */
-
-
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
@@ -547,6 +582,7 @@ int main(int argc, char *argv[])
     }
 
     //outputMesh.save("bunnyref.mesh");
+
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);

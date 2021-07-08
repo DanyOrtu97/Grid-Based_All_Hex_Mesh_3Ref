@@ -42,7 +42,7 @@ struct vert_compare {
     bool operator()(const vec3d & a,
                     const vec3d & b) const
     {
-       double eps = 1e-4;
+       double eps = 1e-6;
        if(a.x()-b.x() < 0.0 && abs(a.x()-b.x()) > eps)
        {
            return true;
@@ -554,6 +554,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
         vec3d v1 = m.vert(vertices[1]);
 
         if(v0.x() == v1.x() || v0.y() == v1.y() || v0.z() == v1.z()){ //2B
+            std::cout<<"2b"<<std::endl;
             for (auto vid: poly_verts_id){
                 if(v0.x() == v1.x())
                     if (m.vert(vid).x() == v0.x() && vid != vertices[0] && vid != vertices[1]){
@@ -574,6 +575,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
             changed_pid.push_back(pid);
         }
         else{ //2C
+            std::cout<<"2c"<<std::endl;
             std::vector<bool> t2_a = {true, false, false, false, false, false, true, false};
             std::vector<bool> t2_b = {false, false, false, true, false, true, false, false};
             std::vector<bool> t2_c = {false, false, true, false, true, false, false, false};
@@ -623,10 +625,11 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
     vec3d v1 = m.vert(vertices[1]);
     vec3d v2 = m.vert(vertices[2]);
 
-    if((v0.x() == v1.x() && v1.x() == v2.x() && v2.x() == v0.x()) ||
-       (v0.y() == v1.y() && v1.y() == v2.y() && v2.y() == v0.y()) ||
-       (v0.z() == v1.z() && v1.z() == v2.z() && v2.z() == v0.z()))
-        is_3a=true;
+
+    if((round(v0.x()) == round(v1.x()) && round(v1.x()) == round(v2.x()) && round(v2.x()) == round(v0.x())) ||
+       (round(v0.y()) == round(v1.y()) && round(v1.y()) == round(v2.y()) && round(v2.y()) == round(v0.y())) ||
+       (round(v0.z()) == round(v1.z()) && round(v1.z()) == round(v2.z()) && round(v2.z()) == round(v0.z()))) is_3a=true;
+
 
 
     if(is_3a){ //3A
@@ -645,6 +648,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                n_free_edge++;
 
         if(n_free_edge == 4){ // 3B
+            std::cout<<"3b"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, true, false, true, false, false};
             std::vector<bool> t3_b = {false, true, false, false, true, false, false, true};
             std::vector<bool> t3_c = {true, false, false, false, false, true, true, false};
@@ -727,6 +731,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         }
         else{  //3C
+            std::cout<<"3c"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, false, false, true, false, true};
             std::vector<bool> t3_b = {false, true, false, false, true, false, true, false};
             std::vector<bool> t3_c = {false, false, true, false, false, true, false, true};
@@ -833,6 +838,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
         }
         else if(n_free_edge == 2){ // 4D, 4E
             if(faces_3_nodes==1){ // 4D
+                std::cout<<"4d"<<std::endl;
                 std::vector<bool> t4_a = {true, true, false, true, false, false, true, false};
                 std::vector<bool> t4_b = {true, false, true, true, false, true, false, false};
                 std::vector<bool> t4_c = {false, true, true, true, true, false, false, false};
@@ -915,7 +921,8 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
 
             }
-            else{ //4E    
+            else{ //4E
+                std::cout<<"4e"<<std::endl;
                 for(auto vid: poly_verts_id){
                     uint vid0 = m.edge_vert_ids(free_edge)[0];
                     uint vid1 = m.edge_vert_ids(free_edge)[1];
@@ -1141,7 +1148,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
         if(changed_pid.size() > 0){
             added_newverts=true;
-
+            std::cout<<"shit"<<std::endl;
             //reset of the auxiliar vector
             changed_pid.clear();
             poly2scheme.clear();
