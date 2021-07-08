@@ -1076,7 +1076,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
     m_out = m_in;
 
     std::unordered_map<uint, SchemeInfo> poly2scheme;
-    std::vector<uint> changed_pid;
+    std::vector<uint> changed_pid; //controls the changed vertices for each pid
 
     bool added_newverts = true;
 
@@ -1091,8 +1091,8 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
     while(added_newverts){
         for (auto pid: polys){
-            std::vector<uint> vertices;
-            std::vector<vec3d> poly_vec3d;
+            std::vector<uint> vertices; //controls the number of "true" vertices for each poly
+            std::vector<vec3d> poly_vec3d; //controls the orientation of the input mesh cubes
             std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
 
             for(uint vid: poly_verts_id){
@@ -1141,10 +1141,10 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
         if(changed_pid.size() > 0){
             added_newverts=true;
+
             //reset of the auxiliar vector
             changed_pid.clear();
             poly2scheme.clear();
-
         }
         else{
             merge_schemes_into_mesh(m_out, poly2scheme);
@@ -1157,16 +1157,6 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
             added_newverts=false;
         }
-
-        /*
-        //insert all the neighboors of each pid
-        polys.clear();
-        for(auto c_pid: changed_pid){
-            for(auto poly_id: m_in.adj_p2p(c_pid)){ //non sono tutti i neighbors (da aggiustare)
-                polys.push_back(poly_id);
-            }
-        }
-        */
     }
 }
 

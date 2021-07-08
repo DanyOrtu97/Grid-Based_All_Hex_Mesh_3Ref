@@ -542,11 +542,11 @@ int main(int argc, char *argv[])
 
         std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
 
-        outputSurfaceMesh.save("bunnyref.obj");
+        //outputSurfaceMesh.save("bunnyref.obj");
 
     }
 
-    outputMesh.save("bunnyref.mesh");
+    //outputMesh.save("bunnyref.mesh");
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
