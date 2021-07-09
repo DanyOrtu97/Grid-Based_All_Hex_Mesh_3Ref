@@ -144,7 +144,7 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     for(uint ii = 0; ii < poly_labels.size(); ii++) poly_labels[ii]++;
     mesh.poly_apply_labels(poly_labels);*/
 
-    for(int i = 0; i < max-1; i++){
+    for(int i = 0; i < max; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -400,7 +400,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube6x6.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -423,11 +423,10 @@ int main(int argc, char *argv[])
 
 
 
-    balancing(false, mesh);
+    //balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
-
 
 
     mesh.print_quality();
@@ -472,6 +471,7 @@ int main(int argc, char *argv[])
 
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
+                //mesh.save("cube6x6.mesh");
 
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
@@ -526,8 +526,8 @@ int main(int argc, char *argv[])
     };
 
 
-*/
 
+*/
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
@@ -581,9 +581,8 @@ int main(int argc, char *argv[])
 
     }
 
+
     //outputMesh.save("bunnyref.mesh");
-
-
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
