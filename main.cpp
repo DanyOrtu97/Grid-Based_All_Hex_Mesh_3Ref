@@ -440,8 +440,8 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
-
 /*
+
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
                     }
 
                     std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
-                    outputSurfaceMesh.save("cube2manifold.obj");
+                    //outputSurfaceMesh.save("cube2manifold.obj");
 
                 }
 
@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
 
         std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
 
-        //outputSurfaceMesh.save("bunnyref.obj");
+        //outputSurfaceMesh.save("duckshit.obj");
 
     }
 
