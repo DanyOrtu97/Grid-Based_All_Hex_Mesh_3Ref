@@ -56,8 +56,8 @@ class TwseventreeNode
 class Twseventree
 {
     public:
-        explicit Twseventree(const uint max_depth      = 7,
-                             const uint items_per_leaf = 10);
+        explicit Twseventree(const uint max_depth      = 3,
+                             const uint items_per_leaf = 50);
         virtual ~Twseventree();
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -76,7 +76,11 @@ void balancing(const bool                         weakly,
                 std::sort(neighs.begin(), neighs.end());
                 neighs.erase(std::unique(neighs.begin(), neighs.end()), neighs.end());
 
-                for(auto el: neighs) if(poly_labels[pid] - poly_labels[el] > 1) new_poly_labels[el] = poly_labels[pid] -1;
+                for(auto el: neighs) if(poly_labels[pid] - poly_labels[el] > 1){
+                    std::cout<<"Modificato"<<std::endl;
+                    new_poly_labels[el] = poly_labels[pid] -1;
+
+                }
 
             }
 
@@ -140,11 +144,8 @@ void apply_refinements(Hexmesh<M,V,E,F,P>                       & mesh,
     int max = *std::max_element(poly_labels.begin(), poly_labels.end());
     std::vector<uint> vector_pid;
 
-/*
-    for(uint ii = 0; ii < poly_labels.size(); ii++) poly_labels[ii]++;
-    mesh.poly_apply_labels(poly_labels);*/
 
-    for(int i = 0; i < max; i++){
+    for(int i = 0; i < max-1; i++){
         vector_pid.clear();
         std::cout << std::endl;
         std::cout<< "Refinements of level " << i+1 << std::endl;
@@ -400,7 +401,7 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube6x6.mesh";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunnygrid.mesh";
     DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
 
@@ -422,8 +423,7 @@ int main(int argc, char *argv[])
     }
 
 
-
-    //balancing(false, mesh);
+    balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
@@ -577,12 +577,12 @@ int main(int argc, char *argv[])
 
         std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
 
-        //outputSurfaceMesh.save("duckshit.obj");
+        outputSurfaceMesh.save("bunnyref2.obj");
 
     }
 
 
-    //outputMesh.save("bunnyref.mesh");
+    outputMesh.save("bunnyref2.mesh");
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
