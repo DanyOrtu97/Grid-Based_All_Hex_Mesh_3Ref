@@ -160,7 +160,7 @@ class Twseventree
         uint max_depth;      // maximum allowed depth of the tree
         uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
         uint tree_depth = 0; // actual depth of the tree
-        bool print_debug_info = false;
+        bool print_debug_info = true;
 
         // SUPPORT STRUCTURES ::::::::::::::::::::::::::::::::::::::::::::::::::::
 

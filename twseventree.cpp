@@ -191,6 +191,28 @@ void Twseventree::subdivide(TwseventreeNode * node)
     // create children octants
     vec3d min = node->bbox.min;
     vec3d max = node->bbox.max;
+
+
+     if(this->root == node){
+
+        double x = max.x();
+        double y = max.y();
+        double z = max.z();
+
+        std::vector<double> maxV;
+        maxV.push_back(x);
+        maxV.push_back(y);
+        maxV.push_back(z);
+
+        double pmax = *std::max_element(maxV.begin(), maxV.end());
+
+        node->bbox.push(vec3d(pmax, pmax, pmax));
+        node->bbox.push(vec3d(-pmax, -pmax, -pmax));
+
+        max = node->bbox.max;
+        min = node->bbox.min;
+    }
+
     vec3d avg1 = (max + min)/3;
     vec3d avg2 = avg1*2;
 
