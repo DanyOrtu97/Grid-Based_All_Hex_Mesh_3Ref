@@ -41,8 +41,8 @@ class DrawableTwseventree : public Twseventree, public DrawableObject
 {
     public:
 
-        explicit DrawableTwseventree(const uint max_depth      = 7,
-                                    const uint items_per_leaf = 3);
+        explicit DrawableTwseventree(const uint max_depth      = 3,
+                                    const uint items_per_leaf = 50);
 
         ~DrawableTwseventree() {}
 
