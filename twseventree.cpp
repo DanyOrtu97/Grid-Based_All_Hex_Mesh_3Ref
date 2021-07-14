@@ -213,8 +213,8 @@ void Twseventree::subdivide(TwseventreeNode * node)
         min = node->bbox.min;
     }
 
-    vec3d avg1 = min + ((vec3d(abs(max.x()), abs(max.y()), abs(max.z())) + vec3d(abs(min.x()), abs(min.y()), abs(min.z())) )/3);
-    vec3d avg2 = max - ((vec3d(abs(max.x()), abs(max.y()), abs(max.z())) + vec3d(abs(min.x()), abs(min.y()), abs(min.z())) )/3);
+    vec3d avg1 = min + ((vec3d(abs(max.x() - min.x()), abs(max.y() - min.y()), abs(max.z() - min.z())))/3);
+    vec3d avg2 = max - ((vec3d(abs(max.x() - min.x()), abs(max.y() - min.y()), abs(max.z() - min.z())))/3);
 
 
     node->children[0] = new TwseventreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg1[0], avg1[1], avg1[2])));
