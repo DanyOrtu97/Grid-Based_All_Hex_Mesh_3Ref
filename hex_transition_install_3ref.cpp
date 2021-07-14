@@ -1144,6 +1144,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
             added_newverts=true;
             //reset of the auxiliar vector
             changed_pid.clear();
+            std::cout<<"sdfnsld"<<std::endl;
             poly2scheme.clear();
         }
         else{

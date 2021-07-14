@@ -17,6 +17,8 @@
 #include <cinolib/io/io_utilities.h>
 #include <cinolib/export_surface.h>
 #include <numeric>
+#include <cinolib/export_surface.h>
+#include <drawable_twseventree.h>
 
 
 namespace cinolib
@@ -236,6 +238,87 @@ void split27(const uint                                   pid,
     mesh.poly_remove(pid);
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+void export_hexmesh(const Twseventree                                & grid,
+                          Hexmesh <M, V, E, F, P>                    & output,
+                          std::map<vec3d, uint, vert_compare>        & v_map,
+                          std::vector<bool>                          & transition_verts){
+
+    std::vector<uint>               poly;
+    std::vector<std::vector<uint>>  polys;
+    std::vector<vec3d>              verts;
+
+    std::vector<vec3d> true_verts;
+
+
+    for (auto el: grid.leaves){
+        if(el->father->is_inner){
+            for(auto & vert: el->father->bbox.corners()){
+                true_verts.push_back(vert);
+            }
+        }
+    }
+
+
+    uint conta_vert=0;
+    for (auto el: grid.leaves){
+        for(auto & vert : el->bbox.corners()){
+            verts.push_back(vert);
+            poly.push_back(conta_vert);
+            conta_vert++;
+        }
+        polys.push_back(poly);
+        poly.clear();
+    }
+
+
+    //merge vertices
+    for (auto & v : verts){
+        if (v_map.find(v) == v_map.end()){
+            uint fresh_vid = output.vert_add(v);
+            v_map[v] = fresh_vid;
+            transition_verts.push_back(false);
+        }
+    }
+
+
+    for(auto & vert: true_verts) transition_verts[v_map[vert]]=true;
+
+    //merge polys
+    for (uint poly=0; poly<polys.size(); ++poly){
+        auto p = polys.at(poly);
+
+        for (auto & vid: p){
+            vid = v_map[verts.at(vid)];
+        }
+
+        output.poly_add(p);
+    }
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+void balancing_gridmesh(Hexmesh <M, V, E, F, P>    & output){
+
+    std::vector<int> l = output.vector_vert_labels();
+
+    for(int vid=0; vid < output.num_verts(); vid++){
+        for(int i=0; i < output.num_polys(); i++){
+            for(int j=0; j < output.num_polys(); j++){
+                if(output.poly_contains_vert(i, vid) && output.poly_contains_vert(j, vid)){
+                    if(output.edge_length(output.adj_p2e(i)[0]) > 3 * output.edge_length(output.adj_p2e(j)[0])){
+
+                    }
+                    else if(output.edge_length(output.adj_p2e(j)[0]) > 3 * output.edge_length(output.adj_p2e(i)[0])){
+
+                    }
+                }
+            }
+        }
+    }
+}
+
 }
 
 
@@ -246,9 +329,20 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/cube9x9.mesh";
-    DrawableHexmesh<> mesh(s.c_str());
+
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/part.off";
+
+    DrawablePolygonmesh<> m(s.c_str());
+    DrawableTwseventree grid(3, 50);
+
+    grid.build_from_mesh_polys(m);
+
+    DrawableHexmesh<> mesh;
+
+
+    //DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
+
 
     GLcanvas gui_input, gui_output;
 
@@ -262,19 +356,23 @@ int main(int argc, char *argv[])
     std::vector<bool> transition_verts;
 
 
-    for (uint vid=0; vid<mesh.num_verts(); ++vid){
+    /*for (uint vid=0; vid<mesh.num_verts(); ++vid){
         vertices[mesh.vert(vid)] = vid;
         transition_verts.push_back(false);
-    }
+    }*/
 
 
+    export_hexmesh(grid, mesh, vertices, transition_verts);
+    //balancing_gridmesh(mesh);
 
+
+/*
     balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
 
-
+*/
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
