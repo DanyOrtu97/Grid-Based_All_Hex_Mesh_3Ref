@@ -97,7 +97,7 @@ void Twseventree::build()
     std::iota(root->item_indices.begin(),root->item_indices.end(),0);
     for(auto it : items) root->bbox.push(it->aabb);
 
-    root->bbox.scale(1.5); // enlarge bbox to account for queries outside legal area.
+    //root->bbox.scale(1.5); // enlarge bbox to account for queries outside legal area.
                            // this should disappear eventually....
 
     if(root->item_indices.size()<items_per_leaf || max_depth==1)
@@ -195,22 +195,35 @@ void Twseventree::subdivide(TwseventreeNode * node)
 
     if(this->root == node){
 
-        double x = max.x();
-        double y = max.y();
-        double z = max.z();
+        vec3d max_lato = (vec3d(abs(max.x() - min.x()), abs(max.y() - min.y()), abs(max.z() - min.z())));
 
-        std::vector<double> maxV;
-        maxV.push_back(x);
-        maxV.push_back(y);
-        maxV.push_back(z);
+        double diff_x;
+        double diff_y;
+        double diff_z;
 
-        double pmax = *std::max_element(maxV.begin(), maxV.end());
+        if(max_lato.x() > max_lato.y() && max_lato.x() > max_lato.z()){
+            diff_y = max_lato.x() - max_lato.y();
+            diff_z = max_lato.x() - max_lato.z();
+            node->bbox.push(vec3d(min.x(), min.y() - (diff_y/2),  min.z() - (diff_z/2)));
+            node->bbox.push(vec3d(max.x(), max.y() + (diff_y/2),  max.z() + (diff_z/2)));
+        }
+        else if(max_lato.y() > max_lato.x() && max_lato.y() > max_lato.z()){
+            diff_x = max_lato.y() - max_lato.x();
+            diff_z = max_lato.y() - max_lato.z();
+            node->bbox.push(vec3d(min.x() - (diff_x/2), min.y(), min.z() - (diff_z/2)));
+            node->bbox.push(vec3d(max.x() + (diff_x/2), max.y(), max.z() + (diff_z/2)));
+        }
+        else{
+            diff_x = max_lato.z() - max_lato.x();
+            diff_y = max_lato.z() - max_lato.y();
+            node->bbox.push(vec3d(min.x() - (diff_x/2),  min.y() - (diff_y/2), min.z()));
+            node->bbox.push(vec3d(max.x() + (diff_x/2),  max.y() + (diff_y/2), max.z()));
+        }
 
-        node->bbox.push(vec3d(pmax, pmax, pmax));
-        node->bbox.push(vec3d(-pmax, -pmax, -pmax));
 
         max = node->bbox.max;
         min = node->bbox.min;
+
     }
 
     vec3d avg1 = min + ((vec3d(abs(max.x() - min.x()), abs(max.y() - min.y()), abs(max.z() - min.z())))/3);

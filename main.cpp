@@ -238,27 +238,17 @@ void split27(const uint                                   pid,
     mesh.poly_remove(pid);
 }
 
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
 void export_hexmesh(const Twseventree                                & grid,
-                          Hexmesh <M, V, E, F, P>                    & output,
+                          Hexmesh<M,V,E,F,P>                         & output,
                           std::map<vec3d, uint, vert_compare>        & v_map,
                           std::vector<bool>                          & transition_verts){
 
     std::vector<uint>               poly;
     std::vector<std::vector<uint>>  polys;
     std::vector<vec3d>              verts;
-
-    std::vector<vec3d> true_verts;
-
-
-    for (auto el: grid.leaves){
-        if(el->father->is_inner){
-            for(auto & vert: el->father->bbox.corners()){
-                true_verts.push_back(vert);
-            }
-        }
-    }
 
 
     uint conta_vert=0;
@@ -283,8 +273,6 @@ void export_hexmesh(const Twseventree                                & grid,
     }
 
 
-    for(auto & vert: true_verts) transition_verts[v_map[vert]]=true;
-
     //merge polys
     for (uint poly=0; poly<polys.size(); ++poly){
         auto p = polys.at(poly);
@@ -295,28 +283,96 @@ void export_hexmesh(const Twseventree                                & grid,
 
         output.poly_add(p);
     }
+
+    for(uint pid=0; pid<output.num_polys(); ++pid){
+
+        for(auto vid: output.poly_verts_id(pid)){
+
+            for(auto poly: output.adj_v2p(vid)){
+
+                double a = round(output.edge_length(output.adj_p2e(poly)[0]) *1000.0)/1000.0;
+                double b = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+
+                if(a>b) transition_verts[vid] = true;
+
+            }
+        }
+    }
+
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
-void balancing_gridmesh(Hexmesh <M, V, E, F, P>    & output){
+void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & output,
+                        std::map<vec3d, uint, vert_compare>        & v_map,
+                        std::vector<bool>                          & transition_verts,
+                        int                                          levels){
 
-    std::vector<int> l = output.vector_vert_labels();
+    while(levels > 0){
+        std::vector<uint> split_pids_vector;
 
-    for(int vid=0; vid < output.num_verts(); vid++){
-        for(int i=0; i < output.num_polys(); i++){
-            for(int j=0; j < output.num_polys(); j++){
-                if(output.poly_contains_vert(i, vid) && output.poly_contains_vert(j, vid)){
-                    if(output.edge_length(output.adj_p2e(i)[0]) > 3 * output.edge_length(output.adj_p2e(j)[0])){
 
-                    }
-                    else if(output.edge_length(output.adj_p2e(j)[0]) > 3 * output.edge_length(output.adj_p2e(i)[0])){
+        for(uint pid=0; pid<output.num_polys(); ++pid){
+            std::vector<uint> vids = output.poly_verts_id(pid);
 
-                    }
+            //vertices
+            for(auto vid: vids){
+                std::vector<uint> pids = output.adj_v2p(vid);
+
+                for(auto poly_adj: pids){
+
+                    double a = round(output.edge_length(output.adj_p2e(poly_adj)[0]) *1000.0)/1000.0;
+                    double b = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+
+                    if(a > 3.01*b) split_pids_vector.push_back(poly_adj);
+
+
+                    /*std::vector<uint> edge_pids = output.adj_v2p(poly_adj);
+
+                    for(auto poly_adj_edge: edge_pids){
+                        double ae = round(output.edge_length(output.adj_p2e(poly_adj_edge)[0]) *1000.0)/1000.0;
+                        double be = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+
+                        if(ae > 3.01*be) split_pids_vector.push_back(poly_adj_edge);
+                    }*/
+
                 }
+            }
+
+        }
+
+
+        std::sort(split_pids_vector.begin(), split_pids_vector.end());
+        split_pids_vector.erase(std::unique(split_pids_vector.begin(), split_pids_vector.end()), split_pids_vector.end());
+
+        for(auto el: split_pids_vector) split27(el, output, v_map, transition_verts);
+        levels--;
+    }
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+template<class M, class V, class E, class F, class P>
+bool check_balancing(Hexmesh<M,V,E,F,P> & output){
+
+    for(uint pid=0; pid<output.num_polys(); ++pid){
+        std::vector<uint> vids = output.poly_verts_id(pid);
+
+        for(auto vid: vids){
+            std::vector<uint> pids = output.adj_v2p(vid);
+
+            for(auto poly_adj: pids){
+
+                double a = round(output.edge_length(output.adj_p2e(poly_adj)[0]) *1000.0)/1000.0;
+                double b = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+
+                if(a > 3.01*b) return false;
+
             }
         }
     }
+    return true;
+
 }
 
 }
@@ -330,10 +386,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/part.off";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
     DrawablePolygonmesh<> m(s.c_str());
-    DrawableTwseventree grid(3, 50);
+    int max_depth=4;
+    DrawableTwseventree grid(max_depth, 50);
 
     grid.build_from_mesh_polys(m);
 
@@ -363,8 +420,12 @@ int main(int argc, char *argv[])
 
 
     export_hexmesh(grid, mesh, vertices, transition_verts);
-    //balancing_gridmesh(mesh);
 
+    //mesh.save("bunny_prebal.mesh");
+
+    balancing_gridmesh(mesh, vertices, transition_verts, max_depth-3);
+
+    //std::cout<< "Balancing check: "<<check_balancing(mesh) <<std::endl;
 
 /*
     balancing(false, mesh);
@@ -478,7 +539,7 @@ int main(int argc, char *argv[])
     std::cout<<std::endl;
     std::cout<< "Template application in progress ...." <<std::endl;
 
-    hex_transition_install_3ref(mesh, transition_verts, outputMesh);
+    //hex_transition_install_3ref(mesh, transition_verts, outputMesh);
 
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
@@ -492,9 +553,9 @@ int main(int argc, char *argv[])
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
-    for(uint iii=0; iii<outputMesh.num_verts(); iii++){
+    for(uint iii=0; iii<mesh.num_verts(); iii++){
         if(transition_verts[iii])
-            outputMesh.vert_data(iii).color = Color::RED();
+            mesh.vert_data(iii).color = Color::RED();
     }
 
 
