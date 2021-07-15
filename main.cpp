@@ -327,18 +327,30 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & output,
                     if(a > 3.01*b) split_pids_vector.push_back(poly_adj);
 
 
-                    /*std::vector<uint> edge_pids = output.adj_v2p(poly_adj);
 
-                    for(auto poly_adj_edge: edge_pids){
-                        double ae = round(output.edge_length(output.adj_p2e(poly_adj_edge)[0]) *1000.0)/1000.0;
-                        double be = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+                    //edge polys
+                    std::vector<uint> vid_pids = output.poly_verts_id(poly_adj);
 
-                        if(ae > 3.01*be) split_pids_vector.push_back(poly_adj_edge);
-                    }*/
+                    for(auto vid_pid: vid_pids){
+
+                        std::vector<uint> pids_pids = output.adj_v2p(vid_pid);
+
+                        for(auto poly_adj_pid: pids_pids){
+                            double ae = round(output.edge_length(output.adj_p2e(poly_adj_pid)[0]) *1000.0)/1000.0;
+                            double be = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
+
+                            if(ae > 3.01*be){
+
+                                if(output.poly_contains_edge(poly_adj, vid, vid_pid))
+
+                                    split_pids_vector.push_back(poly_adj_pid);
+
+                            }
+                        }
+                    }
 
                 }
             }
-
         }
 
 
@@ -389,8 +401,8 @@ int main(int argc, char *argv[])
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=4;
-    DrawableTwseventree grid(max_depth, 50);
+    int max_depth=5;
+    DrawableTwseventree grid(max_depth, 20);
 
     grid.build_from_mesh_polys(m);
 
@@ -553,9 +565,9 @@ int main(int argc, char *argv[])
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
-    for(uint iii=0; iii<mesh.num_verts(); iii++){
+    for(uint iii=0; iii<outputMesh.num_verts(); iii++){
         if(transition_verts[iii])
-            mesh.vert_data(iii).color = Color::RED();
+            outputMesh.vert_data(iii).color = Color::RED();
     }
 
 
