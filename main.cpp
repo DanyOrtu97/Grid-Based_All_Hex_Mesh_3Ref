@@ -303,62 +303,56 @@ void export_hexmesh(const Twseventree                                & grid,
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 template<class M, class V, class E, class F, class P>
-void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & output,
+void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
                         std::map<vec3d, uint, vert_compare>        & v_map,
-                        std::vector<bool>                          & transition_verts,
-                        int                                          levels){
+                        std::vector<bool>                          & transition_verts){
 
-    while(levels > 0){
+    bool flag=true;
+    Octree octree(5, 100);
+
+    while(flag){
         std::vector<uint> split_pids_vector;
 
+        //populate octree
+        for(uint fid=0; fid < mesh.num_faces(); fid++) octree.push_triangle(fid, mesh.face_verts(fid));
 
-        for(uint pid=0; pid<output.num_polys(); ++pid){
-            std::vector<uint> vids = output.poly_verts_id(pid);
+        octree.build();
 
-            //vertices
-            for(auto vid: vids){
-                std::vector<uint> pids = output.adj_v2p(vid);
+        //solve balancing
+        for(uint pid=0; pid<mesh.num_polys(); pid++){
+            for(auto vid: mesh.poly_verts_id(pid)){
+                std::unordered_set<uint> faces_to_split;
+                vec3d vert[1];
+                vert[0] = mesh.vert(vid);
+                if(octree.intersects_triangle(vert, true, faces_to_split)){
+                    for(auto el: faces_to_split){
 
-                for(auto poly_adj: pids){
+                        for(uint poly=0; poly<mesh.num_polys(); poly++){
 
-                    double a = round(output.edge_length(output.adj_p2e(poly_adj)[0]) *1000.0)/1000.0;
-                    double b = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
-
-                    if(a > 3.01*b) split_pids_vector.push_back(poly_adj);
-
+                            if(mesh.poly_contains_face(poly, el)){
+                                double a = round(mesh.edge_length(el) *1000.0)/1000.0;
+                                double b = round(mesh.edge_length(mesh.adj_p2e(pid)[0]) * 1000.0)/1000.0;
 
 
-                    //edge polys
-                    std::vector<uint> vid_pids = output.poly_verts_id(poly_adj);
-
-                    for(auto vid_pid: vid_pids){
-
-                        std::vector<uint> pids_pids = output.adj_v2p(vid_pid);
-
-                        for(auto poly_adj_pid: pids_pids){
-                            double ae = round(output.edge_length(output.adj_p2e(poly_adj_pid)[0]) *1000.0)/1000.0;
-                            double be = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
-
-                            if(ae > 3.01*be){
-
-                                if(output.poly_contains_edge(poly_adj, vid, vid_pid))
-
-                                    split_pids_vector.push_back(poly_adj_pid);
-
+                                if(a> 3.01 * b) split_pids_vector.push_back(poly);
                             }
                         }
                     }
-
+                    faces_to_split.erase(faces_to_split.begin(), faces_to_split.end());
                 }
+
             }
+            if (pid%1000==0) std::cout<< "pid : " << pid << " [ " << (pid * 100)/ (mesh.num_polys()) << "% ]" <<std::endl;
         }
 
 
-        std::sort(split_pids_vector.begin(), split_pids_vector.end());
+        //std::sort(split_pids_vector.begin(), split_pids_vector.end());
         split_pids_vector.erase(std::unique(split_pids_vector.begin(), split_pids_vector.end()), split_pids_vector.end());
 
-        for(auto el: split_pids_vector) split27(el, output, v_map, transition_verts);
-        levels--;
+        for(auto el: split_pids_vector) split27(el, mesh, v_map, transition_verts);
+
+        if(split_pids_vector.size()==0) flag=false;
+        else octree.root=nullptr; //clear octree
     }
 }
 
@@ -401,7 +395,7 @@ int main(int argc, char *argv[])
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=5;
+    int max_depth=4;
     DrawableTwseventree grid(max_depth, 20);
 
     grid.build_from_mesh_polys(m);
@@ -435,7 +429,7 @@ int main(int argc, char *argv[])
 
     //mesh.save("bunny_prebal.mesh");
 
-    balancing_gridmesh(mesh, vertices, transition_verts, max_depth-3);
+    balancing_gridmesh(mesh, vertices, transition_verts);
 
     //std::cout<< "Balancing check: "<<check_balancing(mesh) <<std::endl;
 
