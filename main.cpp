@@ -20,7 +20,6 @@
 #include <cinolib/export_surface.h>
 #include <drawable_twseventree.h>
 
-
 namespace cinolib
 {
 
@@ -318,7 +317,7 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
             vec3d vert[1];
             vert[0] = mesh.vert(vid);
 
-            if(octree.intersects_triangle(vert, true, faces_to_split)){ //CINOLIB_USES_EXACT_PREDICATES get errors
+            if(octree.intersects_triangle(vert, true, faces_to_split)){ //Non dovrebbero essere 8 massimo le facce che tocca un vid?
 
                 //all the pids of the adj faces of the vid
                 std::vector<uint> pids;

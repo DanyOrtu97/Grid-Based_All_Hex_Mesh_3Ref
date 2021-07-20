@@ -29,7 +29,8 @@ SOURCES += \
         twseventree.cpp \
         drawable_twseventree.cpp \
         hex_transition_orient_3ref.cpp \
-        hex_transition_install_3ref.cpp
+        hex_transition_install_3ref.cpp \
+    ../cinolib/external/predicates/shewchuk.c
 
 HEADERS += \
         mainwindow.h \
@@ -45,10 +46,11 @@ FORMS += \
 #My modifications
 DEFINES += CINOLIB_USES_OPENGL
 DEFINES += CINOLIB_USES_QT
-#DEFINES += CINOLIB_USES_EXACT_PREDICATES
+DEFINES += CINOLIB_USES_EXACT_PREDICATES
 QT += core opengl
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/include
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/eigen
+INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/predicates
 DATA_PATH       = \\\"$$PWD/../Meshes/\\\"
 DEFINES        += DATA_PATH=$$DATA_PATH
 
