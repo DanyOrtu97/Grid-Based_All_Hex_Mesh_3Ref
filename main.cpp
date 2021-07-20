@@ -300,9 +300,15 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
 
         Octree octree(5, 100);
 
-        //populate octree (devo aggiungere 2 triangle per creare un quad?)
-        for(uint fid=0; fid < mesh.num_faces(); fid++) octree.push_triangle(fid, mesh.face_verts(fid));
-
+        //populate octree
+        for(uint fid=0; fid < mesh.num_faces(); fid++){
+            for(uint i=0; i<mesh.face_tessellation(fid).size()/3; ++i){
+                vec3d v0 = mesh.vert(mesh.face_tessellation(fid).at(3*i+0));
+                vec3d v1 = mesh.vert(mesh.face_tessellation(fid).at(3*i+1));
+                vec3d v2 = mesh.vert(mesh.face_tessellation(fid).at(3*i+2));
+                octree.push_triangle(fid, {v0, v1, v2});
+            }
+        }
 
         octree.build();
 
@@ -341,7 +347,6 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
 
                 faces_to_split.erase(faces_to_split.begin(), faces_to_split.end());
             }
-
 
             if (vid%1000==0) std::cout<< "vid : " << vid << " [ " << (vid * 100)/ (mesh.num_verts()) << "% ]" <<std::endl;
         }
@@ -412,7 +417,7 @@ int main(int argc, char *argv[])
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=5;
+    int max_depth=4;
     DrawableTwseventree grid(max_depth, 20);
 
     grid.build_from_mesh_polys(m);
