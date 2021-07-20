@@ -172,7 +172,7 @@ void Twseventree::build()
         Time::time_point t1 = Time::now();
         double t = how_many_seconds(t0,t1);
         std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
-        std::cout << "Octree created (" << t << "s)                      " << std::endl;
+        std::cout << "27tree created (" << t << "s)                      " << std::endl;
         std::cout << "#Items                   : " << items.size()         << std::endl;
         std::cout << "#Leaves                  : " << leaves.size()        << std::endl;
         std::cout << "Max depth                : " << max_depth            << std::endl;

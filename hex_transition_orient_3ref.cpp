@@ -104,6 +104,8 @@ void orient_node(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
+
     }
 
     for (auto & v: verts){
@@ -154,6 +156,7 @@ void orient_edge(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
 
@@ -196,6 +199,7 @@ void orient_face(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -295,6 +299,7 @@ void orient_two_edges(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -345,6 +350,7 @@ void orient_two_faces(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -390,6 +396,7 @@ void orient_corner_4B(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -466,6 +473,7 @@ void orient_corner_4C(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -540,6 +548,7 @@ void orient_corner_5A(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){
@@ -583,6 +592,7 @@ void orient_corner_7A(std::vector<vec3d>              & verts,
         case 1: rotate(verts, "y", -M_PI/2); break;
         case 2: rotate(verts, "y", -M_PI); break;
         case 3: rotate(verts, "y",  M_PI/2); break;
+        case 4: rotate(verts, "x",  M_PI/2); break;
     }
 
     for (auto & v: verts){

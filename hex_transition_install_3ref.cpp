@@ -554,6 +554,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
         vec3d v1 = m.vert(vertices[1]);
 
         if(v0.x() == v1.x() || v0.y() == v1.y() || v0.z() == v1.z()){ //2B
+            std::cout<<"2B"<<std::endl;
             for (auto vid: poly_verts_id){
                 if(v0.x() == v1.x())
                     if (m.vert(vid).x() == v0.x() && vid != vertices[0] && vid != vertices[1]){
@@ -574,6 +575,7 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
             changed_pid.push_back(pid);
         }
         else{ //2C
+            std::cout<<"2C"<<std::endl;
             std::vector<bool> t2_a = {true, false, false, false, false, false, true, false};
             std::vector<bool> t2_b = {false, false, false, true, false, true, false, false};
             std::vector<bool> t2_c = {false, false, true, false, true, false, false, false};
@@ -624,9 +626,9 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
     vec3d v2 = m.vert(vertices[2]);
 
 
-    if((round(v0.x()) == round(v1.x()) && round(v1.x()) == round(v2.x()) && round(v2.x()) == round(v0.x())) ||
-       (round(v0.y()) == round(v1.y()) && round(v1.y()) == round(v2.y()) && round(v2.y()) == round(v0.y())) ||
-       (round(v0.z()) == round(v1.z()) && round(v1.z()) == round(v2.z()) && round(v2.z()) == round(v0.z()))) is_3a=true;
+    if(((round(v0.x()*10000.0)/10000.0) == (round(v1.x()*10000.0)/10000.0) && (round(v1.x()*10000.0)/10000.0) == (round(v2.x()*10000.0)/10000.0) && (round(v2.x()*10000.0)/10000.0) == (round(v0.x()*10000.0)/10000.0)) ||
+       ((round(v0.y()*10000.0)/10000.0) == (round(v1.y()*10000.0)/10000.0) && (round(v1.y()*10000.0)/10000.0) == (round(v2.y()*10000.0)/10000.0) && (round(v2.y()*10000.0)/10000.0) == (round(v0.y()*10000.0)/10000.0)) ||
+       ((round(v0.z()*10000.0)/10000.0) == (round(v1.z()*10000.0)/10000.0) && (round(v1.z()*10000.0)/10000.0) == (round(v2.z()*10000.0)/10000.0) && (round(v2.z()*10000.0)/10000.0) == (round(v0.z()*10000.0)/10000.0))) is_3a=true;
 
 
 
@@ -646,6 +648,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                n_free_edge++;
 
         if(n_free_edge == 4){ // 3B
+            std::cout<<"3B"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, true, false, true, false, false};
             std::vector<bool> t3_b = {false, true, false, false, true, false, false, true};
             std::vector<bool> t3_c = {true, false, false, false, false, true, true, false};
@@ -728,6 +731,7 @@ void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
 
         }
         else{  //3C
+            std::cout<<"3C"<<std::endl;
             std::vector<bool> t3_a = {true, false, false, false, false, true, false, true};
             std::vector<bool> t3_b = {false, true, false, false, true, false, true, false};
             std::vector<bool> t3_c = {false, false, true, false, false, true, false, true};
@@ -834,6 +838,7 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
         }
         else if(n_free_edge == 2){ // 4D, 4E
             if(faces_3_nodes==1){ // 4D
+                std::cout<<"4D"<<std::endl;
                 std::vector<bool> t4_a = {true, true, false, true, false, false, true, false};
                 std::vector<bool> t4_b = {true, false, true, true, false, true, false, false};
                 std::vector<bool> t4_c = {false, true, true, true, true, false, false, false};
@@ -1103,6 +1108,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
 
             SchemeInfo info;
 
+
             if(poly_vec3d[0].z() > poly_vec3d[3].z() && poly_vec3d[0].x() < poly_vec3d[1].x()){
                 info.mask_type=0;
             }
@@ -1115,6 +1121,11 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
             else if(poly_vec3d[0].x() > poly_vec3d[3].x() && poly_vec3d[0].z() > poly_vec3d[1].z()){
                 info.mask_type=3;
             }
+            else if(poly_vec3d[0].y() < poly_vec3d[3].y() && poly_vec3d[0].x() < poly_vec3d[1].x()){
+                info.mask_type=4;
+            }
+
+            //MAYBE WE NEED OTHER CONFIGURATIONS FOR MASK_TYPE
 
             switch (vertices.size()){
                 case 2: mark2vertices(m_in, pid, vertices, transition_verts, poly_verts_id, poly2scheme, changed_pid, info);

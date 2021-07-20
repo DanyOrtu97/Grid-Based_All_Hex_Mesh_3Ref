@@ -45,7 +45,7 @@ FORMS += \
 #My modifications
 DEFINES += CINOLIB_USES_OPENGL
 DEFINES += CINOLIB_USES_QT
-DEFINES += CINOLIB_USES_EXACT_PREDICATES
+#DEFINES += CINOLIB_USES_EXACT_PREDICATES
 QT += core opengl
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/include
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/eigen
