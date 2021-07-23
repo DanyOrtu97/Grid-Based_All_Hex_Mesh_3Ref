@@ -291,73 +291,59 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
                         std::map<vec3d, uint, vert_compare>        & v_map,
                         std::vector<bool>                          & transition_verts){
 
+    std::set<uint> split_pids_set;
 
-    bool flag=true;
-
-    while(flag){
-        std::vector<uint> split_pids_vector;
-
-        Octree octree(5, 100);
+    do{
+        split_pids_set.clear();
+        Octree octree(6, 100);
 
         //populate octree
         for(uint fid=0; fid < mesh.num_faces(); fid++){
-            for(uint i=0; i<mesh.face_tessellation(fid).size()/3; ++i){
-                vec3d v0 = mesh.vert(mesh.face_tessellation(fid).at(3*i+0));
-                vec3d v1 = mesh.vert(mesh.face_tessellation(fid).at(3*i+1));
-                vec3d v2 = mesh.vert(mesh.face_tessellation(fid).at(3*i+2));
-                octree.push_triangle(fid, {v0, v1, v2});
-            }
+            octree.push_triangle(fid, {mesh.face_vert(fid, 0), mesh.face_vert(fid, 1), mesh.face_vert(fid, 2)}); // 0 1 2
+            octree.push_triangle(fid, {mesh.face_vert(fid, 0), mesh.face_vert(fid, 2), mesh.face_vert(fid, 3)}); // 0 2 3
         }
 
         octree.build();
 
-        //solve balancing
-        for(uint vid=0; vid<mesh.num_verts(); vid++){ //cicla sui vertici
-            std::unordered_set<uint> faces_to_split;
-            vec3d vert[1];
-            vert[0] = mesh.vert(vid);
 
-            if(octree.intersects_triangle(vert, true, faces_to_split)){ //Non dovrebbero essere 8 massimo le facce che tocca un vid?
+        for(auto vert: mesh.vector_verts()){
+            std::unordered_set<uint> faces;
+            octree.contains(vert, false, faces);
 
-                //all the pids of the adj faces of the vid
-                std::vector<uint> pids;
-                for(auto fid: faces_to_split){
-                    for(auto el: mesh.adj_f2p(fid)){
-                        pids.push_back(el);
-                    }
+            std::set<uint> polys;
+
+            for(auto fid: faces){
+                for(auto pid: mesh.adj_f2p(fid)){
+                    polys.insert(pid);
                 }
-
-                std::sort(pids.begin(), pids.end());
-                pids.erase(std::unique(pids.begin(), pids.end()), pids.end());
-
-                if(pids.size()>1){
-                    for(uint pid=0; pid<pids.size(); pid++){
-
-                        if(mesh.poly_shared_face(pids[pid], pids[(pid+1)%pids.size()]) == -1){
-                            double a = round(mesh.edge_length(mesh.adj_p2e(pids[pid])[0]) *1000.0)/1000.0;
-                            double b = round(mesh.edge_length(mesh.adj_p2e(pids[((pid+1)%pids.size())])[0]) * 1000.0)/1000.0;
-
-                            if(a> 3.01 * b) split_pids_vector.push_back(pids[pid]);
-
-                        }
-                    }
-                }
-
-
-                faces_to_split.erase(faces_to_split.begin(), faces_to_split.end());
             }
 
-            if (vid%1000==0) std::cout<< "vid : " << vid << " [ " << (vid * 100)/ (mesh.num_verts()) << "% ]" <<std::endl;
+            uint i=0;
+            for(auto pid_i: polys){
+                uint j=0;
+                for(auto pid_j: polys){
+
+                    if(i!=j){
+
+                        double a = mesh.edge_length(mesh.adj_p2e(pid_i)[0]);
+                        double b = mesh.edge_length(mesh.adj_p2e(pid_j)[0]);
+
+                        if(a > 3.01 * b) split_pids_set.insert(pid_i);
+                        else if(b > 3.01 * a) split_pids_set.insert(pid_j);
+
+                    }
+                    j++;
+                }
+                i++;
+            }
         }
 
-
-        std::sort(split_pids_vector.begin(), split_pids_vector.end());
-        split_pids_vector.erase(std::unique(split_pids_vector.begin(), split_pids_vector.end()), split_pids_vector.end());
-
-        if(split_pids_vector.size() > 0) for(auto el: split_pids_vector) split27(el, mesh, v_map, transition_verts);
-        else flag=false;
+        for(auto pid: split_pids_set) split27(pid, mesh, v_map, transition_verts);
 
     }
+    while(split_pids_set.size()>0);
+
+
 
     //update transition verts
     for(uint pid=0; pid<mesh.num_polys(); ++pid){
@@ -416,7 +402,7 @@ int main(int argc, char *argv[])
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=4;
+    int max_depth=5;
     DrawableTwseventree grid(max_depth, 20);
 
     grid.build_from_mesh_polys(m);
