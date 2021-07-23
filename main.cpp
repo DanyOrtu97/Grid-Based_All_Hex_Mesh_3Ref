@@ -223,7 +223,7 @@ void split27(const uint                                   pid,
         }
     }
 
-    if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+    //if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
 
     //merge polys
     for (uint poly=0; poly<polys.size(); ++poly){
@@ -352,39 +352,14 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
 
             for(auto poly: mesh.adj_v2p(vid)){
 
-                double a = round(mesh.edge_length(mesh.adj_p2e(poly)[0]) *10000.0)/10000.0;
-                double b = round(mesh.edge_length(mesh.adj_p2e(pid)[0]) * 10000.0)/10000.0;
+                double a = mesh.edge_length(mesh.adj_p2e(poly)[0]);
+                double b = mesh.edge_length(mesh.adj_p2e(pid)[0]);
 
-                if(a> b) transition_verts[vid] = true;
-
-            }
-        }
-    }
-
-}
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-template<class M, class V, class E, class F, class P>
-bool check_balancing(Hexmesh<M,V,E,F,P> & output){
-
-    for(uint pid=0; pid<output.num_polys(); ++pid){
-        std::vector<uint> vids = output.poly_verts_id(pid);
-
-        for(auto vid: vids){
-            std::vector<uint> pids = output.adj_v2p(vid);
-
-            for(auto poly_adj: pids){
-
-                double a = round(output.edge_length(output.adj_p2e(poly_adj)[0]) *1000.0)/1000.0;
-                double b = round(output.edge_length(output.adj_p2e(pid)[0]) * 1000.0)/1000.0;
-
-                if(a > 3.01*b) return false;
+                if(a> 1.01 * b) transition_verts[vid] = true;
 
             }
         }
     }
-    return true;
 
 }
 
@@ -399,7 +374,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bimba.off";
+
 
     DrawablePolygonmesh<> m(s.c_str());
     int max_depth=5;
@@ -431,14 +407,10 @@ int main(int argc, char *argv[])
         transition_verts.push_back(false);
     }*/
 
-
     export_hexmesh(grid, mesh, vertices, transition_verts);
 
-    //mesh.save("bunny_prebal.mesh");
+    balancing_gridmesh(mesh, vertices, transition_verts);
 
-    balancing_gridmesh(mesh, vertices, transition_verts);   //too slow
-
-    //std::cout<< "Balancing check: "<<check_balancing(mesh) <<std::endl;
 
 /*
     balancing(false, mesh);
@@ -457,8 +429,8 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
-/*
 
+/*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -490,6 +462,11 @@ int main(int argc, char *argv[])
                 std::cout<<"Subdivide Poly " << pid << " into 27 Polys [" << how_many_seconds(t0, t1) << "]" << std::endl;
 
                 mesh.save("cube9x9.mesh");
+
+                for(uint iii=0; iii<mesh.num_verts(); iii++){
+                    if(transition_verts[iii])
+                        mesh.vert_data(iii).color = Color::RED();
+                }
 
                 //chrono for template's application
                 std::chrono::high_resolution_clock::time_point t0o = std::chrono::high_resolution_clock::now();
@@ -542,10 +519,7 @@ int main(int argc, char *argv[])
             }
         }
     };
-
-
 */
-
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -566,9 +540,9 @@ int main(int argc, char *argv[])
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
-    for(uint iii=0; iii<outputMesh.num_verts(); iii++){
+    for(uint iii=0; iii<mesh.num_verts(); iii++){
         if(transition_verts[iii])
-            outputMesh.vert_data(iii).color = Color::RED();
+            mesh.vert_data(iii).color = Color::RED();
     }
 
 
