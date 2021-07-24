@@ -223,7 +223,7 @@ void split27(const uint                                   pid,
         }
     }
 
-    //if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+    if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
 
     //merge polys
     for (uint poly=0; poly<polys.size(); ++poly){
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bimba.off";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
 
 
     DrawablePolygonmesh<> m(s.c_str());
@@ -384,7 +384,6 @@ int main(int argc, char *argv[])
     grid.build_from_mesh_polys(m);
 
     DrawableHexmesh<> mesh;
-
 
     //DrawableHexmesh<> mesh(s.c_str());
     DrawableHexmesh<> outputMesh;
@@ -402,10 +401,11 @@ int main(int argc, char *argv[])
     std::vector<bool> transition_verts;
 
 
-    /*for (uint vid=0; vid<mesh.num_verts(); ++vid){
+    for (uint vid=0; vid<mesh.num_verts(); ++vid){
         vertices[mesh.vert(vid)] = vid;
         transition_verts.push_back(false);
-    }*/
+    }
+
 
     export_hexmesh(grid, mesh, vertices, transition_verts);
 
@@ -519,7 +519,8 @@ int main(int argc, char *argv[])
             }
         }
     };
-*/
+
+    */
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
