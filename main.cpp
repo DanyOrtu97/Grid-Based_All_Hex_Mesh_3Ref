@@ -223,7 +223,7 @@ void split27(const uint                                   pid,
         }
     }
 
-    if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
+    //if(mesh.num_verts() > 64) for(auto vid: mesh.poly_verts_id(pid)) transition_verts[vid] = true;
 
     //merge polys
     for (uint poly=0; poly<polys.size(); ++poly){
@@ -429,8 +429,7 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
-
-/*
+    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
