@@ -36,6 +36,11 @@
 
 namespace cinolib{
 
+struct VertInfo{
+    bool                   is_hanging;
+    double                 scale;
+};
+
 /* This function installs the transitions defined in cinolib/hex_transition_schemes_3ref.h,
  * which allow to transform a strongly or weakly balanced grid into a pure hexahedral mesh.
  *
@@ -49,7 +54,7 @@ namespace cinolib{
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
-                                       std::vector<bool>            & transition_verts,
+                                       std::vector<VertInfo>        & transition_verts,
                                        Hexmesh<M,V,E,F,P>           & m_out);
 
 

@@ -69,7 +69,7 @@ struct vert_compare {
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo1(SchemeInfo                  & info,
-                         std::vector<bool>           & transition_verts,
+                         std::vector<VertInfo>       & transition_verts,
                          std::vector<uint>           & poly_verts_id){
 
 
@@ -84,7 +84,11 @@ void setOrientationInfo1(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
+
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -100,7 +104,7 @@ void setOrientationInfo1(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo2(SchemeInfo                  & info,
-                         std::vector<bool>           & transition_verts,
+                         std::vector<VertInfo>       & transition_verts,
                          std::vector<uint>           & poly_verts_id){
 
 
@@ -146,7 +150,10 @@ void setOrientationInfo2(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a || mask == mask_a1 || mask == mask_p1) info.orientations.push_back(0);
     else if (mask == mask_b || mask == mask_d1 || mask == mask_o1) info.orientations.push_back(1);
@@ -167,7 +174,7 @@ void setOrientationInfo2(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo3(SchemeInfo                  & info,
-                         std::vector<bool>           & transition_verts,
+                         std::vector<VertInfo>       & transition_verts,
                          std::vector<uint>           & poly_verts_id){
 
 
@@ -223,7 +230,10 @@ void setOrientationInfo3(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a || mask == mask_a1) info.orientations.push_back(0);
     else if (mask == mask_b || mask == mask_b1) info.orientations.push_back(1);
@@ -255,7 +265,7 @@ void setOrientationInfo3(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo4A(SchemeInfo                  & info,
-                          std::vector<bool>           & transition_verts,
+                          std::vector<VertInfo>       & transition_verts,
                           std::vector<uint>           & poly_verts_id){
 
 
@@ -269,7 +279,10 @@ void setOrientationInfo4A(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -282,7 +295,7 @@ void setOrientationInfo4A(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo4B(SchemeInfo                  & info,
-                          std::vector<bool>           & transition_verts,
+                          std::vector<VertInfo>       & transition_verts,
                           std::vector<uint>           & poly_verts_id){
 
 
@@ -297,7 +310,10 @@ void setOrientationInfo4B(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -313,7 +329,7 @@ void setOrientationInfo4B(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo4C(SchemeInfo                  & info,
-                          std::vector<bool>           & transition_verts,
+                          std::vector<VertInfo>       & transition_verts,
                           std::vector<uint>           & poly_verts_id){
 
     std::vector<bool> mask_a = {true, true, false, true, false, true, false, false};
@@ -369,8 +385,10 @@ void setOrientationInfo4C(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
-
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if(mask == mask_a || mask == mask_b || mask == mask_c || mask == mask_d || mask == mask_e || mask == mask_f ||
        mask == mask_g || mask == mask_h || mask == mask_i || mask == mask_l || mask == mask_m || mask == mask_n ||
@@ -440,7 +458,7 @@ void setOrientationInfo4C(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo5A(SchemeInfo                  & info,
-                          std::vector<bool>           & transition_verts,
+                          std::vector<VertInfo>       & transition_verts,
                           std::vector<uint>           & poly_verts_id){
 
 
@@ -471,7 +489,10 @@ void setOrientationInfo5A(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -504,7 +525,7 @@ void setOrientationInfo5A(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo6(SchemeInfo                  & info,
-                         std::vector<bool>           & transition_verts,
+                         std::vector<VertInfo>       & transition_verts,
                          std::vector<uint>           & poly_verts_id){
 
 
@@ -523,7 +544,10 @@ void setOrientationInfo6(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -543,7 +567,7 @@ void setOrientationInfo6(SchemeInfo                  & info,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 CINO_INLINE
 void setOrientationInfo7(SchemeInfo                  & info,
-                         std::vector<bool>           & transition_verts,
+                         std::vector<VertInfo>       & transition_verts,
                          std::vector<uint>           & poly_verts_id){
 
 
@@ -559,7 +583,10 @@ void setOrientationInfo7(SchemeInfo                  & info,
 
     std::vector<bool> mask;
 
-    for (auto vid: poly_verts_id) mask.push_back(transition_verts[vid]);
+    for (auto vid: poly_verts_id){
+        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        else mask.push_back(false);
+    }
 
     if (mask == mask_a) info.orientations.push_back(0);
     else if (mask == mask_b) info.orientations.push_back(1);
@@ -582,7 +609,7 @@ CINO_INLINE
 void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
-                         std::vector<bool>                    & transition_verts,
+                         std::vector<VertInfo>                & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
                          std::vector<uint>                    & changed_pid,
@@ -610,17 +637,20 @@ void mark2vertices(const Hexmesh<M,V,E,F,P>                   & m,
             for (auto vid: poly_verts_id){
                 if(v0.x() == v1.x())
                     if (m.vert(vid).x() == v0.x() && vid != vertices[0] && vid != vertices[1]){
-                        transition_verts[vid] = true;
+                        transition_verts[vid].is_hanging = true;
+                        transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
                         break;
                     }
                 if(v0.y() == v1.y())
                     if (m.vert(vid).y() == v0.y() && vid != vertices[0] && vid != vertices[1]){
-                        transition_verts[vid] = true;
+                        transition_verts[vid].is_hanging = true;
+                        transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
                         break;
                     }
                 if(v0.z() == v1.z())
                     if (m.vert(vid).z() == v0.z() && vid != vertices[0] && vid != vertices[1]){
-                        transition_verts[vid] = true;
+                        transition_verts[vid].is_hanging = true;
+                        transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
                         break;
                     }
             }
@@ -664,7 +694,7 @@ CINO_INLINE
 void mark3vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
-                         std::vector<bool>                    & transition_verts,
+                         std::vector<VertInfo>                & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
                          std::vector<uint>                    & changed_pid,
@@ -755,7 +785,7 @@ CINO_INLINE
 void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
-                         std::vector<bool>                    & transition_verts,
+                         std::vector<VertInfo>                & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
                          std::vector<uint>                    & changed_pid,
@@ -834,14 +864,18 @@ void mark4vertices(const Hexmesh<M,V,E,F,P>                   & m,
                     uint vid1 = m.edge_vert_ids(free_edge)[1];
 
                     if(vid != vid0 && vid != vid1 && vid!=vertices[0] && vid!=vertices[1] && vid!=vertices[2] && vid!=vertices[3]){
-                        transition_verts[vid] = true;
+                        transition_verts[vid].is_hanging = true;
+                        transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
                     }
                 }
                 changed_pid.push_back(pid);
             }
         }
         else{ // 4F
-            for (auto vid: poly_verts_id) if(transition_verts[vid]==false) transition_verts[vid] = true;
+            for (auto vid: poly_verts_id) if(transition_verts[vid].is_hanging ==false){
+                transition_verts[vid].is_hanging = true;
+                transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
+            }
             changed_pid.push_back(pid);
         }
     }
@@ -854,7 +888,7 @@ CINO_INLINE
 void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
-                         std::vector<bool>                    & transition_verts,
+                         std::vector<VertInfo>                & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
                          std::vector<uint>                    & changed_pid,
@@ -888,14 +922,18 @@ void mark5vertices(const Hexmesh<M,V,E,F,P>                   & m,
                 uint vid1 = m.edge_vert_ids(free_edge)[1];
 
                 if(vid != vid0 && vid != vid1 && vid!=vertices[0] && vid!=vertices[1] && vid!=vertices[2] && vid!=vertices[3] && vid!=vertices[4]){
-                    transition_verts[vid] = true;
+                    transition_verts[vid].is_hanging = true;
+                    transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
                 }
             }
             changed_pid.push_back(pid);
         }
     }
     else{ // 5C
-        for (auto vid: poly_verts_id) if(! transition_verts[vid]) transition_verts[vid] = true;
+        for (auto vid: poly_verts_id) if(! transition_verts[vid].is_hanging){
+            transition_verts[vid].is_hanging = true;
+            transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
+        }
         changed_pid.push_back(pid);
     }
 }
@@ -907,7 +945,7 @@ CINO_INLINE
 void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
                    const uint                                   pid,
                          std::vector<uint>                    & vertices,
-                         std::vector<bool>                    & transition_verts,
+                         std::vector<VertInfo>                & transition_verts,
                          std::vector<uint>                    & poly_verts_id,
                          std::unordered_map<uint, SchemeInfo> & poly2scheme,
                          std::vector<uint>                    & changed_pid,
@@ -933,7 +971,10 @@ void mark6vertices(const Hexmesh<M,V,E,F,P>                   & m,
         poly2scheme.insert(std::pair<uint, SchemeInfo>(pid, info));
     }
     else{ // 6B, 6C
-        for (auto vid: poly_verts_id) if(! transition_verts[vid]) transition_verts[vid] = true;
+        for (auto vid: poly_verts_id) if(! transition_verts[vid].is_hanging){
+            transition_verts[vid].is_hanging = true;
+            transition_verts[vid].scale = m.edge_length(m.adj_p2e(pid)[0]);
+        }
         changed_pid.push_back(pid);
     }
 }
@@ -985,7 +1026,7 @@ void merge_schemes_into_mesh(Hexmesh<M,V,E,F,P>                   & m,
 template <class M, class V, class E, class F, class P>
 CINO_INLINE
 void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
-                                       std::vector<bool>            & transition_verts,
+                                       std::vector<VertInfo>        & transition_verts,
                                        Hexmesh<M,V,E,F,P>           & m_out){
     m_out = m_in;
 
@@ -1010,7 +1051,9 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
             std::vector<uint> poly_verts_id = m_in.poly_verts_id(pid);
 
             for(uint vid: poly_verts_id){
-                if(transition_verts[vid]) vertices.push_back(vid);
+                if(transition_verts[vid].is_hanging &&
+                   (round(transition_verts[vid].scale * 1000000.0) / 1000000.0) ==
+                   (round(m_in.edge_length(m_in.adj_p2e(pid)[0]) * 1000000.0)/1000000.0) ) vertices.push_back(vid);
                 poly_vec3d.push_back(m_in.vert(vid));
             }
 

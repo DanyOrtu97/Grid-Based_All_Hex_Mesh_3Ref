@@ -13,6 +13,7 @@
 #include <cinolib/drawable_sphere.h>
 #include <cinolib/how_many_seconds.h>
 #include <hex_transition_install_3ref.h>
+#include <hex_transition_orient_3ref.h>
 #include <cinolib/connected_components.h>
 #include <cinolib/io/io_utilities.h>
 #include <cinolib/export_surface.h>
@@ -198,7 +199,7 @@ CINO_INLINE
 void split27(const uint                                   pid,
              Hexmesh<M,V,E,F,P>                         & mesh,
              std::map<vec3d, uint, vert_compare>        & vertices,
-             std::vector<bool>                          & transition_verts){
+             std::vector<VertInfo>                      & transition_verts){
 
 
     SchemeInfo info;
@@ -219,7 +220,10 @@ void split27(const uint                                   pid,
         if (vertices.find(v) == vertices.end()){
             uint fresh_vid = mesh.vert_add(v);
             vertices[v] = fresh_vid;
-            transition_verts.push_back(false);
+
+            VertInfo info;
+            info.is_hanging=false;
+            transition_verts.push_back(info);
         }
     }
 
@@ -243,7 +247,7 @@ template<class M, class V, class E, class F, class P>
 void export_hexmesh(const Twseventree                                & grid,
                           Hexmesh<M,V,E,F,P>                         & output,
                           std::map<vec3d, uint, vert_compare>        & v_map,
-                          std::vector<bool>                          & transition_verts){
+                          std::vector<VertInfo>                      & transition_verts){
 
     std::vector<uint>               poly;
     std::vector<std::vector<uint>>  polys;
@@ -267,7 +271,10 @@ void export_hexmesh(const Twseventree                                & grid,
         if (v_map.find(v) == v_map.end()){
             uint fresh_vid = output.vert_add(v);
             v_map[v] = fresh_vid;
-            transition_verts.push_back(false);
+
+            VertInfo info;
+            info.is_hanging=false;
+            transition_verts.push_back(info);
         }
     }
 
@@ -289,7 +296,7 @@ void export_hexmesh(const Twseventree                                & grid,
 template<class M, class V, class E, class F, class P>
 void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
                         std::map<vec3d, uint, vert_compare>        & v_map,
-                        std::vector<bool>                          & transition_verts){
+                        std::vector<VertInfo>                      & transition_verts){
 
     std::set<uint> split_pids_set;
 
@@ -355,8 +362,10 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
                 double a = mesh.edge_length(mesh.adj_p2e(poly)[0]);
                 double b = mesh.edge_length(mesh.adj_p2e(pid)[0]);
 
-                if(a> 1.01 * b) transition_verts[vid] = true;
-
+                if(a> 1.01 * b){
+                    transition_verts[vid].is_hanging = true;
+                    transition_verts[vid].scale = mesh.edge_length(mesh.adj_p2e(poly)[0]);
+                }
             }
         }
     }
@@ -374,7 +383,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/bunny.off";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/duck.off";
 
 
     DrawablePolygonmesh<> m(s.c_str());
@@ -398,13 +407,13 @@ int main(int argc, char *argv[])
 
 
     std::map<vec3d, uint, vert_compare> vertices;
-    std::vector<bool> transition_verts;
+    std::vector<VertInfo> transition_verts;
 
 
-    for (uint vid=0; vid<mesh.num_verts(); ++vid){
+    /*for (uint vid=0; vid<mesh.num_verts(); ++vid){
         vertices[mesh.vert(vid)] = vid;
         transition_verts.push_back(false);
-    }
+    }*/
 
 
     export_hexmesh(grid, mesh, vertices, transition_verts);
@@ -429,6 +438,7 @@ int main(int argc, char *argv[])
     /*
      * Tool for creating new polys by mouse click
      */
+
     /*
     Profiler profiler;
 
@@ -541,7 +551,7 @@ int main(int argc, char *argv[])
     gui_input.push_obj(&mesh);
 
     for(uint iii=0; iii<mesh.num_verts(); iii++){
-        if(transition_verts[iii])
+        if(transition_verts[iii].is_hanging)
             mesh.vert_data(iii).color = Color::RED();
     }
 
