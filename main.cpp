@@ -383,12 +383,13 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/duck.off";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/32770_sf.obj";
 
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=5;
-    DrawableTwseventree grid(max_depth, 20);
+    int max_depth=4;
+    DrawableTwseventree grid(max_depth, 10);
+
 
     grid.build_from_mesh_polys(m);
 

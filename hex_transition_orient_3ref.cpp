@@ -424,7 +424,6 @@ void orient_corner_4C(std::vector<vec3d>              & verts,
         for (uint vid=0; vid<Corner_4CB::verts.size(); vid+=3) verts.push_back(vec3d(Corner_4CB::verts[vid]-0.5, Corner_4CB::verts[vid+1]-0.5, Corner_4CB::verts[vid+2]-0.5));
     }
 
-
     switch(info.orientations[0])
     {
         case 0:  break; //DEFAULT
@@ -461,11 +460,11 @@ void orient_corner_4C(std::vector<vec3d>              & verts,
                  rotate(verts, "z", -M_PI/2);  break;
         case 20: rotate(verts, "x",  M_PI/2); break;
         case 21: rotate(verts, "x",  M_PI/2);
-                 rotate(verts, "z",  M_PI/2);  break;
+                 rotate(verts, "z", -M_PI/2);  break;
         case 22: rotate(verts, "x",  M_PI/2);
-                 rotate(verts, "z",  M_PI);  break;
+                 rotate(verts, "z", -M_PI);  break;
         case 23: rotate(verts, "x",  M_PI/2);
-                 rotate(verts, "z", -M_PI/2);   break;
+                 rotate(verts, "z",  M_PI/2);   break;
     }
 
     switch(info.mask_type){

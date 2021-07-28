@@ -85,7 +85,7 @@ void setOrientationInfo1(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -151,7 +151,7 @@ void setOrientationInfo2(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale * 1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -231,7 +231,7 @@ void setOrientationInfo3(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -280,7 +280,7 @@ void setOrientationInfo4A(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -311,7 +311,7 @@ void setOrientationInfo4B(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -386,7 +386,7 @@ void setOrientationInfo4C(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -490,7 +490,7 @@ void setOrientationInfo5A(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -545,7 +545,7 @@ void setOrientationInfo6(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
@@ -584,7 +584,7 @@ void setOrientationInfo7(SchemeInfo                  & info,
     std::vector<bool> mask;
 
     for (auto vid: poly_verts_id){
-        if((round(transition_verts[vid].scale * 10000.0) / 10000.0) == (round(info.scale*10000.0)/10000.0) ) mask.push_back(transition_verts[vid].is_hanging);
+        if((round(transition_verts[vid].scale *1000000.0) /1000000.0) == (round(info.scale*1000000.0)/1000000.0) ) mask.push_back(transition_verts[vid].is_hanging);
         else mask.push_back(false);
     }
 
