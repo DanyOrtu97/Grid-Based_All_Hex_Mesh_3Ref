@@ -383,11 +383,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/32770_sf.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/36091_sf.obj";
 
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=4;
+    int max_depth=5;
     DrawableTwseventree grid(max_depth, 10);
 
 
