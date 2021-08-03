@@ -1003,7 +1003,7 @@ void hex_transition_install_3ref(const Hexmesh<M,V,E,F,P>           & m_in,
                 double a = transition_verts[vid].scale;
                 double b = m_in.edge_length(m_in.adj_p2e(pid)[0]);
 
-                if(transition_verts[vid].is_hanging && abs(a - b) < 1e-6) vertices.push_back(vid);
+                if(transition_verts[vid].is_hanging && (abs(a - b) < 1e-6 || a==b)) vertices.push_back(vid);
 
                 poly_vec3d.push_back(m_in.vert(vid));
             }

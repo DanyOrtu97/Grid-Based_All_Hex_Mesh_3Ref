@@ -382,12 +382,56 @@ int main(int argc, char *argv[])
     using namespace cinolib;
     QApplication a(argc, argv);
 
+    char name[] = "/bimba_input_tri.obj";
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + name;
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/36091_sf.obj";
+    std::map<vec3d, uint, vert_compare> vertices;
+    std::vector<VertInfo> transition_verts;
+
+    DrawablePolygonmesh<> m(s.c_str());
+    DrawableHexmesh<> G0; //27tree grid
+    DrawableHexmesh<> G1; //27tree grid balanced
+    DrawableHexmesh<> G2; //grid after mesh application
+    DrawableTwseventree grid(10, 10); //max_depth, item_per_Leaf
+
+    grid.build_from_mesh_polys(m);
+
+    export_hexmesh(grid, G0, vertices, transition_verts);
+    G0.save("bimba_input_tri_G0.mesh");
+
+    G1=G0;
+    balancing_gridmesh(G1, vertices, transition_verts);
+    G1.save("bimba_input_tri_G1.mesh");
+
+    hex_transition_install_3ref(G1, transition_verts, G2);
+    G2.save("bimba_input_tri_G2.mesh");
+
+
+    if(G2.num_polys() > 0 ){
+        Quadmesh<> outputSurfaceMesh;
+
+        export_surface(G2, outputSurfaceMesh);
+
+        std::cout<< "N° componenti connesse: " << connected_components(outputSurfaceMesh) <<std::endl;
+
+        bool manifold = true;
+
+        for (auto eid: outputSurfaceMesh.vector_edges()){
+            if(! outputSurfaceMesh.edge_is_manifold(eid))
+                manifold = false;
+        }
+
+        std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
+
+    }
+
+
+/*
+    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/part.off";
 
 
     DrawablePolygonmesh<> m(s.c_str());
-    int max_depth=5;
+    int max_depth=10;
     DrawableTwseventree grid(max_depth, 10);
 
 
@@ -411,10 +455,10 @@ int main(int argc, char *argv[])
     std::vector<VertInfo> transition_verts;
 
 
-    /*for (uint vid=0; vid<mesh.num_verts(); ++vid){
+    for (uint vid=0; vid<mesh.num_verts(); ++vid){
         vertices[mesh.vert(vid)] = vid;
         transition_verts.push_back(false);
-    }*/
+    }
 
 
     export_hexmesh(grid, mesh, vertices, transition_verts);
@@ -422,25 +466,19 @@ int main(int argc, char *argv[])
     balancing_gridmesh(mesh, vertices, transition_verts);
 
 
-/*
+
     balancing(false, mesh);
     mesh.updateGL();
 
     apply_refinements(mesh, vertices, transition_verts);
 
-*/
+
     mesh.print_quality();
     gui_output.push_obj(&outputMesh);
     gui_input.push_obj(&mesh);
 
 
 
-
-    /*
-     * Tool for creating new polys by mouse click
-     */
-
-    /*
     Profiler profiler;
 
     gui_input.push_marker(vec2i(10, gui_input.height()-20), "Ctrl + click to split a poly into 27 elements", Color::BLACK(), 12, 0);
@@ -530,7 +568,7 @@ int main(int argc, char *argv[])
         }
     };
 
-    */
+
 
 
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
@@ -582,18 +620,15 @@ int main(int argc, char *argv[])
 
         std::cout<< "Surface is manifold (must to be true/1): "<< manifold <<std::endl; //must to be true or 1
 
-        //outputSurfaceMesh.save("bunnyref2.obj");
-
     }
 
-
-    //outputMesh.save("bunnyref2.mesh");
 
 
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_input(&mesh, &gui_input);
     VolumeMeshControlPanel<DrawableHexmesh<>> panel_output(&outputMesh, &gui_output);
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_input), &QShortcut::activated, [&](){panel_input.show();});
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_output), &QShortcut::activated, [&](){panel_output.show();});
+*/
 
     return a.exec();
 }

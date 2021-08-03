@@ -51,7 +51,7 @@ QT += core opengl
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/include
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/eigen
 INCLUDEPATH +=/home/tesi/Scrivania/cinolib/external/predicates
-DATA_PATH       = \\\"$$PWD/../Meshes/\\\"
+DATA_PATH       = \\\"$$PWD/../smooth/\\\"
 DEFINES        += DATA_PATH=$$DATA_PATH
 
 # just for Linux
