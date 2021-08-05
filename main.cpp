@@ -380,15 +380,26 @@ void balancing_gridmesh(Hexmesh<M,V,E,F,P>                         & mesh,
 int main(int argc, char *argv[])
 {
     using namespace cinolib;
-    QApplication a(argc, argv);
+    //QApplication a(argc, argv);
 
-    char name[] = "/bimba_input_tri.obj";
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + name;
+    const char str[] = "/";
+    char *name = strtok(argv[1], str);
+    std::string nameS;
+
+    int i=0;
+    while (name != NULL){
+        if(i==2) nameS.append(name);
+        name = strtok(NULL, str);
+        i++;
+    }
+
+    std::string s = std::string(DATA_PATH) + "/" + nameS;
 
     std::map<vec3d, uint, vert_compare> vertices;
     std::vector<VertInfo> transition_verts;
 
     DrawablePolygonmesh<> m(s.c_str());
+
     DrawableHexmesh<> G0; //27tree grid
     DrawableHexmesh<> G1; //27tree grid balanced
     DrawableHexmesh<> G2; //grid after mesh application
@@ -396,15 +407,18 @@ int main(int argc, char *argv[])
 
     grid.build_from_mesh_polys(m);
 
+    std::string g0 = nameS.substr(0, nameS.find(".")) + "_G0.mesh";
     export_hexmesh(grid, G0, vertices, transition_verts);
-    G0.save("bimba_input_tri_G0.mesh");
+    G0.save(g0.c_str());
 
     G1=G0;
+    std::string g1 = nameS.substr(0, nameS.find(".")) + "_G1.mesh";
     balancing_gridmesh(G1, vertices, transition_verts);
-    G1.save("bimba_input_tri_G1.mesh");
+    G1.save(g1.c_str());
 
+    std::string g2 = nameS.substr(0, nameS.find(".")) + "_G2.mesh";
     hex_transition_install_3ref(G1, transition_verts, G2);
-    G2.save("bimba_input_tri_G2.mesh");
+    G2.save(g2.c_str());
 
 
     if(G2.num_polys() > 0 ){
@@ -630,5 +644,5 @@ int main(int argc, char *argv[])
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_output), &QShortcut::activated, [&](){panel_output.show();});
 */
 
-    return a.exec();
+    //return a.exec();
 }
